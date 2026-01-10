@@ -1,0 +1,10 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cd dashboard && npm install && npm run build && cd .."
+
+[deploy]
+startCommand = "python -m bot_tracker.main"
+healthcheckPath = "/api/config"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

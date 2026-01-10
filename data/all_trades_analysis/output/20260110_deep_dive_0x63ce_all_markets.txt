@@ -1,0 +1,270 @@
+/Users/mattiacostola/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+================================================================================
+DEEP DIVE: 0x63ce3421...f9ba9a
+Analyzing ALL 6 markets
+================================================================================
+
+[1/6] Fetching eth-updown-15m-1768037400...
+  → 300 trades, P&L: $452.19
+
+[2/6] Fetching eth-updown-15m-1768036500...
+  → 40 trades, P&L: $222.81
+
+[3/6] Fetching btc-updown-15m-1768037400...
+  → 1343 trades, P&L: $5081.47
+
+[4/6] Fetching btc-updown-15m-1768036500...
+  → 60 trades, P&L: $258.59
+
+[5/6] Fetching eth-updown-15m-1768035600...
+  → 92 trades, P&L: $-596.32
+
+[6/6] Fetching btc-updown-15m-1768034700...
+  → No trades found
+
+================================================================================
+SUMMARY ACROSS ALL MARKETS
+================================================================================
+
+Markets traded: 5
+Total trades: 1835
+Total P&L: $5418.74
+
+--------------------------------------------------------------------------------
+Market                         Winner  Trades     Up Net   Down Net          P&L
+--------------------------------------------------------------------------------
+eth-1768037400                 UP         300     3637.5      799.9 $    452.19
+eth-1768036500                 UP          40      276.9      458.2 $    222.81
+btc-1768037400                 UP        1343    10865.9    10965.9 $   5081.47
+btc-1768036500                 UP          60      808.9     -157.0 $    258.59
+eth-1768035600                 DOWN        92      946.8      470.3 $   -596.32
+--------------------------------------------------------------------------------
+TOTAL                                    1835                       $   5418.74
+
+================================================================================
+AGGREGATED ORDER FLOW (ALL MARKETS)
+================================================================================
+
+By Role:
+  BUY as Maker:    941 trades (51%)
+  BUY as Taker:    166 trades (9%)
+  SELL as Maker:     0 trades (0%)
+  SELL as Taker:   728 trades (40%)
+
+By Outcome (Volume):
+  Up Bought:        26792.1 shares
+  Down Bought:      25094.7 shares
+  Up Sold:          10256.2 shares
+  Down Sold:        12557.4 shares
+
+Net Position Totals:
+  Net Up:        16535.9 shares
+  Net Down:      12537.3 shares
+
+================================================================================
+STRATEGY PATTERN ANALYSIS
+================================================================================
+
+Position Balance per Market:
+Market                             Up Net   Down Net    Ratio Strategy            
+--------------------------------------------------------------------------------
+eth-1768037400                     3637.5      799.9     0.22 DIRECTIONAL         
+eth-1768036500                      276.9      458.2     0.60 HEDGED DIRECTIONAL  
+btc-1768037400                    10865.9    10965.9     0.99 PURE ARBITRAGE      
+btc-1768036500                      808.9     -157.0     0.00 LONG UP ONLY        
+eth-1768035600                      946.8      470.3     0.50 DIRECTIONAL         
+
+================================================================================
+DETAILED BREAKDOWN PER MARKET
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+MARKET: Ethereum Up or Down - January 10, 4:30AM-4:45AM ET
+Winner: UP
+────────────────────────────────────────────────────────────────────────────────
+
+Trades: 300
+Duration: 828s (13.8 min)
+Trades/min: 21.7
+
+Order Flow:
+  BUY Maker: 208 | BUY Taker: 9
+  SELL Maker: 0 | SELL Taker: 83
+
+Prices:
+  Up Buy:   avg $0.511 (range: $0.300-$0.810)
+  Down Buy: avg $0.461 (range: $0.030-$0.730)
+  Up Sell:  avg $0.424 (range: $0.270-$0.720)
+  Down Sell: avg $0.487 (range: $0.200-$0.650)
+
+  Combined Buy Price: $0.972 → Edge: 2.8%
+
+Phases:
+  LONG_UP_SHORT_DOWN: 76 trades (09:30:10 → 09:33:06)
+  ACCUMULATING_BOTH: 30 trades (09:33:06 → 09:33:12)
+  LONG_DOWN_SHORT_UP: 9 trades (09:33:12 → 09:34:10)
+  ACCUMULATING_BOTH: 185 trades (09:34:10 → 09:43:58)
+
+P&L Breakdown:
+  Up Net: 3637.5 | Down Net: 799.9
+  CLOB Cost: $4600.48 | Revenue: $1415.21
+  Resolution Payout: $3637.46
+  → P&L: $452.19
+
+────────────────────────────────────────────────────────────────────────────────
+MARKET: Ethereum Up or Down - January 10, 4:15AM-4:30AM ET
+Winner: UP
+────────────────────────────────────────────────────────────────────────────────
+
+Trades: 40
+Duration: 492s (8.2 min)
+Trades/min: 4.9
+
+Order Flow:
+  BUY Maker: 15 | BUY Taker: 4
+  SELL Maker: 0 | SELL Taker: 21
+
+Prices:
+  Up Buy:   avg $0.584 (range: $0.510-$0.750)
+  Down Buy: avg $0.166 (range: $0.070-$0.300)
+  Up Sell:  avg $0.755 (range: $0.700-$0.900)
+  Down Sell: avg $0.469 (range: $0.440-$0.490)
+
+  Combined Buy Price: $0.750 → Edge: 25.0%
+
+Phases:
+  LONG_UP_SHORT_DOWN: 34 trades (09:16:38 → 09:22:14)
+  ACCUMULATING_BOTH: 6 trades (09:24:20 → 09:24:50)
+
+P&L Breakdown:
+  Up Net: 276.9 | Down Net: 458.2
+  CLOB Cost: $444.08 | Revenue: $390.02
+  Resolution Payout: $276.86
+  → P&L: $222.81
+
+────────────────────────────────────────────────────────────────────────────────
+MARKET: Bitcoin Up or Down - January 10, 4:30AM-4:45AM ET
+Winner: UP
+────────────────────────────────────────────────────────────────────────────────
+
+Trades: 1343
+Duration: 848s (14.1 min)
+Trades/min: 95.0
+
+Order Flow:
+  BUY Maker: 638 | BUY Taker: 141
+  SELL Maker: 0 | SELL Taker: 564
+
+Prices:
+  Up Buy:   avg $0.392 (range: $0.140-$0.910)
+  Down Buy: avg $0.416 (range: $0.040-$0.839)
+  Up Sell:  avg $0.566 (range: $0.160-$0.960)
+  Down Sell: avg $0.565 (range: $0.230-$0.860)
+
+  Combined Buy Price: $0.808 → Edge: 19.2%
+
+Phases:
+  LONG_DOWN_SHORT_UP: 188 trades (09:30:28 → 09:36:10)
+  ACCUMULATING_BOTH: 1155 trades (09:36:10 → 09:44:36)
+
+P&L Breakdown:
+  Up Net: 10865.9 | Down Net: 10965.9
+  CLOB Cost: $15880.17 | Revenue: $10095.70
+  Resolution Payout: $10865.94
+  → P&L: $5081.47
+
+────────────────────────────────────────────────────────────────────────────────
+MARKET: Bitcoin Up or Down - January 10, 4:15AM-4:30AM ET
+Winner: UP
+────────────────────────────────────────────────────────────────────────────────
+
+Trades: 60
+Duration: 238s (4.0 min)
+Trades/min: 15.1
+
+Order Flow:
+  BUY Maker: 30 | BUY Taker: 4
+  SELL Maker: 0 | SELL Taker: 26
+
+Prices:
+  Up Buy:   avg $0.596 (range: $0.570-$0.620)
+  Down Buy: avg $0.303 (range: $0.230-$0.340)
+  Up Sell:  avg $0.770 (range: $0.770-$0.770)
+  Down Sell: avg $0.401 (range: $0.390-$0.430)
+
+  Combined Buy Price: $0.899 → Edge: 10.1%
+
+Phases:
+  LONG_UP_SHORT_DOWN: 60 trades (09:17:34 → 09:21:32)
+
+P&L Breakdown:
+  Up Net: 808.9 | Down Net: -157.0
+  CLOB Cost: $566.51 | Revenue: $173.27
+  Resolution Payout: $808.87
+  → P&L: $258.59
+
+────────────────────────────────────────────────────────────────────────────────
+MARKET: Ethereum Up or Down - January 10, 4:00AM-4:15AM ET
+Winner: DOWN
+────────────────────────────────────────────────────────────────────────────────
+
+Trades: 92
+Duration: 578s (9.6 min)
+Trades/min: 9.6
+
+Order Flow:
+  BUY Maker: 50 | BUY Taker: 8
+  SELL Maker: 0 | SELL Taker: 34
+
+Prices:
+  Up Buy:   avg $0.545 (range: $0.130-$0.780)
+  Down Buy: avg $0.500 (range: $0.480-$0.520)
+  Up Sell:  avg $0.516 (range: $0.510-$0.520)
+  Down Sell: avg $0.306 (range: $0.220-$0.670)
+
+  Combined Buy Price: $1.045 → Edge: -4.5%
+
+Phases:
+  LONG_DOWN_SHORT_UP: 18 trades (09:04:22 → 09:04:24)
+  ACCUMULATING_BOTH: 39 trades (09:06:16 → 09:06:30)
+  LONG_UP_SHORT_DOWN: 1 trades (09:06:30 → 09:06:30)
+  ACCUMULATING_BOTH: 34 trades (09:09:06 → 09:14:00)
+
+P&L Breakdown:
+  Up Net: 946.8 | Down Net: 470.3
+  CLOB Cost: $1404.00 | Revenue: $337.43
+  Resolution Payout: $470.25
+  → P&L: $-596.32
+
+================================================================================
+STRATEGY CONCLUSIONS
+================================================================================
+
+WALLET: 0x63ce342161250d705dc0b16df89036c8e5f9ba9a
+
+1. STRATEGY TYPE:
+   - Pure arbitrage markets: 1/5
+   - Profitable markets: 4/5
+   - Primary approach: MIXED/DIRECTIONAL
+
+2. EXECUTION STYLE:
+   - Maker ratio: 51%
+   - NEVER posts sell orders (0 SELL as Maker)
+   - Uses limit BUY orders, market SELL orders
+
+3. VOLUME:
+   - Total shares bought: 51887
+   - Total shares sold: 22814
+
+4. PROFITABILITY:
+   - Total P&L: $5418.74
+   - Best market: btc-updown-15m-1768037400
+   - Worst market: eth-updown-15m-1768035600
+
+5. KEY INSIGHT:
+   - Buys both Up and Down at low prices (limit orders)
+   - Sells both at higher prices (market orders hitting bids)
+   - Maintains balanced positions as arbitrage insurance
+   - Profits from: spread capture + resolution payout
+

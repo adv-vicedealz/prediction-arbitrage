@@ -1,0 +1,1941 @@
+======================================================================
+WALLET STRATEGY REPORT: 0x63ce...ba9a
+Full Address: 0x63ce342161250d705dc0b16df89036c8e5f9ba9a
+Profile: https://polymarket.com/profile/0x63ce342161250d705dc0b16df89036c8e5f9ba9a
+======================================================================
+
+## SUMMARY
+----------------------------------------
+Strategy Type:     MIXED
+Total P&L:         $-6,835.85
+Total Trades:      1835
+Markets Traded:    5
+Avg Edge:          20.01%
+Avg Maker Ratio:   52%
+Position Balance:  0.50
+
+## BOT INDICATORS
+----------------------------------------
+  - Fast trading (29.3/min)
+  - Captures 20.0% edge
+
+## PER-MARKET BREAKDOWN
+----------------------------------------
+
+### eth-updown-15m-1768037400
+    Question: Ethereum Up or Down - January 10, 4:30AM-4:45AM ET
+    Winner: UP
+    Trades: 300 (Maker: 69%)
+    Up: 3637.5 @ avg $0.620
+    Down: 799.9 @ avg $0.514
+    Combined Price: $1.1344
+    Edge: -13.44%
+    Complete Sets: 799.9
+    P&L: $-963.02
+    Trades/min: 21.7
+    Entry Delay: 86277s
+    Exit Buffer: 62s
+
+### eth-updown-15m-1768036500
+    Question: Ethereum Up or Down - January 10, 4:15AM-4:30AM ET
+    Winner: UP
+    Trades: 40 (Maker: 38%)
+    Up: 276.9 @ avg $0.567
+    Down: 458.2 @ avg $0.144
+    Combined Price: $0.7112
+    Edge: 28.88%
+    Complete Sets: 276.9
+    P&L: $-167.21
+    Trades/min: 4.9
+    Entry Delay: 86362s
+    Exit Buffer: 310s
+
+### btc-updown-15m-1768037400
+    Question: Bitcoin Up or Down - January 10, 4:30AM-4:45AM ET
+    Winner: UP
+    Trades: 1343 (Maker: 48%)
+    Up: 10865.9 @ avg $0.405
+    Down: 10965.9 @ avg $0.408
+    Combined Price: $0.8126
+    Edge: 18.74%
+    Complete Sets: 10865.9
+    P&L: $-5014.23
+    Trades/min: 95.0
+    Entry Delay: 86291s
+    Exit Buffer: 24s
+
+### btc-updown-15m-1768036500
+    Question: Bitcoin Up or Down - January 10, 4:15AM-4:30AM ET
+    Winner: UP
+    Trades: 60 (Maker: 50%)
+    Up: 808.9 @ avg $0.603
+    Down: -157.0 @ avg $0.272
+    Combined Price: $0.8758
+    Edge: 12.42%
+    Complete Sets: 0.0
+    P&L: $242.36
+    Trades/min: 15.1
+    Entry Delay: 86416s
+    Exit Buffer: 508s
+
+### eth-updown-15m-1768035600
+    Question: Ethereum Up or Down - January 10, 4:00AM-4:15AM ET
+    Winner: DOWN
+    Trades: 92 (Maker: 54%)
+    Up: 946.8 @ avg $0.656
+    Down: 470.3 @ avg $0.497
+    Combined Price: $1.1525
+    Edge: -15.25%
+    Complete Sets: 470.3
+    P&L: $-933.75
+    Trades/min: 9.6
+    Entry Delay: 86524s
+    Exit Buffer: 60s
+
+## TRADE TIMELINES
+----------------------------------------
+
+### eth-updown-15m-1768037400
+[09:30:10] BUY  Up    201.0 @ 0.480  (maker)  Up=  201.0 Down=    0.0
+[09:30:10] BUY  Up     25.9 @ 0.470  (maker)  Up=  226.9 Down=    0.0
+[09:30:10] SELL Down    1.0 @ 0.520  (taker)  Up=  226.9 Down=   -1.0
+[09:30:10] SELL Down  100.0 @ 0.520  (taker)  Up=  226.9 Down= -101.0
+[09:30:10] SELL Down  100.0 @ 0.520  (taker)  Up=  226.9 Down= -201.0
+[09:30:10] SELL Down    9.5 @ 0.530  (taker)  Up=  226.9 Down= -210.5
+[09:30:10] SELL Down    1.8 @ 0.530  (taker)  Up=  226.9 Down= -212.3
+[09:30:10] SELL Down    6.0 @ 0.530  (taker)  Up=  226.9 Down= -218.3
+[09:30:10] SELL Down    8.6 @ 0.530  (taker)  Up=  226.9 Down= -226.9
+[09:30:12] BUY  Up      6.1 @ 0.470  (maker)  Up=  233.0 Down= -226.9
+[09:30:12] BUY  Up    201.0 @ 0.480  (maker)  Up=  434.0 Down= -226.9
+[09:30:12] BUY  Up      2.7 @ 0.470  (maker)  Up=  436.8 Down= -226.9
+[09:30:12] BUY  Up      3.0 @ 0.470  (maker)  Up=  439.8 Down= -226.9
+[09:30:12] BUY  Up      2.1 @ 0.470  (maker)  Up=  441.8 Down= -226.9
+[09:30:12] BUY  Up      5.0 @ 0.470  (maker)  Up=  446.8 Down= -226.9
+[09:30:12] BUY  Up      4.0 @ 0.470  (maker)  Up=  450.9 Down= -226.9
+[09:30:12] BUY  Up     14.8 @ 0.470  (maker)  Up=  465.7 Down= -226.9
+[09:30:12] BUY  Up     14.5 @ 0.470  (maker)  Up=  480.2 Down= -226.9
+[09:30:12] BUY  Up     30.0 @ 0.470  (maker)  Up=  510.2 Down= -226.9
+[09:30:12] SELL Down   23.0 @ 0.520  (taker)  Up=  510.2 Down= -249.9
+[09:30:12] SELL Down   50.0 @ 0.520  (taker)  Up=  510.2 Down= -299.9
+[09:30:12] SELL Down  100.0 @ 0.520  (taker)  Up=  510.2 Down= -399.9
+[09:30:12] SELL Down   28.0 @ 0.520  (taker)  Up=  510.2 Down= -427.9
+[09:30:14] BUY  Up      4.5 @ 0.470  (maker)  Up=  514.8 Down= -427.9
+[09:30:14] BUY  Up      1.9 @ 0.470  (maker)  Up=  516.7 Down= -427.9
+[09:30:14] BUY  Up      2.1 @ 0.470  (maker)  Up=  518.7 Down= -427.9
+[09:30:14] BUY  Up      4.0 @ 0.470  (maker)  Up=  522.8 Down= -427.9
+[09:30:14] BUY  Up      1.9 @ 0.470  (maker)  Up=  524.6 Down= -427.9
+[09:30:14] BUY  Up      1.9 @ 0.470  (maker)  Up=  526.5 Down= -427.9
+[09:30:14] BUY  Up      2.1 @ 0.470  (maker)  Up=  528.6 Down= -427.9
+[09:30:14] BUY  Up      3.1 @ 0.470  (maker)  Up=  531.7 Down= -427.9
+[09:30:14] BUY  Up      1.9 @ 0.470  (maker)  Up=  533.5 Down= -427.9
+[09:30:16] BUY  Up      2.1 @ 0.470  (maker)  Up=  535.6 Down= -427.9
+[09:30:16] BUY  Up      2.2 @ 0.470  (maker)  Up=  537.8 Down= -427.9
+[09:30:16] BUY  Up     10.0 @ 0.470  (maker)  Up=  547.8 Down= -427.9
+[09:30:16] BUY  Up      2.1 @ 0.470  (maker)  Up=  549.9 Down= -427.9
+[09:30:16] BUY  Up      5.3 @ 0.470  (maker)  Up=  555.2 Down= -427.9
+[09:30:16] BUY  Up      2.1 @ 0.470  (maker)  Up=  557.3 Down= -427.9
+[09:30:16] BUY  Up      3.7 @ 0.470  (maker)  Up=  560.9 Down= -427.9
+[09:30:16] BUY  Up      5.2 @ 0.470  (maker)  Up=  566.1 Down= -427.9
+[09:30:16] BUY  Up     14.8 @ 0.470  (maker)  Up=  580.9 Down= -427.9
+[09:30:16] BUY  Up      2.1 @ 0.470  (maker)  Up=  583.0 Down= -427.9
+[09:30:16] BUY  Up      2.1 @ 0.470  (maker)  Up=  585.0 Down= -427.9
+[09:30:16] BUY  Up      2.1 @ 0.470  (maker)  Up=  587.1 Down= -427.9
+[09:30:16] BUY  Up      0.3 @ 0.470  (maker)  Up=  587.4 Down= -427.9
+[09:30:16] BUY  Up      7.6 @ 0.470  (maker)  Up=  595.0 Down= -427.9
+[09:30:16] BUY  Up      2.1 @ 0.470  (maker)  Up=  597.1 Down= -427.9
+[09:30:18] BUY  Up      5.8 @ 0.470  (maker)  Up=  602.9 Down= -427.9
+[09:30:56] BUY  Down   64.1 @ 0.550  (maker)  Up=  602.9 Down= -363.9
+[09:30:58] BUY  Down    3.0 @ 0.550  (maker)  Up=  602.9 Down= -360.8
+[09:30:58] BUY  Down    2.3 @ 0.550  (maker)  Up=  602.9 Down= -358.5
+[09:30:58] BUY  Down    2.2 @ 0.550  (maker)  Up=  602.9 Down= -356.3
+[09:30:58] BUY  Down   36.5 @ 0.550  (maker)  Up=  602.9 Down= -319.8
+[09:31:00] BUY  Down    2.2 @ 0.550  (maker)  Up=  602.9 Down= -317.6
+[09:31:00] BUY  Down    2.2 @ 0.550  (maker)  Up=  602.9 Down= -315.4
+[09:31:00] BUY  Down    2.2 @ 0.550  (maker)  Up=  602.9 Down= -313.2
+[09:31:00] BUY  Down    2.3 @ 0.550  (maker)  Up=  602.9 Down= -310.9
+[09:31:02] BUY  Down    4.0 @ 0.550  (maker)  Up=  602.9 Down= -306.9
+[09:31:02] BUY  Down    2.2 @ 0.550  (maker)  Up=  602.9 Down= -304.7
+[09:31:02] BUY  Down    2.2 @ 0.550  (maker)  Up=  602.9 Down= -302.4
+[09:31:04] BUY  Down    2.2 @ 0.550  (maker)  Up=  602.9 Down= -300.2
+[09:31:04] BUY  Down    5.3 @ 0.550  (maker)  Up=  602.9 Down= -294.9
+[09:31:06] BUY  Down    2.2 @ 0.550  (maker)  Up=  602.9 Down= -292.7
+[09:31:06] BUY  Down    4.5 @ 0.550  (maker)  Up=  602.9 Down= -288.2
+[09:31:08] BUY  Down    2.4 @ 0.550  (maker)  Up=  602.9 Down= -285.8
+[09:31:38] BUY  Down    5.0 @ 0.560  (maker)  Up=  602.9 Down= -280.8
+[09:31:38] BUY  Down    5.1 @ 0.560  (maker)  Up=  602.9 Down= -275.6
+[09:33:06] BUY  Up     73.2 @ 0.330  (maker)  Up=  676.1 Down= -275.6
+[09:33:06] SELL Up    201.0 @ 0.330  (taker)  Up=  475.1 Down= -275.6
+[09:33:06] SELL Up    189.0 @ 0.330  (taker)  Up=  286.1 Down= -275.6
+[09:33:06] SELL Up     12.0 @ 0.330  (taker)  Up=  274.1 Down= -275.6
+[09:33:06] BUY  Up     12.0 @ 0.330  (maker)  Up=  286.0 Down= -275.6
+[09:33:06] BUY  Down  142.0 @ 0.620  (maker)  Up=  286.0 Down= -133.6
+[09:33:06] BUY  Down   10.0 @ 0.660  (maker)  Up=  286.0 Down= -123.6
+[09:33:06] BUY  Down   10.0 @ 0.620  (maker)  Up=  286.0 Down= -113.6
+[09:33:06] BUY  Down   12.0 @ 0.650  (maker)  Up=  286.0 Down= -101.6
+[09:33:06] BUY  Down  201.0 @ 0.670  (maker)  Up=  286.0 Down=   99.4
+[09:33:06] BUY  Down  201.0 @ 0.670  (maker)  Up=  286.0 Down=  300.4
+[09:33:06] BUY  Down   25.0 @ 0.660  (maker)  Up=  286.0 Down=  325.4
+[09:33:06] BUY  Down  201.0 @ 0.640  (maker)  Up=  286.0 Down=  526.4
+[09:33:06] BUY  Down  130.1 @ 0.630  (maker)  Up=  286.0 Down=  656.5
+[09:33:08] BUY  Up     20.0 @ 0.330  (maker)  Up=  306.0 Down=  656.5
+[09:33:08] SELL Up     89.8 @ 0.350  (taker)  Up=  216.2 Down=  656.5
+[09:33:08] SELL Up    110.0 @ 0.330  (taker)  Up=  106.2 Down=  656.5
+[09:33:08] SELL Up      1.2 @ 0.330  (taker)  Up=  105.0 Down=  656.5
+[09:33:08] BUY  Up     20.0 @ 0.330  (maker)  Up=  125.0 Down=  656.5
+[09:33:08] BUY  Up     13.6 @ 0.330  (maker)  Up=  138.6 Down=  656.5
+[09:33:08] BUY  Down    6.1 @ 0.620  (maker)  Up=  138.6 Down=  662.6
+[09:33:08] BUY  Down   21.6 @ 0.620  (maker)  Up=  138.6 Down=  684.2
+[09:33:08] BUY  Down    3.0 @ 0.650  (maker)  Up=  138.6 Down=  687.2
+[09:33:08] BUY  Down    9.0 @ 0.660  (maker)  Up=  138.6 Down=  696.2
+[09:33:08] BUY  Down   38.8 @ 0.630  (maker)  Up=  138.6 Down=  735.0
+[09:33:08] BUY  Down  142.0 @ 0.660  (maker)  Up=  138.6 Down=  877.0
+[09:33:08] BUY  Down    7.5 @ 0.620  (maker)  Up=  138.6 Down=  884.5
+[09:33:08] BUY  Down   15.0 @ 0.660  (maker)  Up=  138.6 Down=  899.5
+[09:33:08] BUY  Down  201.0 @ 0.661  (maker)  Up=  138.6 Down= 1100.5
+[09:33:08] BUY  Down   32.1 @ 0.630  (maker)  Up=  138.6 Down= 1132.6
+[09:33:08] BUY  Down    4.5 @ 0.620  (maker)  Up=  138.6 Down= 1137.1
+[09:33:08] BUY  Down  142.0 @ 0.650  (maker)  Up=  138.6 Down= 1279.1
+[09:33:08] BUY  Down   44.0 @ 0.650  (maker)  Up=  138.6 Down= 1323.1
+[09:33:10] BUY  Down    9.2 @ 0.620  (maker)  Up=  138.6 Down= 1332.3
+[09:33:12] SELL Up     16.0 @ 0.370  (taker)  Up=  122.6 Down= 1332.3
+[09:33:12] SELL Up     12.0 @ 0.360  (taker)  Up=  110.6 Down= 1332.3
+[09:33:12] SELL Up      2.0 @ 0.370  (taker)  Up=  108.6 Down= 1332.3
+[09:33:12] SELL Up     96.0 @ 0.330  (taker)  Up=   12.6 Down= 1332.3
+[09:33:12] SELL Up     12.0 @ 0.360  (taker)  Up=    0.6 Down= 1332.3
+[09:33:12] SELL Up     10.0 @ 0.350  (taker)  Up=   -9.4 Down= 1332.3
+[09:33:12] SELL Up     16.0 @ 0.370  (taker)  Up=  -25.4 Down= 1332.3
+[09:33:12] SELL Up     12.0 @ 0.370  (taker)  Up=  -37.4 Down= 1332.3
+[09:33:12] SELL Up     25.0 @ 0.350  (taker)  Up=  -62.4 Down= 1332.3
+[09:33:12] BUY  Down  201.0 @ 0.654  (maker)  Up=  -62.4 Down= 1533.3
+[09:33:20] BUY  Up      1.9 @ 0.360  (maker)  Up=  -60.5 Down= 1533.3
+[09:34:10] BUY  Up      7.5 @ 0.360  (taker)  Up=  -53.0 Down= 1533.3
+[09:34:10] BUY  Up      0.1 @ 0.350  (taker)  Up=  -53.0 Down= 1533.3
+[09:34:10] BUY  Up     10.0 @ 0.360  (taker)  Up=  -43.0 Down= 1533.3
+[09:34:10] BUY  Up     81.1 @ 0.360  (maker)  Up=   38.1 Down= 1533.3
+[09:34:10] BUY  Up      0.5 @ 0.360  (maker)  Up=   38.6 Down= 1533.3
+[09:34:10] BUY  Up     15.6 @ 0.360  (maker)  Up=   54.2 Down= 1533.3
+[09:34:10] BUY  Up    201.0 @ 0.356  (maker)  Up=  255.2 Down= 1533.3
+[09:34:10] SELL Down   58.6 @ 0.640  (taker)  Up=  255.2 Down= 1474.7
+[09:34:10] SELL Down   22.5 @ 0.640  (taker)  Up=  255.2 Down= 1452.3
+[09:34:10] SELL Down    5.0 @ 0.650  (taker)  Up=  255.2 Down= 1447.3
+[09:34:10] SELL Down   20.0 @ 0.650  (taker)  Up=  255.2 Down= 1427.3
+[09:34:10] SELL Down    5.7 @ 0.640  (taker)  Up=  255.2 Down= 1421.5
+[09:34:10] SELL Down   10.0 @ 0.640  (taker)  Up=  255.2 Down= 1411.5
+[09:34:10] SELL Down    7.5 @ 0.650  (taker)  Up=  255.2 Down= 1404.0
+[09:34:10] SELL Down   77.5 @ 0.640  (taker)  Up=  255.2 Down= 1326.5
+[09:34:10] SELL Down   57.7 @ 0.650  (taker)  Up=  255.2 Down= 1268.8
+[09:34:12] BUY  Up      7.5 @ 0.390  (taker)  Up=  262.7 Down= 1268.8
+[09:34:12] BUY  Up     10.0 @ 0.390  (taker)  Up=  272.7 Down= 1268.8
+[09:34:12] BUY  Up    201.0 @ 0.371  (maker)  Up=  473.7 Down= 1268.8
+[09:34:12] BUY  Up      1.6 @ 0.390  (maker)  Up=  475.4 Down= 1268.8
+[09:34:12] BUY  Up      2.4 @ 0.390  (maker)  Up=  477.8 Down= 1268.8
+[09:34:12] BUY  Up     20.0 @ 0.390  (maker)  Up=  497.8 Down= 1268.8
+[09:34:12] BUY  Up     87.0 @ 0.390  (maker)  Up=  584.8 Down= 1268.8
+[09:34:12] BUY  Up     10.0 @ 0.390  (maker)  Up=  594.8 Down= 1268.8
+[09:34:12] SELL Down   12.3 @ 0.630  (taker)  Up=  594.8 Down= 1256.5
+[09:34:12] SELL Down  175.0 @ 0.630  (taker)  Up=  594.8 Down= 1081.5
+[09:34:12] SELL Down    3.6 @ 0.620  (taker)  Up=  594.8 Down= 1077.8
+[09:34:12] SELL Down   10.0 @ 0.620  (taker)  Up=  594.8 Down= 1067.8
+[09:34:12] SELL Down   12.0 @ 0.610  (taker)  Up=  594.8 Down= 1055.8
+[09:34:12] SELL Down   16.0 @ 0.610  (taker)  Up=  594.8 Down= 1039.8
+[09:34:12] SELL Down    7.5 @ 0.610  (taker)  Up=  594.8 Down= 1032.3
+[09:34:12] SELL Down   10.0 @ 0.610  (taker)  Up=  594.8 Down= 1022.3
+[09:34:12] SELL Down   12.0 @ 0.610  (taker)  Up=  594.8 Down= 1010.3
+[09:34:12] SELL Down   12.0 @ 0.610  (taker)  Up=  594.8 Down=  998.3
+[09:34:14] BUY  Up      6.5 @ 0.390  (maker)  Up=  601.4 Down=  998.3
+[09:34:14] BUY  Up      3.3 @ 0.390  (maker)  Up=  604.6 Down=  998.3
+[09:34:14] BUY  Up      1.9 @ 0.390  (maker)  Up=  606.5 Down=  998.3
+[09:34:16] BUY  Up      1.9 @ 0.390  (maker)  Up=  608.4 Down=  998.3
+[09:34:20] BUY  Up      2.2 @ 0.390  (maker)  Up=  610.6 Down=  998.3
+[09:34:20] BUY  Up      4.5 @ 0.390  (maker)  Up=  615.1 Down=  998.3
+[09:34:22] BUY  Up      1.5 @ 0.390  (maker)  Up=  616.6 Down=  998.3
+[09:34:22] BUY  Up      4.6 @ 0.390  (maker)  Up=  621.2 Down=  998.3
+[09:34:22] BUY  Up      2.8 @ 0.390  (maker)  Up=  624.0 Down=  998.3
+[09:34:26] BUY  Up      6.6 @ 0.390  (maker)  Up=  630.6 Down=  998.3
+[09:34:28] BUY  Up      4.3 @ 0.390  (maker)  Up=  635.0 Down=  998.3
+[09:34:28] BUY  Up      2.2 @ 0.390  (maker)  Up=  637.2 Down=  998.3
+[09:34:28] BUY  Up      2.9 @ 0.390  (maker)  Up=  640.0 Down=  998.3
+[09:34:28] BUY  Up      6.3 @ 0.390  (maker)  Up=  646.3 Down=  998.3
+[09:34:28] BUY  Up      2.2 @ 0.390  (maker)  Up=  648.6 Down=  998.3
+[09:34:30] BUY  Up      1.9 @ 0.390  (maker)  Up=  650.4 Down=  998.3
+[09:34:30] BUY  Up     19.5 @ 0.390  (maker)  Up=  669.9 Down=  998.3
+[09:34:32] BUY  Up      4.8 @ 0.390  (maker)  Up=  674.7 Down=  998.3
+[09:35:04] BUY  Up      5.0 @ 0.400  (maker)  Up=  679.7 Down=  998.3
+[09:35:12] BUY  Down   43.6 @ 0.680  (maker)  Up=  679.7 Down= 1041.9
+[09:35:14] SELL Up     12.0 @ 0.270  (taker)  Up=  667.7 Down= 1041.9
+[09:35:14] SELL Up     12.0 @ 0.270  (taker)  Up=  655.7 Down= 1041.9
+[09:35:14] SELL Up     12.0 @ 0.270  (taker)  Up=  643.7 Down= 1041.9
+[09:35:14] SELL Up     12.0 @ 0.270  (taker)  Up=  631.7 Down= 1041.9
+[09:35:14] SELL Up     12.0 @ 0.270  (taker)  Up=  619.7 Down= 1041.9
+[09:35:14] SELL Up     12.0 @ 0.270  (taker)  Up=  607.7 Down= 1041.9
+[09:35:14] BUY  Down    3.7 @ 0.730  (maker)  Up=  607.7 Down= 1045.6
+[09:35:14] BUY  Down   72.0 @ 0.730  (maker)  Up=  607.7 Down= 1117.6
+[09:36:00] BUY  Up      2.0 @ 0.300  (maker)  Up=  609.7 Down= 1117.6
+[09:36:00] BUY  Up     25.5 @ 0.300  (maker)  Up=  635.2 Down= 1117.6
+[09:36:00] BUY  Up      0.5 @ 0.300  (maker)  Up=  635.7 Down= 1117.6
+[09:36:02] BUY  Up     12.0 @ 0.300  (maker)  Up=  647.7 Down= 1117.6
+[09:36:02] BUY  Up     12.0 @ 0.300  (maker)  Up=  659.7 Down= 1117.6
+[09:36:02] BUY  Up     12.0 @ 0.300  (maker)  Up=  671.7 Down= 1117.6
+[09:36:02] BUY  Up     12.0 @ 0.300  (maker)  Up=  683.7 Down= 1117.6
+[09:36:04] BUY  Up      5.2 @ 0.300  (maker)  Up=  688.9 Down= 1117.6
+[09:36:04] BUY  Up      0.7 @ 0.300  (maker)  Up=  689.6 Down= 1117.6
+[09:36:04] BUY  Up     21.0 @ 0.300  (maker)  Up=  710.6 Down= 1117.6
+[09:36:08] BUY  Up      0.5 @ 0.300  (maker)  Up=  711.1 Down= 1117.6
+[09:36:08] BUY  Up      2.2 @ 0.300  (maker)  Up=  713.3 Down= 1117.6
+[09:36:30] BUY  Up      6.0 @ 0.420  (taker)  Up=  719.3 Down= 1117.6
+[09:36:30] BUY  Up     10.0 @ 0.420  (maker)  Up=  729.3 Down= 1117.6
+[09:36:30] BUY  Up    110.0 @ 0.420  (maker)  Up=  839.3 Down= 1117.6
+[09:36:30] BUY  Up      3.0 @ 0.420  (maker)  Up=  842.3 Down= 1117.6
+[09:36:30] BUY  Up     44.5 @ 0.420  (maker)  Up=  886.8 Down= 1117.6
+[09:36:30] SELL Down   12.0 @ 0.580  (taker)  Up=  886.8 Down= 1105.6
+[09:36:30] SELL Down   16.0 @ 0.580  (taker)  Up=  886.8 Down= 1089.6
+[09:36:30] SELL Down   12.0 @ 0.580  (taker)  Up=  886.8 Down= 1077.6
+[09:36:30] SELL Down   12.0 @ 0.580  (taker)  Up=  886.8 Down= 1065.6
+[09:36:30] SELL Down   12.0 @ 0.580  (taker)  Up=  886.8 Down= 1053.6
+[09:36:30] SELL Down   12.0 @ 0.580  (taker)  Up=  886.8 Down= 1041.6
+[09:36:30] SELL Down   16.0 @ 0.580  (taker)  Up=  886.8 Down= 1025.6
+[09:36:30] SELL Down   12.0 @ 0.580  (taker)  Up=  886.8 Down= 1013.6
+[09:37:04] BUY  Up     54.0 @ 0.500  (maker)  Up=  940.8 Down= 1013.6
+[09:38:22] BUY  Up    201.0 @ 0.710  (maker)  Up= 1141.8 Down= 1013.6
+[09:38:22] SELL Down  201.0 @ 0.290  (taker)  Up= 1141.8 Down=  812.6
+[09:38:24] BUY  Up    201.0 @ 0.709  (maker)  Up= 1342.8 Down=  812.6
+[09:38:24] BUY  Up      0.5 @ 0.700  (maker)  Up= 1343.3 Down=  812.6
+[09:38:24] BUY  Up    201.0 @ 0.712  (maker)  Up= 1544.3 Down=  812.6
+[09:38:24] BUY  Up    201.0 @ 0.720  (maker)  Up= 1745.3 Down=  812.6
+[09:38:24] SELL Down   15.0 @ 0.290  (taker)  Up= 1745.3 Down=  797.6
+[09:38:24] SELL Down  135.3 @ 0.290  (taker)  Up= 1745.3 Down=  662.3
+[09:38:24] SELL Down   11.0 @ 0.290  (taker)  Up= 1745.3 Down=  651.3
+[09:38:24] SELL Down   15.0 @ 0.290  (taker)  Up= 1745.3 Down=  636.3
+[09:38:24] SELL Down   24.7 @ 0.300  (taker)  Up= 1745.3 Down=  611.6
+[09:38:24] SELL Down  163.7 @ 0.290  (taker)  Up= 1745.3 Down=  447.9
+[09:38:24] SELL Down   11.0 @ 0.280  (taker)  Up= 1745.3 Down=  436.9
+[09:38:24] SELL Down   26.3 @ 0.280  (taker)  Up= 1745.3 Down=  410.6
+[09:38:24] SELL Down  201.0 @ 0.280  (taker)  Up= 1745.3 Down=  209.6
+[09:38:26] BUY  Up      2.0 @ 0.700  (maker)  Up= 1747.3 Down=  209.6
+[09:39:50] BUY  Down    7.5 @ 0.260  (maker)  Up= 1747.3 Down=  217.1
+[09:39:50] BUY  Down   30.6 @ 0.260  (maker)  Up= 1747.3 Down=  247.7
+[09:39:50] BUY  Down   51.2 @ 0.260  (maker)  Up= 1747.3 Down=  298.9
+[09:39:52] BUY  Down    2.2 @ 0.260  (maker)  Up= 1747.3 Down=  301.1
+[09:39:54] BUY  Down   11.0 @ 0.300  (maker)  Up= 1747.3 Down=  312.1
+[09:39:54] BUY  Down   11.0 @ 0.300  (maker)  Up= 1747.3 Down=  323.1
+[09:39:54] BUY  Down   11.0 @ 0.300  (maker)  Up= 1747.3 Down=  334.1
+[09:39:54] BUY  Down   11.0 @ 0.300  (maker)  Up= 1747.3 Down=  345.1
+[09:39:56] BUY  Down   21.0 @ 0.300  (maker)  Up= 1747.3 Down=  366.1
+[09:39:56] BUY  Down   57.1 @ 0.300  (maker)  Up= 1747.3 Down=  423.2
+[09:39:56] BUY  Down   29.4 @ 0.300  (maker)  Up= 1747.3 Down=  452.6
+[09:39:56] BUY  Down   25.0 @ 0.290  (maker)  Up= 1747.3 Down=  477.6
+[09:39:56] BUY  Down    6.9 @ 0.300  (maker)  Up= 1747.3 Down=  484.6
+[09:39:56] BUY  Down    4.5 @ 0.290  (maker)  Up= 1747.3 Down=  489.0
+[09:39:56] BUY  Down    5.2 @ 0.300  (maker)  Up= 1747.3 Down=  494.3
+[09:39:56] BUY  Down   25.4 @ 0.300  (maker)  Up= 1747.3 Down=  519.6
+[09:39:56] BUY  Down   40.0 @ 0.290  (maker)  Up= 1747.3 Down=  559.6
+[09:39:56] BUY  Down    7.0 @ 0.300  (maker)  Up= 1747.3 Down=  566.6
+[09:39:56] BUY  Down    5.0 @ 0.300  (maker)  Up= 1747.3 Down=  571.6
+[09:39:56] BUY  Down   40.0 @ 0.290  (maker)  Up= 1747.3 Down=  611.6
+[09:41:40] BUY  Up    100.0 @ 0.810  (maker)  Up= 1847.3 Down=  611.6
+[09:41:40] BUY  Up    159.9 @ 0.800  (maker)  Up= 2007.3 Down=  611.6
+[09:41:40] BUY  Up     53.0 @ 0.770  (maker)  Up= 2060.3 Down=  611.6
+[09:41:40] SELL Down  154.8 @ 0.200  (taker)  Up= 2060.3 Down=  456.8
+[09:41:40] SELL Down    5.1 @ 0.200  (taker)  Up= 2060.3 Down=  451.7
+[09:41:40] SELL Down   53.0 @ 0.230  (taker)  Up= 2060.3 Down=  398.7
+[09:41:42] BUY  Up     18.4 @ 0.800  (maker)  Up= 2078.7 Down=  398.7
+[09:41:42] BUY  Up     20.0 @ 0.810  (maker)  Up= 2098.7 Down=  398.7
+[09:41:42] BUY  Up     45.1 @ 0.810  (maker)  Up= 2143.8 Down=  398.7
+[09:41:42] BUY  Up     15.9 @ 0.810  (maker)  Up= 2159.7 Down=  398.7
+[09:41:42] BUY  Up     20.0 @ 0.810  (maker)  Up= 2179.7 Down=  398.7
+[09:41:42] BUY  Up     18.8 @ 0.800  (maker)  Up= 2198.5 Down=  398.7
+[09:41:44] BUY  Up      3.9 @ 0.800  (maker)  Up= 2202.3 Down=  398.7
+[09:41:44] BUY  Up    201.0 @ 0.790  (maker)  Up= 2403.3 Down=  398.7
+[09:41:44] BUY  Up    148.0 @ 0.780  (maker)  Up= 2551.3 Down=  398.7
+[09:41:52] SELL Up      8.0 @ 0.700  (taker)  Up= 2543.3 Down=  398.7
+[09:41:52] BUY  Down    8.0 @ 0.300  (maker)  Up= 2543.3 Down=  406.7
+[09:41:52] BUY  Down   49.0 @ 0.300  (maker)  Up= 2543.3 Down=  455.7
+[09:41:52] BUY  Down   35.7 @ 0.300  (maker)  Up= 2543.3 Down=  491.4
+[09:41:52] BUY  Down    7.1 @ 0.300  (maker)  Up= 2543.3 Down=  498.6
+[09:41:52] BUY  Down   74.7 @ 0.300  (maker)  Up= 2543.3 Down=  573.3
+[09:41:52] BUY  Down   19.3 @ 0.300  (maker)  Up= 2543.3 Down=  592.5
+[09:41:54] BUY  Down    7.5 @ 0.290  (maker)  Up= 2543.3 Down=  600.0
+[09:41:54] BUY  Down    7.1 @ 0.300  (maker)  Up= 2543.3 Down=  607.2
+[09:41:54] BUY  Down   43.7 @ 0.290  (maker)  Up= 2543.3 Down=  650.8
+[09:41:56] BUY  Down   75.8 @ 0.290  (maker)  Up= 2543.3 Down=  726.6
+[09:41:56] BUY  Down   71.0 @ 0.290  (maker)  Up= 2543.3 Down=  797.6
+[09:41:56] BUY  Down    3.0 @ 0.290  (maker)  Up= 2543.3 Down=  800.7
+[09:42:04] BUY  Up      7.5 @ 0.740  (maker)  Up= 2550.9 Down=  800.7
+[09:42:04] BUY  Up     43.5 @ 0.740  (maker)  Up= 2594.3 Down=  800.7
+[09:42:04] BUY  Up     21.9 @ 0.740  (maker)  Up= 2616.2 Down=  800.7
+[09:42:10] BUY  Up     21.0 @ 0.750  (maker)  Up= 2637.2 Down=  800.7
+[09:42:10] BUY  Up     80.0 @ 0.750  (maker)  Up= 2717.2 Down=  800.7
+[09:42:10] BUY  Up     76.9 @ 0.740  (maker)  Up= 2794.2 Down=  800.7
+[09:42:10] BUY  Up     80.0 @ 0.750  (maker)  Up= 2874.2 Down=  800.7
+[09:42:16] BUY  Up    114.5 @ 0.730  (maker)  Up= 2988.7 Down=  800.7
+[09:42:18] SELL Up     14.0 @ 0.720  (taker)  Up= 2974.7 Down=  800.7
+[09:42:18] SELL Up      9.0 @ 0.720  (taker)  Up= 2965.7 Down=  800.7
+[09:42:18] SELL Up     12.0 @ 0.720  (taker)  Up= 2953.7 Down=  800.7
+[09:42:18] SELL Up      9.0 @ 0.720  (taker)  Up= 2944.7 Down=  800.7
+[09:42:18] SELL Up    142.0 @ 0.720  (taker)  Up= 2802.7 Down=  800.7
+[09:42:18] SELL Up      7.5 @ 0.720  (taker)  Up= 2795.2 Down=  800.7
+[09:42:18] BUY  Up    176.7 @ 0.740  (maker)  Up= 2971.8 Down=  800.7
+[09:42:18] BUY  Up     24.3 @ 0.740  (maker)  Up= 2996.2 Down=  800.7
+[09:42:18] BUY  Up     94.3 @ 0.720  (maker)  Up= 3090.4 Down=  800.7
+[09:42:18] BUY  Up      5.0 @ 0.750  (maker)  Up= 3095.4 Down=  800.7
+[09:42:18] BUY  Up     86.5 @ 0.730  (maker)  Up= 3181.9 Down=  800.7
+[09:42:18] BUY  Down    7.5 @ 0.280  (taker)  Up= 3181.9 Down=  808.2
+[09:42:18] BUY  Down  201.0 @ 0.280  (maker)  Up= 3181.9 Down= 1009.2
+[09:42:18] BUY  Down  142.0 @ 0.270  (maker)  Up= 3181.9 Down= 1151.2
+[09:42:18] SELL Down    5.0 @ 0.250  (taker)  Up= 3181.9 Down= 1146.2
+[09:42:20] BUY  Up     20.0 @ 0.780  (taker)  Up= 3201.9 Down= 1146.2
+[09:42:20] BUY  Up     10.0 @ 0.780  (taker)  Up= 3211.9 Down= 1146.2
+[09:42:20] BUY  Up    201.0 @ 0.780  (maker)  Up= 3412.9 Down= 1146.2
+[09:42:20] BUY  Up    201.0 @ 0.780  (maker)  Up= 3613.9 Down= 1146.2
+[09:42:20] SELL Down  201.0 @ 0.220  (taker)  Up= 3613.9 Down=  945.2
+[09:42:20] SELL Down   19.0 @ 0.220  (taker)  Up= 3613.9 Down=  926.2
+[09:42:20] SELL Down  152.0 @ 0.220  (taker)  Up= 3613.9 Down=  774.2
+[09:42:28] BUY  Up      9.0 @ 0.810  (maker)  Up= 3622.9 Down=  774.2
+[09:42:28] BUY  Up      1.0 @ 0.810  (maker)  Up= 3623.9 Down=  774.2
+[09:42:34] BUY  Up      8.5 @ 0.810  (maker)  Up= 3632.5 Down=  774.2
+[09:42:34] BUY  Up      5.0 @ 0.810  (maker)  Up= 3637.5 Down=  774.2
+[09:43:56] BUY  Down    5.2 @ 0.030  (maker)  Up= 3637.5 Down=  779.3
+[09:43:58] BUY  Down   20.6 @ 0.030  (maker)  Up= 3637.5 Down=  799.9
+
+### eth-updown-15m-1768036500
+[09:16:38] BUY  Up      6.0 @ 0.510  (taker)  Up=    6.0 Down=    0.0
+[09:16:38] BUY  Up      9.5 @ 0.510  (taker)  Up=   15.5 Down=    0.0
+[09:16:38] BUY  Up    201.0 @ 0.510  (maker)  Up=  216.5 Down=    0.0
+[09:16:38] SELL Down   10.0 @ 0.490  (taker)  Up=  216.5 Down=  -10.0
+[09:16:38] SELL Down    8.6 @ 0.490  (taker)  Up=  216.5 Down=  -18.6
+[09:16:38] SELL Down    5.7 @ 0.490  (taker)  Up=  216.5 Down=  -24.3
+[09:16:38] SELL Down   20.0 @ 0.490  (taker)  Up=  216.5 Down=  -44.3
+[09:16:38] SELL Down  126.2 @ 0.490  (taker)  Up=  216.5 Down= -170.5
+[09:16:38] SELL Down   10.0 @ 0.490  (taker)  Up=  216.5 Down= -180.5
+[09:16:38] SELL Down    5.0 @ 0.490  (taker)  Up=  216.5 Down= -185.5
+[09:17:34] BUY  Up     45.5 @ 0.560  (maker)  Up=  262.0 Down= -185.5
+[09:17:34] BUY  Up     41.2 @ 0.560  (maker)  Up=  303.2 Down= -185.5
+[09:17:34] BUY  Up     16.8 @ 0.540  (maker)  Up=  320.0 Down= -185.5
+[09:17:34] BUY  Up     48.0 @ 0.560  (maker)  Up=  368.0 Down= -185.5
+[09:17:34] BUY  Up     12.0 @ 0.550  (maker)  Up=  380.0 Down= -185.5
+[09:17:34] SELL Down   16.8 @ 0.460  (taker)  Up=  380.0 Down= -202.3
+[09:17:34] SELL Down   12.0 @ 0.440  (taker)  Up=  380.0 Down= -214.3
+[09:17:34] SELL Down   12.0 @ 0.440  (taker)  Up=  380.0 Down= -226.3
+[09:17:34] SELL Down   12.0 @ 0.440  (taker)  Up=  380.0 Down= -238.3
+[09:17:34] SELL Down   12.0 @ 0.440  (taker)  Up=  380.0 Down= -250.3
+[09:17:34] SELL Down   12.0 @ 0.450  (taker)  Up=  380.0 Down= -262.3
+[09:19:58] BUY  Up    201.0 @ 0.620  (maker)  Up=  581.0 Down= -262.3
+[09:21:52] BUY  Up      9.5 @ 0.750  (taker)  Up=  590.5 Down= -262.3
+[09:21:52] BUY  Up      9.5 @ 0.750  (maker)  Up=  600.0 Down= -262.3
+[09:21:56] SELL Up     27.0 @ 0.710  (taker)  Up=  573.0 Down= -262.3
+[09:21:56] SELL Up      6.0 @ 0.710  (taker)  Up=  567.0 Down= -262.3
+[09:21:56] SELL Up      8.6 @ 0.710  (taker)  Up=  558.4 Down= -262.3
+[09:21:56] SELL Up      9.5 @ 0.710  (taker)  Up=  548.9 Down= -262.3
+[09:21:56] BUY  Down   51.1 @ 0.290  (maker)  Up=  548.9 Down= -211.2
+[09:21:58] SELL Up      6.0 @ 0.700  (taker)  Up=  542.9 Down= -211.2
+[09:21:58] SELL Up     75.0 @ 0.700  (taker)  Up=  467.9 Down= -211.2
+[09:21:58] BUY  Down   81.0 @ 0.300  (maker)  Up=  467.9 Down= -130.2
+[09:22:14] BUY  Down   99.7 @ 0.190  (maker)  Up=  467.9 Down=  -30.5
+[09:22:14] BUY  Down    9.4 @ 0.190  (maker)  Up=  467.9 Down=  -21.1
+[09:24:20] BUY  Down   69.8 @ 0.070  (maker)  Up=  467.9 Down=   48.7
+[09:24:28] SELL Up    102.0 @ 0.900  (taker)  Up=  365.9 Down=   48.7
+[09:24:28] SELL Up     89.0 @ 0.900  (taker)  Up=  276.9 Down=   48.7
+[09:24:28] BUY  Down   10.0 @ 0.100  (taker)  Up=  276.9 Down=   58.7
+[09:24:28] BUY  Down  201.0 @ 0.100  (maker)  Up=  276.9 Down=  259.7
+[09:24:50] BUY  Down  198.6 @ 0.090  (maker)  Up=  276.9 Down=  458.2
+
+### btc-updown-15m-1768037400
+[09:30:28] BUY  Down  301.0 @ 0.430  (maker)  Up=    0.0 Down=  301.0
+[09:30:28] BUY  Down  301.0 @ 0.460  (maker)  Up=    0.0 Down=  602.0
+[09:30:28] BUY  Down  301.0 @ 0.450  (maker)  Up=    0.0 Down=  903.0
+[09:30:28] BUY  Down  301.0 @ 0.440  (maker)  Up=    0.0 Down= 1204.0
+[09:30:52] BUY  Down    5.0 @ 0.540  (maker)  Up=    0.0 Down= 1209.0
+[09:30:54] SELL Up      5.6 @ 0.450  (taker)  Up=   -5.6 Down= 1209.0
+[09:30:54] SELL Up    100.0 @ 0.450  (taker)  Up= -105.6 Down= 1209.0
+[09:30:54] SELL Up      5.0 @ 0.450  (taker)  Up= -110.6 Down= 1209.0
+[09:30:54] SELL Up     40.0 @ 0.450  (taker)  Up= -150.6 Down= 1209.0
+[09:30:54] SELL Up     67.5 @ 0.450  (taker)  Up= -218.1 Down= 1209.0
+[09:30:54] SELL Up      5.9 @ 0.450  (taker)  Up= -224.0 Down= 1209.0
+[09:30:54] SELL Up     30.0 @ 0.450  (taker)  Up= -254.0 Down= 1209.0
+[09:30:54] SELL Up      5.0 @ 0.450  (taker)  Up= -259.0 Down= 1209.0
+[09:30:54] SELL Up     33.0 @ 0.450  (taker)  Up= -292.0 Down= 1209.0
+[09:30:54] SELL Up      3.9 @ 0.450  (taker)  Up= -295.9 Down= 1209.0
+[09:30:54] BUY  Down    5.1 @ 0.550  (taker)  Up= -295.9 Down= 1214.1
+[09:30:54] BUY  Down  301.0 @ 0.550  (maker)  Up= -295.9 Down= 1515.1
+[09:31:12] SELL Up    301.0 @ 0.420  (taker)  Up= -596.9 Down= 1515.1
+[09:31:12] SELL Up    301.0 @ 0.420  (taker)  Up= -897.9 Down= 1515.1
+[09:31:12] BUY  Down   10.0 @ 0.570  (maker)  Up= -897.9 Down= 1525.1
+[09:31:12] BUY  Down   11.2 @ 0.570  (maker)  Up= -897.9 Down= 1536.4
+[09:31:12] BUY  Down  301.0 @ 0.580  (maker)  Up= -897.9 Down= 1837.4
+[09:31:12] BUY  Down    5.0 @ 0.570  (maker)  Up= -897.9 Down= 1842.4
+[09:31:12] BUY  Down  301.0 @ 0.580  (maker)  Up= -897.9 Down= 2143.4
+[09:31:14] SELL Up     26.0 @ 0.420  (taker)  Up= -923.9 Down= 2143.4
+[09:31:14] SELL Up    100.0 @ 0.410  (taker)  Up=-1023.9 Down= 2143.4
+[09:31:14] SELL Up     26.0 @ 0.420  (taker)  Up=-1049.9 Down= 2143.4
+[09:31:14] SELL Up      5.0 @ 0.410  (taker)  Up=-1054.9 Down= 2143.4
+[09:31:14] SELL Up     56.7 @ 0.420  (taker)  Up=-1111.6 Down= 2143.4
+[09:31:14] SELL Up      7.3 @ 0.410  (taker)  Up=-1118.9 Down= 2143.4
+[09:31:14] SELL Up     26.0 @ 0.420  (taker)  Up=-1144.9 Down= 2143.4
+[09:31:14] SELL Up     13.9 @ 0.410  (taker)  Up=-1158.9 Down= 2143.4
+[09:31:14] SELL Up     20.0 @ 0.420  (taker)  Up=-1178.9 Down= 2143.4
+[09:31:14] SELL Up     20.0 @ 0.410  (taker)  Up=-1198.9 Down= 2143.4
+[09:31:14] BUY  Down  301.0 @ 0.585  (maker)  Up=-1198.9 Down= 2444.4
+[09:31:40] BUY  Down    2.8 @ 0.570  (maker)  Up=-1198.9 Down= 2447.2
+[09:31:40] BUY  Down    0.5 @ 0.570  (maker)  Up=-1198.9 Down= 2447.7
+[09:31:42] BUY  Down    5.1 @ 0.570  (maker)  Up=-1198.9 Down= 2452.7
+[09:31:42] BUY  Down  148.8 @ 0.570  (maker)  Up=-1198.9 Down= 2601.6
+[09:31:44] BUY  Down    1.8 @ 0.570  (maker)  Up=-1198.9 Down= 2603.4
+[09:31:44] BUY  Down   11.8 @ 0.570  (maker)  Up=-1198.9 Down= 2615.2
+[09:31:46] BUY  Down   92.2 @ 0.570  (maker)  Up=-1198.9 Down= 2707.4
+[09:31:46] BUY  Down   11.8 @ 0.570  (maker)  Up=-1198.9 Down= 2719.1
+[09:32:12] BUY  Down    5.0 @ 0.550  (maker)  Up=-1198.9 Down= 2724.1
+[09:32:12] BUY  Down  301.0 @ 0.560  (maker)  Up=-1198.9 Down= 3025.1
+[09:32:12] BUY  Down   48.5 @ 0.550  (maker)  Up=-1198.9 Down= 3073.6
+[09:32:12] BUY  Down    6.0 @ 0.550  (maker)  Up=-1198.9 Down= 3079.6
+[09:32:12] BUY  Down    9.5 @ 0.550  (maker)  Up=-1198.9 Down= 3089.1
+[09:32:12] BUY  Down   15.4 @ 0.550  (maker)  Up=-1198.9 Down= 3104.5
+[09:32:14] BUY  Down   28.6 @ 0.550  (maker)  Up=-1198.9 Down= 3133.1
+[09:32:14] BUY  Down    2.2 @ 0.550  (maker)  Up=-1198.9 Down= 3135.4
+[09:32:14] BUY  Down    3.0 @ 0.550  (maker)  Up=-1198.9 Down= 3138.4
+[09:32:14] BUY  Down    1.6 @ 0.550  (maker)  Up=-1198.9 Down= 3140.0
+[09:32:16] BUY  Down    9.6 @ 0.550  (maker)  Up=-1198.9 Down= 3149.6
+[09:32:16] BUY  Down   15.2 @ 0.550  (maker)  Up=-1198.9 Down= 3164.8
+[09:32:16] BUY  Down    4.4 @ 0.550  (maker)  Up=-1198.9 Down= 3169.2
+[09:32:50] BUY  Up    301.0 @ 0.420  (maker)  Up= -897.9 Down= 3169.2
+[09:32:50] BUY  Up      2.6 @ 0.410  (maker)  Up= -895.3 Down= 3169.2
+[09:32:50] BUY  Up     16.9 @ 0.410  (maker)  Up= -878.4 Down= 3169.2
+[09:32:50] BUY  Up      1.7 @ 0.410  (maker)  Up= -876.7 Down= 3169.2
+[09:32:50] BUY  Up     26.0 @ 0.410  (maker)  Up= -850.7 Down= 3169.2
+[09:32:50] SELL Down  301.0 @ 0.580  (taker)  Up= -850.7 Down= 2868.2
+[09:32:52] BUY  Up     16.9 @ 0.410  (maker)  Up= -833.7 Down= 2868.2
+[09:32:54] BUY  Up     10.2 @ 0.410  (maker)  Up= -823.5 Down= 2868.2
+[09:32:54] BUY  Up      2.6 @ 0.410  (maker)  Up= -821.0 Down= 2868.2
+[09:32:54] BUY  Up      8.5 @ 0.410  (maker)  Up= -812.5 Down= 2868.2
+[09:32:54] BUY  Up      5.0 @ 0.410  (maker)  Up= -807.5 Down= 2868.2
+[09:32:56] BUY  Up     16.9 @ 0.410  (maker)  Up= -790.6 Down= 2868.2
+[09:32:56] BUY  Up     16.9 @ 0.410  (maker)  Up= -773.6 Down= 2868.2
+[09:32:58] BUY  Up    169.1 @ 0.410  (maker)  Up= -604.5 Down= 2868.2
+[09:32:58] BUY  Up      2.6 @ 0.410  (maker)  Up= -601.9 Down= 2868.2
+[09:32:58] BUY  Up      5.0 @ 0.410  (maker)  Up= -596.9 Down= 2868.2
+[09:33:08] BUY  Up     10.5 @ 0.190  (maker)  Up= -586.4 Down= 2868.2
+[09:33:08] BUY  Up     25.8 @ 0.190  (maker)  Up= -560.6 Down= 2868.2
+[09:33:08] BUY  Up      7.5 @ 0.200  (maker)  Up= -553.1 Down= 2868.2
+[09:33:08] BUY  Down    5.1 @ 0.800  (maker)  Up= -553.1 Down= 2873.3
+[09:33:10] SELL Up    201.0 @ 0.200  (taker)  Up= -754.1 Down= 2873.3
+[09:33:10] BUY  Up     10.0 @ 0.170  (maker)  Up= -744.1 Down= 2873.3
+[09:33:10] SELL Up    129.0 @ 0.180  (taker)  Up= -873.1 Down= 2873.3
+[09:33:10] BUY  Up     16.0 @ 0.190  (maker)  Up= -857.1 Down= 2873.3
+[09:33:10] BUY  Down  201.0 @ 0.790  (maker)  Up= -857.1 Down= 3074.3
+[09:33:10] BUY  Down   26.0 @ 0.820  (maker)  Up= -857.1 Down= 3100.3
+[09:33:10] BUY  Down   50.0 @ 0.810  (maker)  Up= -857.1 Down= 3150.3
+[09:33:10] BUY  Down    3.3 @ 0.800  (maker)  Up= -857.1 Down= 3153.6
+[09:33:10] BUY  Down  201.0 @ 0.800  (maker)  Up= -857.1 Down= 3354.6
+[09:33:10] BUY  Down   13.0 @ 0.800  (maker)  Up= -857.1 Down= 3367.6
+[09:33:10] BUY  Down   13.5 @ 0.800  (maker)  Up= -857.1 Down= 3381.1
+[09:33:10] BUY  Down   23.0 @ 0.810  (maker)  Up= -857.1 Down= 3404.0
+[09:33:10] BUY  Down   15.0 @ 0.800  (maker)  Up= -857.1 Down= 3419.0
+[09:33:10] BUY  Down   13.2 @ 0.800  (maker)  Up= -857.1 Down= 3432.2
+[09:33:10] BUY  Down    5.0 @ 0.810  (maker)  Up= -857.1 Down= 3437.2
+[09:33:10] BUY  Down  129.0 @ 0.820  (maker)  Up= -857.1 Down= 3566.2
+[09:33:10] BUY  Down   14.9 @ 0.820  (maker)  Up= -857.1 Down= 3581.1
+[09:33:10] BUY  Down    0.8 @ 0.810  (maker)  Up= -857.1 Down= 3581.9
+[09:33:10] BUY  Down   12.0 @ 0.820  (maker)  Up= -857.1 Down= 3593.9
+[09:33:10] BUY  Down   25.0 @ 0.820  (maker)  Up= -857.1 Down= 3618.9
+[09:33:10] BUY  Down   13.5 @ 0.810  (maker)  Up= -857.1 Down= 3632.4
+[09:33:10] BUY  Down   12.0 @ 0.800  (maker)  Up= -857.1 Down= 3644.4
+[09:33:10] BUY  Down    5.0 @ 0.800  (maker)  Up= -857.1 Down= 3649.4
+[09:33:10] BUY  Down   26.0 @ 0.820  (maker)  Up= -857.1 Down= 3675.4
+[09:33:12] BUY  Up     16.4 @ 0.170  (maker)  Up= -840.7 Down= 3675.4
+[09:33:12] BUY  Up    201.0 @ 0.210  (maker)  Up= -639.7 Down= 3675.4
+[09:33:12] BUY  Up      5.0 @ 0.170  (maker)  Up= -634.7 Down= 3675.4
+[09:33:12] BUY  Up      0.5 @ 0.170  (maker)  Up= -634.2 Down= 3675.4
+[09:33:12] BUY  Up     15.0 @ 0.170  (maker)  Up= -619.2 Down= 3675.4
+[09:33:12] BUY  Up     31.2 @ 0.190  (maker)  Up= -587.9 Down= 3675.4
+[09:33:12] BUY  Up      5.2 @ 0.170  (maker)  Up= -582.7 Down= 3675.4
+[09:33:12] BUY  Up     45.2 @ 0.170  (maker)  Up= -537.5 Down= 3675.4
+[09:33:12] SELL Up      6.0 @ 0.180  (taker)  Up= -543.5 Down= 3675.4
+[09:33:12] SELL Up      6.0 @ 0.180  (taker)  Up= -549.5 Down= 3675.4
+[09:33:12] SELL Up     72.0 @ 0.180  (taker)  Up= -621.5 Down= 3675.4
+[09:33:12] SELL Up      6.0 @ 0.180  (taker)  Up= -627.5 Down= 3675.4
+[09:33:12] SELL Up    201.0 @ 0.190  (taker)  Up= -828.5 Down= 3675.4
+[09:33:12] SELL Up      5.0 @ 0.180  (taker)  Up= -833.5 Down= 3675.4
+[09:33:12] SELL Up      5.0 @ 0.180  (taker)  Up= -838.5 Down= 3675.4
+[09:33:12] BUY  Up      9.8 @ 0.170  (maker)  Up= -828.7 Down= 3675.4
+[09:33:12] BUY  Up     99.9 @ 0.210  (maker)  Up= -728.8 Down= 3675.4
+[09:33:12] SELL Up     50.0 @ 0.160  (taker)  Up= -778.8 Down= 3675.4
+[09:33:12] SELL Up      5.0 @ 0.170  (taker)  Up= -783.8 Down= 3675.4
+[09:33:12] SELL Up      6.0 @ 0.170  (taker)  Up= -789.8 Down= 3675.4
+[09:33:12] SELL Up      6.0 @ 0.170  (taker)  Up= -795.8 Down= 3675.4
+[09:33:12] SELL Up      6.0 @ 0.160  (taker)  Up= -801.8 Down= 3675.4
+[09:33:12] SELL Up      6.0 @ 0.160  (taker)  Up= -807.8 Down= 3675.4
+[09:33:12] SELL Up      5.0 @ 0.160  (taker)  Up= -812.8 Down= 3675.4
+[09:33:12] SELL Up      5.0 @ 0.170  (taker)  Up= -817.8 Down= 3675.4
+[09:33:12] SELL Up      6.0 @ 0.170  (taker)  Up= -823.8 Down= 3675.4
+[09:33:12] SELL Up     10.0 @ 0.160  (taker)  Up= -833.8 Down= 3675.4
+[09:33:12] SELL Up     30.0 @ 0.160  (taker)  Up= -863.8 Down= 3675.4
+[09:33:12] SELL Up      6.0 @ 0.160  (taker)  Up= -869.8 Down= 3675.4
+[09:33:12] SELL Up    144.5 @ 0.160  (taker)  Up=-1014.3 Down= 3675.4
+[09:33:12] SELL Up      5.0 @ 0.160  (taker)  Up=-1019.3 Down= 3675.4
+[09:33:12] BUY  Up    115.0 @ 0.200  (maker)  Up= -904.3 Down= 3675.4
+[09:33:12] SELL Up    201.0 @ 0.220  (taker)  Up=-1105.3 Down= 3675.4
+[09:33:12] SELL Up     57.6 @ 0.230  (taker)  Up=-1162.9 Down= 3675.4
+[09:33:12] BUY  Up    178.5 @ 0.200  (maker)  Up= -984.4 Down= 3675.4
+[09:33:12] BUY  Up     44.6 @ 0.170  (maker)  Up= -939.7 Down= 3675.4
+[09:33:12] BUY  Down   10.5 @ 0.830  (taker)  Up= -939.7 Down= 3685.9
+[09:33:12] BUY  Down  156.3 @ 0.810  (maker)  Up= -939.7 Down= 3842.2
+[09:33:12] BUY  Down    4.2 @ 0.770  (maker)  Up= -939.7 Down= 3846.4
+[09:33:12] BUY  Down   14.2 @ 0.810  (maker)  Up= -939.7 Down= 3860.6
+[09:33:12] BUY  Down   37.1 @ 0.820  (maker)  Up= -939.7 Down= 3897.6
+[09:33:12] BUY  Down   15.0 @ 0.800  (maker)  Up= -939.7 Down= 3912.6
+[09:33:12] BUY  Down    7.3 @ 0.810  (maker)  Up= -939.7 Down= 3919.9
+[09:33:12] BUY  Down    5.0 @ 0.800  (maker)  Up= -939.7 Down= 3924.9
+[09:33:12] BUY  Down   10.0 @ 0.810  (maker)  Up= -939.7 Down= 3934.9
+[09:33:12] BUY  Down    8.0 @ 0.810  (maker)  Up= -939.7 Down= 3942.9
+[09:33:12] BUY  Down    8.0 @ 0.810  (maker)  Up= -939.7 Down= 3950.9
+[09:33:12] BUY  Down   26.0 @ 0.820  (maker)  Up= -939.7 Down= 3976.9
+[09:33:12] BUY  Down   81.4 @ 0.790  (maker)  Up= -939.7 Down= 4058.2
+[09:33:12] BUY  Down  301.0 @ 0.813  (maker)  Up= -939.7 Down= 4359.2
+[09:33:12] BUY  Down  301.0 @ 0.839  (maker)  Up= -939.7 Down= 4660.2
+[09:33:12] BUY  Down  258.6 @ 0.778  (maker)  Up= -939.7 Down= 4918.8
+[09:33:12] BUY  Down    5.0 @ 0.810  (maker)  Up= -939.7 Down= 4923.8
+[09:33:12] BUY  Down    5.0 @ 0.820  (maker)  Up= -939.7 Down= 4928.8
+[09:33:14] BUY  Up      3.0 @ 0.170  (maker)  Up= -936.7 Down= 4928.8
+[09:33:14] BUY  Up    139.7 @ 0.170  (maker)  Up= -797.0 Down= 4928.8
+[09:33:14] BUY  Up      6.5 @ 0.170  (maker)  Up= -790.5 Down= 4928.8
+[09:33:14] BUY  Down   42.4 @ 0.780  (maker)  Up= -790.5 Down= 4971.2
+[09:33:14] BUY  Down   18.6 @ 0.790  (maker)  Up= -790.5 Down= 4989.9
+[09:34:02] BUY  Up      6.9 @ 0.170  (maker)  Up= -783.7 Down= 4989.9
+[09:34:02] BUY  Up    256.0 @ 0.170  (maker)  Up= -527.7 Down= 4989.9
+[09:34:02] BUY  Up     30.7 @ 0.170  (maker)  Up= -497.0 Down= 4989.9
+[09:34:02] SELL Down   20.0 @ 0.830  (taker)  Up= -497.0 Down= 4969.9
+[09:34:02] SELL Down   70.0 @ 0.830  (taker)  Up= -497.0 Down= 4899.9
+[09:34:02] SELL Down  161.0 @ 0.830  (taker)  Up= -497.0 Down= 4738.9
+[09:34:02] SELL Down    5.0 @ 0.830  (taker)  Up= -497.0 Down= 4733.9
+[09:34:04] BUY  Up     27.8 @ 0.180  (taker)  Up= -469.2 Down= 4733.9
+[09:34:04] BUY  Up      6.1 @ 0.180  (maker)  Up= -463.1 Down= 4733.9
+[09:34:04] BUY  Up     10.0 @ 0.180  (maker)  Up= -453.1 Down= 4733.9
+[09:34:04] BUY  Up     12.3 @ 0.180  (maker)  Up= -440.8 Down= 4733.9
+[09:34:04] BUY  Up      1.2 @ 0.180  (maker)  Up= -439.6 Down= 4733.9
+[09:34:04] BUY  Up     20.0 @ 0.180  (maker)  Up= -419.6 Down= 4733.9
+[09:34:04] BUY  Up    162.5 @ 0.180  (maker)  Up= -257.1 Down= 4733.9
+[09:34:04] BUY  Up     12.2 @ 0.180  (maker)  Up= -244.9 Down= 4733.9
+[09:34:04] SELL Down    5.0 @ 0.820  (taker)  Up= -244.9 Down= 4728.9
+[09:34:04] SELL Down    5.0 @ 0.820  (taker)  Up= -244.9 Down= 4723.9
+[09:34:04] SELL Down   20.0 @ 0.820  (taker)  Up= -244.9 Down= 4703.9
+[09:34:04] SELL Down   12.1 @ 0.820  (taker)  Up= -244.9 Down= 4691.8
+[09:34:04] SELL Down    5.0 @ 0.820  (taker)  Up= -244.9 Down= 4686.8
+[09:34:04] SELL Down    8.6 @ 0.820  (taker)  Up= -244.9 Down= 4678.1
+[09:34:04] SELL Down   70.0 @ 0.820  (taker)  Up= -244.9 Down= 4608.1
+[09:34:04] SELL Down    9.0 @ 0.820  (taker)  Up= -244.9 Down= 4599.1
+[09:34:06] BUY  Up      3.2 @ 0.180  (maker)  Up= -241.7 Down= 4599.1
+[09:34:06] BUY  Up      5.0 @ 0.180  (maker)  Up= -236.7 Down= 4599.1
+[09:36:08] BUY  Up      1.2 @ 0.140  (maker)  Up= -235.6 Down= 4599.1
+[09:36:10] BUY  Up     35.0 @ 0.140  (taker)  Up= -200.6 Down= 4599.1
+[09:36:10] BUY  Up     11.0 @ 0.140  (taker)  Up= -189.6 Down= 4599.1
+[09:36:10] BUY  Up    163.6 @ 0.140  (maker)  Up=  -26.0 Down= 4599.1
+[09:36:10] BUY  Up     45.0 @ 0.140  (maker)  Up=   19.0 Down= 4599.1
+[09:36:10] BUY  Up     63.0 @ 0.140  (maker)  Up=   82.0 Down= 4599.1
+[09:36:10] SELL Down   26.0 @ 0.860  (taker)  Up=   82.0 Down= 4573.1
+[09:36:10] SELL Down   26.0 @ 0.860  (taker)  Up=   82.0 Down= 4547.1
+[09:36:10] SELL Down    6.0 @ 0.860  (taker)  Up=   82.0 Down= 4541.1
+[09:36:10] SELL Down    5.0 @ 0.860  (taker)  Up=   82.0 Down= 4536.1
+[09:36:10] SELL Down   10.5 @ 0.860  (taker)  Up=   82.0 Down= 4525.6
+[09:36:10] SELL Down    9.5 @ 0.860  (taker)  Up=   82.0 Down= 4516.1
+[09:36:10] SELL Down   20.0 @ 0.860  (taker)  Up=   82.0 Down= 4496.1
+[09:36:10] SELL Down   14.6 @ 0.860  (taker)  Up=   82.0 Down= 4481.6
+[09:36:14] BUY  Up      5.8 @ 0.140  (maker)  Up=   87.8 Down= 4481.6
+[09:36:14] BUY  Up      2.6 @ 0.140  (maker)  Up=   90.4 Down= 4481.6
+[09:36:14] BUY  Up      2.6 @ 0.140  (maker)  Up=   93.0 Down= 4481.6
+[09:36:14] BUY  Up      2.6 @ 0.140  (maker)  Up=   95.5 Down= 4481.6
+[09:36:14] BUY  Up      5.0 @ 0.140  (maker)  Up=  100.6 Down= 4481.6
+[09:36:14] BUY  Up      2.4 @ 0.140  (maker)  Up=  103.0 Down= 4481.6
+[09:36:14] BUY  Up      1.4 @ 0.140  (maker)  Up=  104.4 Down= 4481.6
+[09:36:14] BUY  Up      4.5 @ 0.140  (maker)  Up=  109.0 Down= 4481.6
+[09:36:20] BUY  Up     33.3 @ 0.150  (taker)  Up=  142.3 Down= 4481.6
+[09:36:20] BUY  Up    301.0 @ 0.150  (maker)  Up=  443.3 Down= 4481.6
+[09:36:20] BUY  Up    301.0 @ 0.160  (maker)  Up=  744.3 Down= 4481.6
+[09:36:20] SELL Down    5.0 @ 0.850  (taker)  Up=  744.3 Down= 4476.6
+[09:36:20] SELL Down   40.0 @ 0.850  (taker)  Up=  744.3 Down= 4436.6
+[09:36:20] SELL Down   11.0 @ 0.850  (taker)  Up=  744.3 Down= 4425.6
+[09:36:20] SELL Down    5.0 @ 0.850  (taker)  Up=  744.3 Down= 4420.6
+[09:36:20] SELL Down    5.0 @ 0.850  (taker)  Up=  744.3 Down= 4415.6
+[09:36:20] SELL Down  177.2 @ 0.850  (taker)  Up=  744.3 Down= 4238.4
+[09:36:20] SELL Down    5.9 @ 0.850  (taker)  Up=  744.3 Down= 4232.5
+[09:36:20] SELL Down    3.6 @ 0.850  (taker)  Up=  744.3 Down= 4228.9
+[09:36:20] SELL Down    5.0 @ 0.850  (taker)  Up=  744.3 Down= 4223.9
+[09:36:20] SELL Down   10.0 @ 0.850  (taker)  Up=  744.3 Down= 4213.9
+[09:36:20] SELL Down  301.0 @ 0.840  (taker)  Up=  744.3 Down= 3912.9
+[09:36:24] BUY  Up     25.0 @ 0.170  (taker)  Up=  769.3 Down= 3912.9
+[09:36:24] BUY  Up     10.0 @ 0.170  (taker)  Up=  779.3 Down= 3912.9
+[09:36:24] BUY  Up     11.9 @ 0.170  (taker)  Up=  791.2 Down= 3912.9
+[09:36:24] BUY  Up     10.5 @ 0.170  (taker)  Up=  801.7 Down= 3912.9
+[09:36:24] BUY  Up     25.0 @ 0.170  (taker)  Up=  826.7 Down= 3912.9
+[09:36:24] BUY  Up     25.0 @ 0.170  (taker)  Up=  851.7 Down= 3912.9
+[09:36:24] BUY  Up     10.5 @ 0.170  (taker)  Up=  862.2 Down= 3912.9
+[09:36:24] BUY  Up      6.0 @ 0.170  (taker)  Up=  868.2 Down= 3912.9
+[09:36:24] BUY  Up    249.9 @ 0.170  (maker)  Up= 1118.2 Down= 3912.9
+[09:36:24] BUY  Up     20.0 @ 0.170  (maker)  Up= 1138.2 Down= 3912.9
+[09:36:24] BUY  Up      5.6 @ 0.170  (maker)  Up= 1143.7 Down= 3912.9
+[09:36:24] BUY  Up      2.3 @ 0.170  (maker)  Up= 1146.0 Down= 3912.9
+[09:36:24] SELL Down   25.0 @ 0.830  (taker)  Up= 1146.0 Down= 3887.9
+[09:36:24] SELL Down   10.0 @ 0.830  (taker)  Up= 1146.0 Down= 3877.9
+[09:36:24] SELL Down    5.0 @ 0.830  (taker)  Up= 1146.0 Down= 3872.9
+[09:36:24] SELL Down   11.0 @ 0.830  (taker)  Up= 1146.0 Down= 3861.9
+[09:36:24] SELL Down   20.0 @ 0.830  (taker)  Up= 1146.0 Down= 3841.9
+[09:36:24] SELL Down   25.0 @ 0.830  (taker)  Up= 1146.0 Down= 3816.9
+[09:36:24] SELL Down   25.0 @ 0.830  (taker)  Up= 1146.0 Down= 3791.9
+[09:36:24] SELL Down    5.0 @ 0.830  (taker)  Up= 1146.0 Down= 3786.9
+[09:36:26] BUY  Up     16.0 @ 0.170  (maker)  Up= 1162.0 Down= 3786.9
+[09:36:26] BUY  Up      6.0 @ 0.170  (maker)  Up= 1168.0 Down= 3786.9
+[09:36:26] BUY  Up      1.2 @ 0.170  (maker)  Up= 1169.2 Down= 3786.9
+[09:36:44] BUY  Up    110.0 @ 0.200  (maker)  Up= 1279.2 Down= 3786.9
+[09:36:44] SELL Down    5.0 @ 0.800  (taker)  Up= 1279.2 Down= 3781.9
+[09:36:44] SELL Down   90.0 @ 0.800  (taker)  Up= 1279.2 Down= 3692.0
+[09:36:44] SELL Down    5.0 @ 0.800  (taker)  Up= 1279.2 Down= 3687.0
+[09:36:44] SELL Down    5.0 @ 0.800  (taker)  Up= 1279.2 Down= 3682.0
+[09:36:44] SELL Down    5.0 @ 0.800  (taker)  Up= 1279.2 Down= 3677.0
+[09:36:46] BUY  Up    301.0 @ 0.250  (maker)  Up= 1580.2 Down= 3677.0
+[09:36:46] BUY  Up    301.0 @ 0.250  (maker)  Up= 1881.2 Down= 3677.0
+[09:36:46] SELL Down  301.0 @ 0.750  (taker)  Up= 1881.2 Down= 3376.0
+[09:36:46] SELL Down  301.0 @ 0.750  (taker)  Up= 1881.2 Down= 3075.0
+[09:36:48] BUY  Up      9.4 @ 0.240  (taker)  Up= 1890.6 Down= 3075.0
+[09:36:48] BUY  Up     10.0 @ 0.240  (taker)  Up= 1900.6 Down= 3075.0
+[09:36:48] BUY  Up     16.0 @ 0.240  (maker)  Up= 1916.6 Down= 3075.0
+[09:36:48] BUY  Up    114.2 @ 0.240  (maker)  Up= 2030.8 Down= 3075.0
+[09:36:48] BUY  Up     50.0 @ 0.240  (maker)  Up= 2080.8 Down= 3075.0
+[09:36:48] BUY  Up     84.1 @ 0.240  (maker)  Up= 2164.9 Down= 3075.0
+[09:36:48] BUY  Up     25.0 @ 0.240  (maker)  Up= 2189.9 Down= 3075.0
+[09:36:48] BUY  Up      6.6 @ 0.240  (maker)  Up= 2196.6 Down= 3075.0
+[09:36:48] SELL Down   26.0 @ 0.760  (taker)  Up= 2196.6 Down= 3049.0
+[09:36:48] SELL Down   26.0 @ 0.760  (taker)  Up= 2196.6 Down= 3023.0
+[09:36:48] SELL Down   16.4 @ 0.760  (taker)  Up= 2196.6 Down= 3006.6
+[09:36:48] SELL Down   26.0 @ 0.760  (taker)  Up= 2196.6 Down= 2980.6
+[09:36:48] SELL Down    0.5 @ 0.760  (taker)  Up= 2196.6 Down= 2980.1
+[09:36:50] BUY  Up      5.0 @ 0.240  (maker)  Up= 2201.6 Down= 2980.1
+[09:37:02] BUY  Up     31.1 @ 0.310  (maker)  Up= 2232.7 Down= 2980.1
+[09:37:02] BUY  Up      5.1 @ 0.310  (maker)  Up= 2237.8 Down= 2980.1
+[09:37:02] BUY  Up      1.2 @ 0.310  (maker)  Up= 2239.0 Down= 2980.1
+[09:37:02] BUY  Up     33.9 @ 0.310  (maker)  Up= 2272.9 Down= 2980.1
+[09:37:02] BUY  Up     25.0 @ 0.310  (maker)  Up= 2297.9 Down= 2980.1
+[09:37:02] BUY  Up      2.9 @ 0.310  (maker)  Up= 2300.8 Down= 2980.1
+[09:37:02] BUY  Up     18.0 @ 0.310  (maker)  Up= 2318.8 Down= 2980.1
+[09:37:02] BUY  Up     25.0 @ 0.310  (maker)  Up= 2343.8 Down= 2980.1
+[09:37:02] BUY  Up      5.0 @ 0.310  (maker)  Up= 2348.8 Down= 2980.1
+[09:37:02] BUY  Up      1.4 @ 0.310  (maker)  Up= 2350.1 Down= 2980.1
+[09:37:02] BUY  Up     33.2 @ 0.310  (maker)  Up= 2383.3 Down= 2980.1
+[09:37:02] BUY  Up      8.0 @ 0.310  (maker)  Up= 2391.3 Down= 2980.1
+[09:37:02] BUY  Up     25.0 @ 0.300  (maker)  Up= 2416.3 Down= 2980.1
+[09:37:02] BUY  Up      5.0 @ 0.310  (maker)  Up= 2421.3 Down= 2980.1
+[09:37:02] BUY  Up     33.4 @ 0.310  (maker)  Up= 2454.7 Down= 2980.1
+[09:37:02] BUY  Up      5.1 @ 0.310  (maker)  Up= 2459.9 Down= 2980.1
+[09:37:02] BUY  Up     18.0 @ 0.310  (maker)  Up= 2477.9 Down= 2980.1
+[09:37:02] BUY  Up      4.1 @ 0.310  (maker)  Up= 2482.0 Down= 2980.1
+[09:37:02] BUY  Up      8.7 @ 0.310  (maker)  Up= 2490.7 Down= 2980.1
+[09:37:02] BUY  Up      5.0 @ 0.310  (maker)  Up= 2495.7 Down= 2980.1
+[09:37:02] BUY  Up     10.0 @ 0.310  (maker)  Up= 2505.7 Down= 2980.1
+[09:37:02] BUY  Up      8.9 @ 0.310  (maker)  Up= 2514.5 Down= 2980.1
+[09:37:04] BUY  Up      5.0 @ 0.360  (maker)  Up= 2519.5 Down= 2980.1
+[09:37:04] BUY  Up      2.1 @ 0.360  (maker)  Up= 2521.7 Down= 2980.1
+[09:37:04] BUY  Up     15.6 @ 0.360  (maker)  Up= 2537.3 Down= 2980.1
+[09:37:04] BUY  Up      5.8 @ 0.310  (maker)  Up= 2543.0 Down= 2980.1
+[09:37:04] BUY  Up      7.2 @ 0.310  (maker)  Up= 2550.3 Down= 2980.1
+[09:37:04] BUY  Up      5.5 @ 0.360  (maker)  Up= 2555.8 Down= 2980.1
+[09:37:04] BUY  Up      1.1 @ 0.360  (maker)  Up= 2556.9 Down= 2980.1
+[09:37:04] BUY  Up     32.2 @ 0.360  (maker)  Up= 2589.1 Down= 2980.1
+[09:37:06] BUY  Up     16.0 @ 0.360  (taker)  Up= 2605.1 Down= 2980.1
+[09:37:06] BUY  Up     44.6 @ 0.360  (taker)  Up= 2649.7 Down= 2980.1
+[09:37:06] BUY  Up      6.0 @ 0.360  (maker)  Up= 2655.7 Down= 2980.1
+[09:37:06] BUY  Up     65.6 @ 0.360  (maker)  Up= 2721.3 Down= 2980.1
+[09:37:06] BUY  Up     20.0 @ 0.360  (maker)  Up= 2741.3 Down= 2980.1
+[09:37:06] BUY  Up      5.0 @ 0.360  (maker)  Up= 2746.3 Down= 2980.1
+[09:37:06] BUY  Up      6.0 @ 0.360  (maker)  Up= 2752.3 Down= 2980.1
+[09:37:06] BUY  Up      5.0 @ 0.360  (maker)  Up= 2757.3 Down= 2980.1
+[09:37:06] BUY  Up      5.0 @ 0.360  (maker)  Up= 2762.3 Down= 2980.1
+[09:37:06] BUY  Up     10.0 @ 0.360  (maker)  Up= 2772.3 Down= 2980.1
+[09:37:06] BUY  Up     35.0 @ 0.360  (maker)  Up= 2807.3 Down= 2980.1
+[09:37:06] SELL Down    5.0 @ 0.640  (taker)  Up= 2807.3 Down= 2975.1
+[09:37:16] BUY  Down   32.6 @ 0.650  (maker)  Up= 2807.3 Down= 3007.7
+[09:37:18] SELL Up     40.0 @ 0.350  (taker)  Up= 2767.3 Down= 3007.7
+[09:37:18] SELL Up     25.0 @ 0.350  (taker)  Up= 2742.3 Down= 3007.7
+[09:37:18] SELL Up      6.0 @ 0.350  (taker)  Up= 2736.3 Down= 3007.7
+[09:37:18] SELL Up      5.0 @ 0.350  (taker)  Up= 2731.3 Down= 3007.7
+[09:37:18] BUY  Down   20.0 @ 0.650  (taker)  Up= 2731.3 Down= 3027.7
+[09:37:18] BUY  Down   10.0 @ 0.650  (taker)  Up= 2731.3 Down= 3037.7
+[09:37:18] BUY  Down   16.0 @ 0.650  (taker)  Up= 2731.3 Down= 3053.7
+[09:37:18] BUY  Down   11.0 @ 0.650  (taker)  Up= 2731.3 Down= 3064.7
+[09:37:18] BUY  Down    3.1 @ 0.650  (maker)  Up= 2731.3 Down= 3067.9
+[09:37:18] BUY  Down  133.0 @ 0.650  (maker)  Up= 2731.3 Down= 3200.9
+[09:37:48] BUY  Up    301.0 @ 0.350  (maker)  Up= 3032.3 Down= 3200.9
+[09:37:48] BUY  Up    301.0 @ 0.350  (maker)  Up= 3333.3 Down= 3200.9
+[09:37:48] SELL Down  135.7 @ 0.650  (taker)  Up= 3333.3 Down= 3065.2
+[09:37:48] SELL Down  159.2 @ 0.650  (taker)  Up= 3333.3 Down= 2906.0
+[09:37:48] SELL Down    6.2 @ 0.650  (taker)  Up= 3333.3 Down= 2899.9
+[09:37:48] SELL Down   25.0 @ 0.650  (taker)  Up= 3333.3 Down= 2874.9
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2869.9
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2864.9
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2859.9
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2854.9
+[09:37:48] SELL Down   20.9 @ 0.650  (taker)  Up= 3333.3 Down= 2834.0
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2829.0
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2824.0
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2819.0
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2814.0
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2809.0
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2804.0
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2799.0
+[09:37:48] SELL Down   25.0 @ 0.650  (taker)  Up= 3333.3 Down= 2774.0
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2769.0
+[09:37:48] SELL Down    9.5 @ 0.650  (taker)  Up= 3333.3 Down= 2759.5
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2754.5
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2749.5
+[09:37:48] SELL Down    8.6 @ 0.650  (taker)  Up= 3333.3 Down= 2740.9
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2735.9
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2730.9
+[09:37:48] SELL Down    6.2 @ 0.650  (taker)  Up= 3333.3 Down= 2724.8
+[09:37:48] SELL Down   10.4 @ 0.650  (taker)  Up= 3333.3 Down= 2714.4
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2709.4
+[09:37:48] SELL Down   40.8 @ 0.650  (taker)  Up= 3333.3 Down= 2668.5
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2663.5
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2658.5
+[09:37:48] SELL Down    8.1 @ 0.650  (taker)  Up= 3333.3 Down= 2650.4
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2645.4
+[09:37:48] SELL Down    0.8 @ 0.650  (taker)  Up= 3333.3 Down= 2644.6
+[09:37:48] SELL Down   25.0 @ 0.650  (taker)  Up= 3333.3 Down= 2619.6
+[09:37:48] SELL Down    5.7 @ 0.650  (taker)  Up= 3333.3 Down= 2613.9
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2608.9
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2603.9
+[09:37:48] SELL Down    5.0 @ 0.650  (taker)  Up= 3333.3 Down= 2598.9
+[09:37:54] BUY  Up     25.0 @ 0.380  (taker)  Up= 3358.3 Down= 2598.9
+[09:37:54] BUY  Up     19.9 @ 0.380  (taker)  Up= 3378.3 Down= 2598.9
+[09:37:54] BUY  Up     25.0 @ 0.380  (taker)  Up= 3403.3 Down= 2598.9
+[09:37:54] BUY  Up     10.0 @ 0.390  (taker)  Up= 3413.3 Down= 2598.9
+[09:37:54] BUY  Up     10.0 @ 0.380  (taker)  Up= 3423.3 Down= 2598.9
+[09:37:54] BUY  Up      8.0 @ 0.390  (taker)  Up= 3431.3 Down= 2598.9
+[09:37:54] BUY  Up      0.5 @ 0.390  (maker)  Up= 3431.8 Down= 2598.9
+[09:37:54] BUY  Up    287.4 @ 0.380  (maker)  Up= 3719.1 Down= 2598.9
+[09:37:54] BUY  Up     13.2 @ 0.390  (maker)  Up= 3732.3 Down= 2598.9
+[09:37:54] BUY  Up     11.8 @ 0.380  (maker)  Up= 3744.1 Down= 2598.9
+[09:37:54] BUY  Up    301.0 @ 0.370  (maker)  Up= 4045.1 Down= 2598.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2593.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2588.9
+[09:37:54] SELL Down    5.0 @ 0.620  (taker)  Up= 4045.1 Down= 2583.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2578.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2573.9
+[09:37:54] SELL Down   40.0 @ 0.620  (taker)  Up= 4045.1 Down= 2533.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2528.9
+[09:37:54] SELL Down    9.0 @ 0.610  (taker)  Up= 4045.1 Down= 2519.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2514.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2509.9
+[09:37:54] SELL Down    5.0 @ 0.610  (taker)  Up= 4045.1 Down= 2504.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2499.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2494.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2489.9
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2484.9
+[09:37:54] SELL Down   40.0 @ 0.610  (taker)  Up= 4045.1 Down= 2444.9
+[09:37:54] SELL Down    5.0 @ 0.610  (taker)  Up= 4045.1 Down= 2439.9
+[09:37:54] SELL Down    0.5 @ 0.630  (taker)  Up= 4045.1 Down= 2439.5
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2434.5
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2429.5
+[09:37:54] SELL Down    5.0 @ 0.620  (taker)  Up= 4045.1 Down= 2424.5
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2419.5
+[09:37:54] SELL Down    5.0 @ 0.630  (taker)  Up= 4045.1 Down= 2414.5
+[09:37:54] SELL Down    5.0 @ 0.620  (taker)  Up= 4045.1 Down= 2409.5
+[09:37:54] SELL Down  301.0 @ 0.630  (taker)  Up= 4045.1 Down= 2108.5
+[09:37:56] BUY  Up      1.5 @ 0.440  (maker)  Up= 4046.7 Down= 2108.5
+[09:37:56] BUY  Up      5.0 @ 0.440  (maker)  Up= 4051.7 Down= 2108.5
+[09:37:56] BUY  Up      1.8 @ 0.440  (maker)  Up= 4053.4 Down= 2108.5
+[09:37:56] BUY  Up      5.0 @ 0.440  (maker)  Up= 4058.4 Down= 2108.5
+[09:37:56] BUY  Up      5.0 @ 0.440  (maker)  Up= 4063.4 Down= 2108.5
+[09:37:56] BUY  Up      5.0 @ 0.440  (maker)  Up= 4068.4 Down= 2108.5
+[09:37:56] BUY  Up      1.5 @ 0.440  (maker)  Up= 4070.0 Down= 2108.5
+[09:37:56] BUY  Up      5.0 @ 0.440  (maker)  Up= 4075.0 Down= 2108.5
+[09:37:56] BUY  Up     10.0 @ 0.440  (maker)  Up= 4085.0 Down= 2108.5
+[09:37:56] BUY  Up     10.9 @ 0.440  (maker)  Up= 4095.9 Down= 2108.5
+[09:37:58] BUY  Up      8.1 @ 0.440  (maker)  Up= 4104.0 Down= 2108.5
+[09:37:58] BUY  Up      1.5 @ 0.440  (maker)  Up= 4105.6 Down= 2108.5
+[09:38:12] BUY  Up      7.1 @ 0.480  (maker)  Up= 4112.7 Down= 2108.5
+[09:38:12] BUY  Up      2.5 @ 0.480  (maker)  Up= 4115.2 Down= 2108.5
+[09:38:14] BUY  Up    125.0 @ 0.480  (maker)  Up= 4240.2 Down= 2108.5
+[09:38:14] BUY  Up      3.8 @ 0.480  (maker)  Up= 4244.0 Down= 2108.5
+[09:38:14] BUY  Up      7.8 @ 0.480  (maker)  Up= 4251.8 Down= 2108.5
+[09:38:16] BUY  Up    154.8 @ 0.480  (maker)  Up= 4406.6 Down= 2108.5
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2113.5
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2118.5
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2123.5
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2128.5
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2133.5
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2138.5
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2143.5
+[09:38:54] BUY  Down    1.3 @ 0.130  (maker)  Up= 4406.6 Down= 2144.8
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2149.8
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2154.8
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2159.8
+[09:38:54] BUY  Down    3.1 @ 0.130  (maker)  Up= 4406.6 Down= 2162.8
+[09:38:54] BUY  Down    5.0 @ 0.130  (maker)  Up= 4406.6 Down= 2167.8
+[09:39:08] BUY  Down    5.4 @ 0.090  (maker)  Up= 4406.6 Down= 2173.3
+[09:39:10] SELL Up     42.0 @ 0.910  (taker)  Up= 4364.6 Down= 2173.3
+[09:39:10] SELL Up     20.0 @ 0.910  (taker)  Up= 4344.6 Down= 2173.3
+[09:39:10] SELL Up      5.5 @ 0.910  (taker)  Up= 4339.1 Down= 2173.3
+[09:39:10] SELL Up      7.1 @ 0.910  (taker)  Up= 4332.0 Down= 2173.3
+[09:39:10] SELL Up      5.0 @ 0.910  (taker)  Up= 4327.0 Down= 2173.3
+[09:39:10] BUY  Down    2.2 @ 0.090  (maker)  Up= 4327.0 Down= 2175.5
+[09:39:10] BUY  Down   43.0 @ 0.090  (maker)  Up= 4327.0 Down= 2218.4
+[09:39:10] BUY  Down    2.2 @ 0.090  (maker)  Up= 4327.0 Down= 2220.6
+[09:39:10] BUY  Down    2.2 @ 0.090  (maker)  Up= 4327.0 Down= 2222.8
+[09:39:10] BUY  Down   32.5 @ 0.090  (maker)  Up= 4327.0 Down= 2255.4
+[09:39:10] BUY  Down   40.0 @ 0.090  (maker)  Up= 4327.0 Down= 2295.4
+[09:39:10] BUY  Down    2.2 @ 0.090  (maker)  Up= 4327.0 Down= 2297.6
+[09:39:10] BUY  Down    2.2 @ 0.090  (maker)  Up= 4327.0 Down= 2299.8
+[09:39:10] BUY  Down    5.4 @ 0.090  (maker)  Up= 4327.0 Down= 2305.2
+[09:39:10] BUY  Down   46.0 @ 0.090  (maker)  Up= 4327.0 Down= 2351.2
+[09:39:10] BUY  Down   79.6 @ 0.090  (maker)  Up= 4327.0 Down= 2430.8
+[09:39:10] BUY  Down    2.2 @ 0.090  (maker)  Up= 4327.0 Down= 2433.0
+[09:39:10] BUY  Down    9.8 @ 0.090  (maker)  Up= 4327.0 Down= 2442.9
+[09:39:10] BUY  Down    2.2 @ 0.090  (maker)  Up= 4327.0 Down= 2445.1
+[09:39:10] BUY  Down    2.2 @ 0.090  (maker)  Up= 4327.0 Down= 2447.3
+[09:39:10] BUY  Down    3.7 @ 0.090  (maker)  Up= 4327.0 Down= 2450.9
+[09:39:10] BUY  Down    2.2 @ 0.090  (maker)  Up= 4327.0 Down= 2453.1
+[09:39:10] BUY  Down   14.6 @ 0.090  (maker)  Up= 4327.0 Down= 2467.7
+[09:39:10] BUY  Down    1.1 @ 0.090  (maker)  Up= 4327.0 Down= 2468.8
+[09:39:32] BUY  Up    301.0 @ 0.910  (maker)  Up= 4628.0 Down= 2468.8
+[09:39:44] BUY  Down    7.0 @ 0.050  (maker)  Up= 4628.0 Down= 2475.8
+[09:39:46] BUY  Down   34.2 @ 0.050  (maker)  Up= 4628.0 Down= 2510.1
+[09:39:48] BUY  Down   15.0 @ 0.140  (maker)  Up= 4628.0 Down= 2525.1
+[09:39:50] SELL Up      5.0 @ 0.830  (taker)  Up= 4623.0 Down= 2525.1
+[09:39:50] SELL Up     38.9 @ 0.800  (taker)  Up= 4584.1 Down= 2525.1
+[09:39:50] SELL Up      5.0 @ 0.790  (taker)  Up= 4579.1 Down= 2525.1
+[09:39:50] SELL Up      5.0 @ 0.790  (taker)  Up= 4574.1 Down= 2525.1
+[09:39:50] SELL Up     40.0 @ 0.790  (taker)  Up= 4534.1 Down= 2525.1
+[09:39:50] SELL Up     23.0 @ 0.790  (taker)  Up= 4511.1 Down= 2525.1
+[09:39:50] SELL Up      5.0 @ 0.790  (taker)  Up= 4506.1 Down= 2525.1
+[09:39:50] SELL Up      5.0 @ 0.790  (taker)  Up= 4501.1 Down= 2525.1
+[09:39:50] BUY  Down   25.9 @ 0.200  (maker)  Up= 4501.1 Down= 2551.0
+[09:39:50] BUY  Down   43.9 @ 0.197  (maker)  Up= 4501.1 Down= 2594.8
+[09:39:50] BUY  Down   19.0 @ 0.210  (maker)  Up= 4501.1 Down= 2613.8
+[09:39:50] BUY  Down   12.6 @ 0.210  (maker)  Up= 4501.1 Down= 2626.5
+[09:39:50] BUY  Down   83.0 @ 0.210  (maker)  Up= 4501.1 Down= 2709.5
+[09:39:50] BUY  Down    5.8 @ 0.210  (maker)  Up= 4501.1 Down= 2715.3
+[09:39:50] BUY  Down    1.3 @ 0.210  (maker)  Up= 4501.1 Down= 2716.6
+[09:39:50] BUY  Down  162.4 @ 0.210  (maker)  Up= 4501.1 Down= 2879.0
+[09:39:50] BUY  Down    2.0 @ 0.210  (maker)  Up= 4501.1 Down= 2881.0
+[09:39:50] BUY  Down    2.5 @ 0.210  (maker)  Up= 4501.1 Down= 2883.5
+[09:39:50] BUY  Down   33.3 @ 0.200  (maker)  Up= 4501.1 Down= 2916.8
+[09:39:50] BUY  Down    7.4 @ 0.210  (maker)  Up= 4501.1 Down= 2924.2
+[09:39:52] SELL Up      8.0 @ 0.830  (taker)  Up= 4493.1 Down= 2924.2
+[09:39:52] SELL Up      9.1 @ 0.840  (taker)  Up= 4484.0 Down= 2924.2
+[09:39:52] SELL Up     10.0 @ 0.810  (taker)  Up= 4474.0 Down= 2924.2
+[09:39:52] SELL Up      5.0 @ 0.820  (taker)  Up= 4469.0 Down= 2924.2
+[09:39:52] SELL Up     17.9 @ 0.800  (taker)  Up= 4451.2 Down= 2924.2
+[09:39:52] SELL Up     25.0 @ 0.810  (taker)  Up= 4426.2 Down= 2924.2
+[09:39:52] SELL Up      8.6 @ 0.820  (taker)  Up= 4417.6 Down= 2924.2
+[09:39:52] SELL Up     23.0 @ 0.800  (taker)  Up= 4394.6 Down= 2924.2
+[09:39:52] SELL Up     23.0 @ 0.800  (taker)  Up= 4371.6 Down= 2924.2
+[09:39:52] SELL Up      5.0 @ 0.810  (taker)  Up= 4366.6 Down= 2924.2
+[09:39:52] SELL Up     25.0 @ 0.810  (taker)  Up= 4341.6 Down= 2924.2
+[09:39:52] SELL Up     31.1 @ 0.800  (taker)  Up= 4310.4 Down= 2924.2
+[09:39:52] SELL Up     23.0 @ 0.800  (taker)  Up= 4287.4 Down= 2924.2
+[09:39:52] BUY  Down   25.0 @ 0.190  (taker)  Up= 4287.4 Down= 2949.2
+[09:39:52] BUY  Down   10.0 @ 0.190  (taker)  Up= 4287.4 Down= 2959.2
+[09:39:52] BUY  Down   17.8 @ 0.190  (taker)  Up= 4287.4 Down= 2977.0
+[09:39:52] BUY  Down    9.5 @ 0.190  (taker)  Up= 4287.4 Down= 2986.5
+[09:39:52] BUY  Down   25.0 @ 0.190  (taker)  Up= 4287.4 Down= 3011.5
+[09:39:52] BUY  Down   43.0 @ 0.200  (maker)  Up= 4287.4 Down= 3054.5
+[09:39:52] BUY  Down    5.0 @ 0.210  (maker)  Up= 4287.4 Down= 3059.5
+[09:39:52] BUY  Down  301.0 @ 0.192  (maker)  Up= 4287.4 Down= 3360.5
+[09:39:52] BUY  Down   10.0 @ 0.200  (maker)  Up= 4287.4 Down= 3370.5
+[09:39:52] BUY  Down    4.0 @ 0.200  (maker)  Up= 4287.4 Down= 3374.5
+[09:39:52] BUY  Down   42.0 @ 0.200  (maker)  Up= 4287.4 Down= 3416.5
+[09:39:54] BUY  Up     93.7 @ 0.770  (maker)  Up= 4381.1 Down= 3416.5
+[09:39:54] SELL Down   40.0 @ 0.230  (taker)  Up= 4381.1 Down= 3376.5
+[09:39:54] SELL Down   35.0 @ 0.230  (taker)  Up= 4381.1 Down= 3341.5
+[09:39:54] SELL Down   10.0 @ 0.230  (taker)  Up= 4381.1 Down= 3331.5
+[09:39:54] SELL Down    8.7 @ 0.230  (taker)  Up= 4381.1 Down= 3322.8
+[09:40:56] SELL Up    301.0 @ 0.950  (taker)  Up= 4080.1 Down= 3322.8
+[09:40:56] BUY  Down  301.0 @ 0.050  (maker)  Up= 4080.1 Down= 3623.8
+[09:40:58] SELL Up    131.4 @ 0.960  (taker)  Up= 3948.7 Down= 3623.8
+[09:40:58] SELL Up      5.0 @ 0.960  (taker)  Up= 3943.7 Down= 3623.8
+[09:40:58] SELL Up      4.4 @ 0.960  (taker)  Up= 3939.3 Down= 3623.8
+[09:40:58] SELL Up      5.2 @ 0.960  (taker)  Up= 3934.1 Down= 3623.8
+[09:40:58] SELL Up     30.0 @ 0.960  (taker)  Up= 3904.1 Down= 3623.8
+[09:40:58] SELL Up     50.0 @ 0.960  (taker)  Up= 3854.1 Down= 3623.8
+[09:40:58] SELL Up    186.4 @ 0.950  (taker)  Up= 3667.7 Down= 3623.8
+[09:40:58] SELL Up      5.0 @ 0.960  (taker)  Up= 3662.7 Down= 3623.8
+[09:40:58] BUY  Down  125.0 @ 0.040  (taker)  Up= 3662.7 Down= 3748.8
+[09:40:58] BUY  Down   59.6 @ 0.040  (taker)  Up= 3662.7 Down= 3808.4
+[09:40:58] BUY  Down  301.0 @ 0.040  (maker)  Up= 3662.7 Down= 4109.4
+[09:40:58] BUY  Down  301.0 @ 0.046  (maker)  Up= 3662.7 Down= 4410.4
+[09:41:00] SELL Up    301.0 @ 0.950  (taker)  Up= 3361.7 Down= 4410.4
+[09:41:00] BUY  Down  301.0 @ 0.050  (maker)  Up= 3361.7 Down= 4711.4
+[09:41:28] SELL Up     30.0 @ 0.950  (taker)  Up= 3331.7 Down= 4711.4
+[09:41:28] SELL Up     34.6 @ 0.950  (taker)  Up= 3297.1 Down= 4711.4
+[09:41:28] SELL Up      5.3 @ 0.950  (taker)  Up= 3291.8 Down= 4711.4
+[09:41:28] SELL Up      5.3 @ 0.950  (taker)  Up= 3286.6 Down= 4711.4
+[09:41:28] SELL Up     50.0 @ 0.950  (taker)  Up= 3236.6 Down= 4711.4
+[09:41:28] BUY  Down  100.0 @ 0.050  (taker)  Up= 3236.6 Down= 4811.4
+[09:41:28] BUY  Down   75.9 @ 0.050  (taker)  Up= 3236.6 Down= 4887.2
+[09:41:28] BUY  Down  301.0 @ 0.050  (maker)  Up= 3236.6 Down= 5188.2
+[09:41:34] SELL Up      5.0 @ 0.940  (taker)  Up= 3231.6 Down= 5188.2
+[09:41:34] SELL Up    252.7 @ 0.940  (taker)  Up= 2978.9 Down= 5188.2
+[09:41:34] BUY  Down   43.3 @ 0.060  (taker)  Up= 2978.9 Down= 5231.6
+[09:41:34] BUY  Down  301.0 @ 0.060  (maker)  Up= 2978.9 Down= 5532.6
+[09:41:46] SELL Up      5.9 @ 0.850  (taker)  Up= 2973.0 Down= 5532.6
+[09:41:46] SELL Up      5.9 @ 0.850  (taker)  Up= 2967.1 Down= 5532.6
+[09:41:46] SELL Up     56.2 @ 0.850  (taker)  Up= 2911.0 Down= 5532.6
+[09:41:46] SELL Up      5.0 @ 0.840  (taker)  Up= 2906.0 Down= 5532.6
+[09:41:46] SELL Up     24.8 @ 0.840  (taker)  Up= 2881.2 Down= 5532.6
+[09:41:46] SELL Up      5.0 @ 0.840  (taker)  Up= 2876.2 Down= 5532.6
+[09:41:46] SELL Up     19.0 @ 0.850  (taker)  Up= 2857.2 Down= 5532.6
+[09:41:46] SELL Up     16.0 @ 0.840  (taker)  Up= 2841.2 Down= 5532.6
+[09:41:46] BUY  Down   33.3 @ 0.150  (taker)  Up= 2841.2 Down= 5565.9
+[09:41:46] BUY  Down    7.0 @ 0.150  (taker)  Up= 2841.2 Down= 5572.9
+[09:41:46] BUY  Down    7.0 @ 0.160  (maker)  Up= 2841.2 Down= 5579.9
+[09:41:46] BUY  Down  178.1 @ 0.153  (maker)  Up= 2841.2 Down= 5757.9
+[09:41:50] SELL Up     12.0 @ 0.810  (taker)  Up= 2829.2 Down= 5757.9
+[09:41:50] SELL Up     10.0 @ 0.810  (taker)  Up= 2819.2 Down= 5757.9
+[09:41:50] BUY  Down   43.8 @ 0.190  (taker)  Up= 2819.2 Down= 5801.8
+[09:41:50] BUY  Down   65.8 @ 0.190  (maker)  Up= 2819.2 Down= 5867.6
+[09:41:52] SELL Up    199.9 @ 0.710  (taker)  Up= 2619.3 Down= 5867.6
+[09:41:52] SELL Up     25.0 @ 0.710  (taker)  Up= 2594.3 Down= 5867.6
+[09:41:52] SELL Up     51.1 @ 0.700  (taker)  Up= 2543.2 Down= 5867.6
+[09:41:52] SELL Up     19.0 @ 0.700  (taker)  Up= 2524.2 Down= 5867.6
+[09:41:52] SELL Up      8.0 @ 0.710  (taker)  Up= 2516.2 Down= 5867.6
+[09:41:52] SELL Up    293.0 @ 0.700  (taker)  Up= 2223.2 Down= 5867.6
+[09:41:52] SELL Up     10.0 @ 0.710  (taker)  Up= 2213.2 Down= 5867.6
+[09:41:52] SELL Up     25.0 @ 0.710  (taker)  Up= 2188.2 Down= 5867.6
+[09:41:52] SELL Up    301.0 @ 0.700  (taker)  Up= 1887.2 Down= 5867.6
+[09:41:52] BUY  Down   25.0 @ 0.290  (taker)  Up= 1887.2 Down= 5892.6
+[09:41:52] BUY  Down   10.0 @ 0.290  (taker)  Up= 1887.2 Down= 5902.6
+[09:41:52] BUY  Down    8.0 @ 0.300  (maker)  Up= 1887.2 Down= 5910.6
+[09:41:52] BUY  Down  301.0 @ 0.292  (maker)  Up= 1887.2 Down= 6211.6
+[09:41:52] BUY  Down   19.0 @ 0.300  (maker)  Up= 1887.2 Down= 6230.6
+[09:41:52] BUY  Down    2.4 @ 0.300  (maker)  Up= 1887.2 Down= 6233.1
+[09:41:52] BUY  Down  100.0 @ 0.290  (maker)  Up= 1887.2 Down= 6333.0
+[09:41:52] BUY  Down    8.0 @ 0.300  (maker)  Up= 1887.2 Down= 6341.0
+[09:41:52] BUY  Down  301.0 @ 0.300  (maker)  Up= 1887.2 Down= 6642.0
+[09:41:52] BUY  Down   45.0 @ 0.290  (maker)  Up= 1887.2 Down= 6687.0
+[09:41:52] BUY  Down  301.0 @ 0.300  (maker)  Up= 1887.2 Down= 6988.0
+[09:41:52] BUY  Down    5.0 @ 0.190  (maker)  Up= 1887.2 Down= 6993.0
+[09:41:52] BUY  Down    6.4 @ 0.300  (maker)  Up= 1887.2 Down= 6999.4
+[09:41:54] SELL Up     58.5 @ 0.690  (taker)  Up= 1828.7 Down= 6999.4
+[09:41:54] SELL Up     25.0 @ 0.700  (taker)  Up= 1803.7 Down= 6999.4
+[09:41:54] SELL Up      6.0 @ 0.700  (taker)  Up= 1797.7 Down= 6999.4
+[09:41:54] SELL Up     25.0 @ 0.710  (taker)  Up= 1772.7 Down= 6999.4
+[09:41:54] SELL Up      8.0 @ 0.700  (taker)  Up= 1764.7 Down= 6999.4
+[09:41:54] SELL Up     25.0 @ 0.700  (taker)  Up= 1739.7 Down= 6999.4
+[09:41:54] SELL Up    104.9 @ 0.700  (taker)  Up= 1634.8 Down= 6999.4
+[09:41:54] SELL Up     10.0 @ 0.700  (taker)  Up= 1624.8 Down= 6999.4
+[09:41:54] BUY  Down   10.0 @ 0.300  (taker)  Up= 1624.8 Down= 7009.4
+[09:41:54] BUY  Down   10.5 @ 0.300  (taker)  Up= 1624.8 Down= 7019.9
+[09:41:54] BUY  Down    8.6 @ 0.300  (taker)  Up= 1624.8 Down= 7028.5
+[09:41:54] BUY  Down    9.5 @ 0.300  (taker)  Up= 1624.8 Down= 7038.0
+[09:41:54] BUY  Down   73.8 @ 0.300  (maker)  Up= 1624.8 Down= 7111.7
+[09:41:54] BUY  Down  301.0 @ 0.301  (maker)  Up= 1624.8 Down= 7412.7
+[09:41:54] BUY  Down    2.2 @ 0.290  (maker)  Up= 1624.8 Down= 7415.0
+[09:41:54] BUY  Down   25.0 @ 0.290  (maker)  Up= 1624.8 Down= 7440.0
+[09:41:54] BUY  Down   18.0 @ 0.290  (maker)  Up= 1624.8 Down= 7458.0
+[09:41:54] BUY  Down    6.0 @ 0.290  (maker)  Up= 1624.8 Down= 7464.0
+[09:41:54] BUY  Down   13.4 @ 0.290  (maker)  Up= 1624.8 Down= 7477.4
+[09:41:54] BUY  Down    5.0 @ 0.290  (maker)  Up= 1624.8 Down= 7482.4
+[09:41:54] BUY  Down   42.4 @ 0.300  (maker)  Up= 1624.8 Down= 7524.8
+[09:41:54] BUY  Down    1.4 @ 0.300  (maker)  Up= 1624.8 Down= 7526.2
+[09:41:54] BUY  Down   44.2 @ 0.300  (maker)  Up= 1624.8 Down= 7570.5
+[09:41:54] BUY  Down    2.3 @ 0.290  (maker)  Up= 1624.8 Down= 7572.7
+[09:41:54] BUY  Down   51.4 @ 0.300  (maker)  Up= 1624.8 Down= 7624.1
+[09:41:54] BUY  Down   32.6 @ 0.290  (maker)  Up= 1624.8 Down= 7656.8
+[09:41:54] BUY  Down   10.3 @ 0.300  (maker)  Up= 1624.8 Down= 7667.0
+[09:41:54] BUY  Down    8.6 @ 0.290  (maker)  Up= 1624.8 Down= 7675.7
+[09:41:54] BUY  Down   25.4 @ 0.290  (maker)  Up= 1624.8 Down= 7701.0
+[09:41:54] BUY  Down   33.6 @ 0.300  (maker)  Up= 1624.8 Down= 7734.7
+[09:41:54] BUY  Down   17.5 @ 0.290  (maker)  Up= 1624.8 Down= 7752.2
+[09:41:56] BUY  Up      2.1 @ 0.740  (maker)  Up= 1626.9 Down= 7752.2
+[09:41:56] BUY  Up     25.0 @ 0.760  (maker)  Up= 1651.9 Down= 7752.2
+[09:41:56] BUY  Up     20.0 @ 0.760  (maker)  Up= 1671.9 Down= 7752.2
+[09:41:56] BUY  Up    135.8 @ 0.762  (maker)  Up= 1807.7 Down= 7752.2
+[09:41:56] BUY  Up      3.0 @ 0.770  (maker)  Up= 1810.7 Down= 7752.2
+[09:41:56] BUY  Up      2.0 @ 0.770  (maker)  Up= 1812.7 Down= 7752.2
+[09:41:56] BUY  Up     25.0 @ 0.770  (maker)  Up= 1837.7 Down= 7752.2
+[09:41:56] BUY  Up     16.0 @ 0.770  (maker)  Up= 1853.7 Down= 7752.2
+[09:41:56] SELL Down    2.1 @ 0.260  (taker)  Up= 1853.7 Down= 7750.1
+[09:41:56] SELL Down   11.0 @ 0.230  (taker)  Up= 1853.7 Down= 7739.1
+[09:41:56] SELL Down   40.0 @ 0.230  (taker)  Up= 1853.7 Down= 7699.1
+[09:41:56] SELL Down   24.0 @ 0.250  (taker)  Up= 1853.7 Down= 7675.1
+[09:41:56] SELL Down   40.0 @ 0.240  (taker)  Up= 1853.7 Down= 7635.1
+[09:41:56] SELL Down   20.8 @ 0.240  (taker)  Up= 1853.7 Down= 7614.2
+[09:41:58] BUY  Up     25.0 @ 0.760  (maker)  Up= 1878.7 Down= 7614.2
+[09:41:58] BUY  Up     25.0 @ 0.770  (maker)  Up= 1903.7 Down= 7614.2
+[09:41:58] BUY  Up     25.0 @ 0.760  (maker)  Up= 1928.7 Down= 7614.2
+[09:41:58] BUY  Up      9.2 @ 0.770  (maker)  Up= 1937.9 Down= 7614.2
+[09:41:58] BUY  Up      5.5 @ 0.760  (maker)  Up= 1943.4 Down= 7614.2
+[09:41:58] BUY  Up     25.0 @ 0.760  (maker)  Up= 1968.4 Down= 7614.2
+[09:41:58] BUY  Up     20.0 @ 0.770  (maker)  Up= 1988.4 Down= 7614.2
+[09:41:58] BUY  Up     25.0 @ 0.770  (maker)  Up= 2013.4 Down= 7614.2
+[09:41:58] BUY  Up     40.0 @ 0.770  (maker)  Up= 2053.4 Down= 7614.2
+[09:41:58] BUY  Up     20.0 @ 0.760  (maker)  Up= 2073.4 Down= 7614.2
+[09:41:58] BUY  Up     25.0 @ 0.760  (maker)  Up= 2098.4 Down= 7614.2
+[09:41:58] BUY  Down    5.0 @ 0.220  (maker)  Up= 2098.4 Down= 7619.2
+[09:42:14] BUY  Up     35.0 @ 0.620  (taker)  Up= 2133.4 Down= 7619.2
+[09:42:14] BUY  Up     35.0 @ 0.640  (taker)  Up= 2168.4 Down= 7619.2
+[09:42:14] BUY  Up     10.0 @ 0.630  (taker)  Up= 2178.4 Down= 7619.2
+[09:42:14] BUY  Up     35.0 @ 0.650  (taker)  Up= 2213.4 Down= 7619.2
+[09:42:14] BUY  Up     25.0 @ 0.660  (taker)  Up= 2238.4 Down= 7619.2
+[09:42:14] BUY  Up     35.0 @ 0.660  (taker)  Up= 2273.4 Down= 7619.2
+[09:42:14] BUY  Up    301.0 @ 0.632  (maker)  Up= 2574.4 Down= 7619.2
+[09:42:14] BUY  Up      2.1 @ 0.660  (maker)  Up= 2576.5 Down= 7619.2
+[09:42:14] BUY  Up    203.3 @ 0.656  (maker)  Up= 2779.8 Down= 7619.2
+[09:42:14] BUY  Up     40.0 @ 0.660  (maker)  Up= 2819.8 Down= 7619.2
+[09:42:14] SELL Down   40.0 @ 0.370  (taker)  Up= 2819.8 Down= 7579.2
+[09:42:14] SELL Down   13.2 @ 0.380  (taker)  Up= 2819.8 Down= 7566.1
+[09:42:14] SELL Down   40.0 @ 0.360  (taker)  Up= 2819.8 Down= 7526.1
+[09:42:14] SELL Down    7.9 @ 0.380  (taker)  Up= 2819.8 Down= 7518.2
+[09:42:14] SELL Down   70.0 @ 0.360  (taker)  Up= 2819.8 Down= 7448.2
+[09:42:14] SELL Down    5.3 @ 0.380  (taker)  Up= 2819.8 Down= 7442.9
+[09:42:14] SELL Down   40.0 @ 0.380  (taker)  Up= 2819.8 Down= 7402.9
+[09:42:14] SELL Down    4.7 @ 0.350  (taker)  Up= 2819.8 Down= 7398.2
+[09:42:14] SELL Down   22.0 @ 0.340  (taker)  Up= 2819.8 Down= 7376.2
+[09:42:14] SELL Down   11.0 @ 0.350  (taker)  Up= 2819.8 Down= 7365.2
+[09:42:14] SELL Down   40.0 @ 0.340  (taker)  Up= 2819.8 Down= 7325.2
+[09:42:14] SELL Down   35.3 @ 0.350  (taker)  Up= 2819.8 Down= 7289.9
+[09:42:16] BUY  Up     55.5 @ 0.660  (maker)  Up= 2875.4 Down= 7289.9
+[09:42:16] BUY  Down    8.0 @ 0.440  (maker)  Up= 2875.4 Down= 7297.9
+[09:42:16] BUY  Down    5.0 @ 0.440  (maker)  Up= 2875.4 Down= 7302.9
+[09:42:18] SELL Up    253.2 @ 0.540  (taker)  Up= 2622.2 Down= 7302.9
+[09:42:18] SELL Up     22.8 @ 0.550  (taker)  Up= 2599.4 Down= 7302.9
+[09:42:18] SELL Up     25.0 @ 0.550  (taker)  Up= 2574.4 Down= 7302.9
+[09:42:18] BUY  Up      2.2 @ 0.550  (maker)  Up= 2576.6 Down= 7302.9
+[09:42:18] SELL Up     25.0 @ 0.550  (taker)  Up= 2551.6 Down= 7302.9
+[09:42:18] SELL Up    186.0 @ 0.540  (taker)  Up= 2365.6 Down= 7302.9
+[09:42:18] SELL Up     40.0 @ 0.540  (taker)  Up= 2325.6 Down= 7302.9
+[09:42:18] BUY  Down   25.0 @ 0.450  (taker)  Up= 2325.6 Down= 7327.9
+[09:42:18] BUY  Down   25.0 @ 0.450  (taker)  Up= 2325.6 Down= 7352.9
+[09:42:18] BUY  Down    4.0 @ 0.440  (maker)  Up= 2325.6 Down= 7356.9
+[09:42:18] BUY  Down  301.0 @ 0.458  (maker)  Up= 2325.6 Down= 7657.9
+[09:42:18] BUY  Down    1.2 @ 0.440  (maker)  Up= 2325.6 Down= 7659.1
+[09:42:18] BUY  Down    5.0 @ 0.440  (maker)  Up= 2325.6 Down= 7664.1
+[09:42:18] BUY  Down   12.0 @ 0.440  (maker)  Up= 2325.6 Down= 7676.1
+[09:42:18] BUY  Down   32.9 @ 0.440  (maker)  Up= 2325.6 Down= 7709.0
+[09:42:18] BUY  Down    6.1 @ 0.440  (maker)  Up= 2325.6 Down= 7715.0
+[09:42:18] BUY  Down    4.0 @ 0.440  (maker)  Up= 2325.6 Down= 7719.0
+[09:42:18] BUY  Down   18.0 @ 0.440  (maker)  Up= 2325.6 Down= 7737.0
+[09:42:18] BUY  Down   19.0 @ 0.440  (maker)  Up= 2325.6 Down= 7756.0
+[09:42:18] BUY  Down  301.0 @ 0.458  (maker)  Up= 2325.6 Down= 8057.0
+[09:42:18] BUY  Down    7.1 @ 0.440  (maker)  Up= 2325.6 Down= 8064.1
+[09:42:18] BUY  Down   32.2 @ 0.440  (maker)  Up= 2325.6 Down= 8096.3
+[09:42:20] BUY  Up     25.0 @ 0.670  (taker)  Up= 2350.6 Down= 8096.3
+[09:42:20] BUY  Up     25.0 @ 0.680  (taker)  Up= 2375.6 Down= 8096.3
+[09:42:20] BUY  Up     10.0 @ 0.690  (taker)  Up= 2385.6 Down= 8096.3
+[09:42:20] BUY  Up     10.0 @ 0.680  (taker)  Up= 2395.6 Down= 8096.3
+[09:42:20] BUY  Up     21.6 @ 0.680  (taker)  Up= 2417.1 Down= 8096.3
+[09:42:20] BUY  Up     46.8 @ 0.650  (maker)  Up= 2464.0 Down= 8096.3
+[09:42:20] BUY  Up    219.7 @ 0.688  (maker)  Up= 2683.6 Down= 8096.3
+[09:42:20] BUY  Up      7.1 @ 0.550  (maker)  Up= 2690.7 Down= 8096.3
+[09:42:20] BUY  Up     25.0 @ 0.690  (maker)  Up= 2715.7 Down= 8096.3
+[09:42:20] BUY  Up    301.0 @ 0.684  (maker)  Up= 3016.7 Down= 8096.3
+[09:42:20] BUY  Up     23.4 @ 0.690  (maker)  Up= 3040.1 Down= 8096.3
+[09:42:20] BUY  Up      3.0 @ 0.690  (maker)  Up= 3043.1 Down= 8096.3
+[09:42:20] BUY  Up     19.0 @ 0.550  (maker)  Up= 3062.1 Down= 8096.3
+[09:42:20] BUY  Up      5.0 @ 0.690  (maker)  Up= 3067.1 Down= 8096.3
+[09:42:20] BUY  Up     25.0 @ 0.690  (maker)  Up= 3092.1 Down= 8096.3
+[09:42:20] SELL Down  140.7 @ 0.310  (taker)  Up= 3092.1 Down= 7955.7
+[09:42:20] SELL Down   19.0 @ 0.310  (taker)  Up= 3092.1 Down= 7936.7
+[09:42:20] SELL Down   35.0 @ 0.310  (taker)  Up= 3092.1 Down= 7901.7
+[09:42:20] SELL Down    6.1 @ 0.310  (taker)  Up= 3092.1 Down= 7895.6
+[09:42:20] SELL Down   20.0 @ 0.320  (taker)  Up= 3092.1 Down= 7875.6
+[09:42:20] SELL Down   10.0 @ 0.320  (taker)  Up= 3092.1 Down= 7865.6
+[09:42:20] SELL Down   25.0 @ 0.320  (taker)  Up= 3092.1 Down= 7840.6
+[09:42:20] SELL Down   60.3 @ 0.310  (taker)  Up= 3092.1 Down= 7780.2
+[09:42:20] SELL Down   19.0 @ 0.320  (taker)  Up= 3092.1 Down= 7761.2
+[09:42:20] SELL Down   25.0 @ 0.320  (taker)  Up= 3092.1 Down= 7736.2
+[09:42:20] SELL Down   40.0 @ 0.310  (taker)  Up= 3092.1 Down= 7696.2
+[09:42:20] SELL Down   10.0 @ 0.310  (taker)  Up= 3092.1 Down= 7686.2
+[09:42:20] SELL Down   19.0 @ 0.320  (taker)  Up= 3092.1 Down= 7667.2
+[09:42:22] BUY  Up      7.5 @ 0.670  (taker)  Up= 3099.5 Down= 7667.2
+[09:42:22] BUY  Up     25.0 @ 0.670  (taker)  Up= 3124.5 Down= 7667.2
+[09:42:22] BUY  Up      3.4 @ 0.680  (taker)  Up= 3127.9 Down= 7667.2
+[09:42:22] BUY  Up     10.0 @ 0.680  (taker)  Up= 3137.9 Down= 7667.2
+[09:42:22] BUY  Up      8.6 @ 0.640  (taker)  Up= 3146.5 Down= 7667.2
+[09:42:22] BUY  Up    301.0 @ 0.668  (maker)  Up= 3447.5 Down= 7667.2
+[09:42:22] BUY  Up    212.2 @ 0.633  (maker)  Up= 3659.7 Down= 7667.2
+[09:42:22] BUY  Down   26.9 @ 0.310  (maker)  Up= 3659.7 Down= 7694.2
+[09:42:22] BUY  Down  134.2 @ 0.310  (maker)  Up= 3659.7 Down= 7828.4
+[09:42:22] BUY  Down   10.0 @ 0.310  (maker)  Up= 3659.7 Down= 7838.4
+[09:42:22] SELL Down   25.0 @ 0.330  (taker)  Up= 3659.7 Down= 7813.4
+[09:42:22] SELL Down   26.4 @ 0.320  (taker)  Up= 3659.7 Down= 7787.0
+[09:42:22] SELL Down   14.7 @ 0.340  (taker)  Up= 3659.7 Down= 7772.2
+[09:42:22] SELL Down   19.0 @ 0.320  (taker)  Up= 3659.7 Down= 7753.2
+[09:42:22] SELL Down   19.0 @ 0.330  (taker)  Up= 3659.7 Down= 7734.2
+[09:42:22] SELL Down    6.0 @ 0.320  (taker)  Up= 3659.7 Down= 7728.2
+[09:42:22] SELL Down   70.0 @ 0.340  (taker)  Up= 3659.7 Down= 7658.2
+[09:42:22] SELL Down   40.0 @ 0.340  (taker)  Up= 3659.7 Down= 7618.2
+[09:42:22] SELL Down   35.0 @ 0.330  (taker)  Up= 3659.7 Down= 7583.2
+[09:42:22] BUY  Down   30.0 @ 0.310  (maker)  Up= 3659.7 Down= 7613.3
+[09:42:22] SELL Down    6.0 @ 0.390  (taker)  Up= 3659.7 Down= 7607.3
+[09:42:22] SELL Down   40.0 @ 0.370  (taker)  Up= 3659.7 Down= 7567.3
+[09:42:22] SELL Down    9.5 @ 0.380  (taker)  Up= 3659.7 Down= 7557.8
+[09:42:22] SELL Down   10.0 @ 0.360  (taker)  Up= 3659.7 Down= 7547.8
+[09:42:22] SELL Down   12.0 @ 0.390  (taker)  Up= 3659.7 Down= 7535.8
+[09:42:22] SELL Down    9.5 @ 0.350  (taker)  Up= 3659.7 Down= 7526.3
+[09:42:22] SELL Down   40.0 @ 0.360  (taker)  Up= 3659.7 Down= 7486.3
+[09:42:22] SELL Down   10.5 @ 0.380  (taker)  Up= 3659.7 Down= 7475.8
+[09:42:22] SELL Down   40.0 @ 0.350  (taker)  Up= 3659.7 Down= 7435.8
+[09:42:22] SELL Down    8.6 @ 0.350  (taker)  Up= 3659.7 Down= 7427.2
+[09:42:22] SELL Down   11.0 @ 0.400  (taker)  Up= 3659.7 Down= 7416.2
+[09:42:22] SELL Down    6.5 @ 0.400  (taker)  Up= 3659.7 Down= 7409.7
+[09:42:22] BUY  Down   50.0 @ 0.310  (maker)  Up= 3659.7 Down= 7459.7
+[09:42:24] BUY  Up      3.1 @ 0.700  (taker)  Up= 3662.8 Down= 7459.7
+[09:42:24] BUY  Up     10.0 @ 0.700  (taker)  Up= 3672.8 Down= 7459.7
+[09:42:24] BUY  Up     10.0 @ 0.720  (taker)  Up= 3682.8 Down= 7459.7
+[09:42:24] SELL Up      9.5 @ 0.590  (taker)  Up= 3673.3 Down= 7459.7
+[09:42:24] SELL Up     40.0 @ 0.580  (taker)  Up= 3633.3 Down= 7459.7
+[09:42:24] SELL Up    200.8 @ 0.570  (taker)  Up= 3432.5 Down= 7459.7
+[09:42:24] SELL Up      6.0 @ 0.580  (taker)  Up= 3426.5 Down= 7459.7
+[09:42:24] SELL Up     25.7 @ 0.590  (taker)  Up= 3400.8 Down= 7459.7
+[09:42:24] SELL Up     19.0 @ 0.590  (taker)  Up= 3381.8 Down= 7459.7
+[09:42:24] BUY  Up    301.0 @ 0.714  (maker)  Up= 3682.8 Down= 7459.7
+[09:42:24] BUY  Up     35.0 @ 0.650  (maker)  Up= 3717.8 Down= 7459.7
+[09:42:24] BUY  Down   16.9 @ 0.420  (maker)  Up= 3717.8 Down= 7476.6
+[09:42:24] BUY  Down   10.5 @ 0.420  (maker)  Up= 3717.8 Down= 7487.1
+[09:42:24] BUY  Down    8.6 @ 0.420  (maker)  Up= 3717.8 Down= 7495.7
+[09:42:24] BUY  Down   20.0 @ 0.420  (maker)  Up= 3717.8 Down= 7515.7
+[09:42:24] BUY  Down   25.0 @ 0.420  (maker)  Up= 3717.8 Down= 7540.7
+[09:42:24] BUY  Down   16.5 @ 0.420  (maker)  Up= 3717.8 Down= 7557.2
+[09:42:24] BUY  Down  301.0 @ 0.425  (maker)  Up= 3717.8 Down= 7858.2
+[09:42:24] BUY  Down   25.0 @ 0.400  (maker)  Up= 3717.8 Down= 7883.2
+[09:42:24] BUY  Down   25.4 @ 0.420  (maker)  Up= 3717.8 Down= 7908.6
+[09:42:24] BUY  Down   10.0 @ 0.420  (maker)  Up= 3717.8 Down= 7918.6
+[09:42:24] BUY  Down   35.0 @ 0.420  (maker)  Up= 3717.8 Down= 7953.6
+[09:42:24] BUY  Down    5.3 @ 0.420  (maker)  Up= 3717.8 Down= 7958.9
+[09:42:24] BUY  Down    8.6 @ 0.420  (maker)  Up= 3717.8 Down= 7967.5
+[09:42:24] BUY  Down   19.0 @ 0.420  (maker)  Up= 3717.8 Down= 7986.5
+[09:42:24] BUY  Down   10.0 @ 0.420  (maker)  Up= 3717.8 Down= 7996.5
+[09:42:24] SELL Down   11.4 @ 0.280  (taker)  Up= 3717.8 Down= 7985.1
+[09:42:24] SELL Down   10.0 @ 0.280  (taker)  Up= 3717.8 Down= 7975.1
+[09:42:24] SELL Down   10.0 @ 0.290  (taker)  Up= 3717.8 Down= 7965.1
+[09:42:24] SELL Down   30.0 @ 0.290  (taker)  Up= 3717.8 Down= 7935.1
+[09:42:24] SELL Down    0.8 @ 0.300  (taker)  Up= 3717.8 Down= 7934.4
+[09:42:24] SELL Down    6.4 @ 0.280  (taker)  Up= 3717.8 Down= 7928.0
+[09:42:24] SELL Down   35.0 @ 0.290  (taker)  Up= 3717.8 Down= 7893.0
+[09:42:24] SELL Down   23.1 @ 0.290  (taker)  Up= 3717.8 Down= 7869.9
+[09:42:24] SELL Down   30.0 @ 0.280  (taker)  Up= 3717.8 Down= 7839.9
+[09:42:24] SELL Down   35.0 @ 0.280  (taker)  Up= 3717.8 Down= 7804.9
+[09:42:24] SELL Down    6.3 @ 0.290  (taker)  Up= 3717.8 Down= 7798.6
+[09:42:24] SELL Down   40.0 @ 0.290  (taker)  Up= 3717.8 Down= 7758.6
+[09:42:24] SELL Down   40.0 @ 0.280  (taker)  Up= 3717.8 Down= 7718.6
+[09:42:24] BUY  Down   16.9 @ 0.420  (maker)  Up= 3717.8 Down= 7735.5
+[09:42:24] BUY  Down   25.0 @ 0.420  (maker)  Up= 3717.8 Down= 7760.5
+[09:42:24] BUY  Down    5.9 @ 0.420  (maker)  Up= 3717.8 Down= 7766.4
+[09:42:24] BUY  Down    5.0 @ 0.420  (maker)  Up= 3717.8 Down= 7771.4
+[09:42:24] BUY  Down   17.5 @ 0.310  (maker)  Up= 3717.8 Down= 7788.9
+[09:42:24] BUY  Down   29.6 @ 0.420  (maker)  Up= 3717.8 Down= 7818.5
+[09:42:24] BUY  Down    7.7 @ 0.420  (maker)  Up= 3717.8 Down= 7826.1
+[09:42:24] BUY  Down   32.4 @ 0.310  (maker)  Up= 3717.8 Down= 7858.5
+[09:42:26] BUY  Up     25.0 @ 0.650  (taker)  Up= 3742.8 Down= 7858.5
+[09:42:26] BUY  Up     10.0 @ 0.650  (maker)  Up= 3752.8 Down= 7858.5
+[09:42:26] BUY  Up     16.0 @ 0.640  (maker)  Up= 3768.8 Down= 7858.5
+[09:42:26] BUY  Up      8.0 @ 0.640  (maker)  Up= 3776.8 Down= 7858.5
+[09:42:26] BUY  Up    148.6 @ 0.629  (maker)  Up= 3925.4 Down= 7858.5
+[09:42:26] BUY  Up     50.0 @ 0.650  (maker)  Up= 3975.4 Down= 7858.5
+[09:42:26] BUY  Up     85.0 @ 0.610  (maker)  Up= 4060.4 Down= 7858.5
+[09:42:26] BUY  Up     41.3 @ 0.640  (maker)  Up= 4101.7 Down= 7858.5
+[09:42:26] BUY  Up     30.4 @ 0.650  (maker)  Up= 4132.1 Down= 7858.5
+[09:42:26] BUY  Up     50.0 @ 0.640  (maker)  Up= 4182.1 Down= 7858.5
+[09:42:26] BUY  Up     12.1 @ 0.640  (maker)  Up= 4194.2 Down= 7858.5
+[09:42:26] BUY  Up      8.0 @ 0.650  (maker)  Up= 4202.2 Down= 7858.5
+[09:42:26] BUY  Up      8.0 @ 0.610  (maker)  Up= 4210.2 Down= 7858.5
+[09:42:26] BUY  Up    167.6 @ 0.650  (maker)  Up= 4377.8 Down= 7858.5
+[09:42:26] BUY  Up      5.0 @ 0.640  (maker)  Up= 4382.8 Down= 7858.5
+[09:42:26] BUY  Up     20.0 @ 0.640  (maker)  Up= 4402.8 Down= 7858.5
+[09:42:26] SELL Down   40.0 @ 0.380  (taker)  Up= 4402.8 Down= 7818.5
+[09:42:26] SELL Down   40.0 @ 0.360  (taker)  Up= 4402.8 Down= 7778.5
+[09:42:26] SELL Down    9.5 @ 0.380  (taker)  Up= 4402.8 Down= 7769.0
+[09:42:26] SELL Down    8.6 @ 0.380  (taker)  Up= 4402.8 Down= 7760.4
+[09:42:26] SELL Down   40.0 @ 0.370  (taker)  Up= 4402.8 Down= 7720.4
+[09:42:26] SELL Down   10.5 @ 0.370  (taker)  Up= 4402.8 Down= 7709.9
+[09:42:26] SELL Down   70.0 @ 0.390  (taker)  Up= 4402.8 Down= 7639.9
+[09:42:26] SELL Down   15.0 @ 0.390  (taker)  Up= 4402.8 Down= 7624.9
+[09:42:26] SELL Down   19.0 @ 0.350  (taker)  Up= 4402.8 Down= 7605.9
+[09:42:26] SELL Down   40.0 @ 0.350  (taker)  Up= 4402.8 Down= 7565.9
+[09:42:26] SELL Down   19.0 @ 0.350  (taker)  Up= 4402.8 Down= 7546.9
+[09:42:26] SELL Down   19.0 @ 0.350  (taker)  Up= 4402.8 Down= 7527.9
+[09:42:26] SELL Down   19.0 @ 0.350  (taker)  Up= 4402.8 Down= 7508.9
+[09:42:26] SELL Down   19.0 @ 0.350  (taker)  Up= 4402.8 Down= 7489.9
+[09:42:26] SELL Down    7.6 @ 0.350  (taker)  Up= 4402.8 Down= 7482.3
+[09:42:28] BUY  Up    195.2 @ 0.660  (maker)  Up= 4598.0 Down= 7482.3
+[09:42:28] BUY  Up     48.4 @ 0.660  (maker)  Up= 4646.4 Down= 7482.3
+[09:42:28] BUY  Up      5.2 @ 0.660  (maker)  Up= 4651.5 Down= 7482.3
+[09:42:30] BUY  Up     50.5 @ 0.660  (maker)  Up= 4702.1 Down= 7482.3
+[09:42:30] BUY  Up      1.7 @ 0.660  (maker)  Up= 4703.8 Down= 7482.3
+[09:42:34] SELL Up      6.0 @ 0.610  (taker)  Up= 4697.8 Down= 7482.3
+[09:42:34] SELL Up     20.0 @ 0.610  (taker)  Up= 4677.8 Down= 7482.3
+[09:42:34] SELL Up      5.0 @ 0.610  (taker)  Up= 4672.8 Down= 7482.3
+[09:42:34] SELL Up      6.3 @ 0.630  (taker)  Up= 4666.5 Down= 7482.3
+[09:42:34] SELL Up      5.0 @ 0.630  (taker)  Up= 4661.5 Down= 7482.3
+[09:42:34] SELL Up     35.0 @ 0.630  (taker)  Up= 4626.5 Down= 7482.3
+[09:42:34] SELL Up     10.0 @ 0.640  (taker)  Up= 4616.5 Down= 7482.3
+[09:42:34] SELL Up      8.0 @ 0.650  (taker)  Up= 4608.5 Down= 7482.3
+[09:42:34] SELL Up      7.9 @ 0.630  (taker)  Up= 4600.5 Down= 7482.3
+[09:42:34] SELL Up      4.8 @ 0.620  (taker)  Up= 4595.7 Down= 7482.3
+[09:42:34] SELL Up     40.0 @ 0.640  (taker)  Up= 4555.7 Down= 7482.3
+[09:42:34] SELL Up     10.0 @ 0.630  (taker)  Up= 4545.7 Down= 7482.3
+[09:42:34] SELL Up      5.0 @ 0.630  (taker)  Up= 4540.7 Down= 7482.3
+[09:42:34] SELL Up     10.0 @ 0.650  (taker)  Up= 4530.7 Down= 7482.3
+[09:42:34] SELL Up     40.0 @ 0.630  (taker)  Up= 4490.7 Down= 7482.3
+[09:42:34] BUY  Down    9.5 @ 0.390  (taker)  Up= 4490.7 Down= 7491.8
+[09:42:34] BUY  Down    6.8 @ 0.390  (taker)  Up= 4490.7 Down= 7498.6
+[09:42:34] BUY  Down    9.5 @ 0.390  (taker)  Up= 4490.7 Down= 7508.1
+[09:42:34] BUY  Down   35.0 @ 0.390  (taker)  Up= 4490.7 Down= 7543.1
+[09:42:34] BUY  Down   11.0 @ 0.390  (taker)  Up= 4490.7 Down= 7554.1
+[09:42:34] BUY  Down   10.5 @ 0.390  (taker)  Up= 4490.7 Down= 7564.6
+[09:42:34] BUY  Down   13.9 @ 0.360  (taker)  Up= 4490.7 Down= 7578.5
+[09:42:34] BUY  Down   10.0 @ 0.360  (taker)  Up= 4490.7 Down= 7588.5
+[09:42:34] BUY  Down   35.0 @ 0.370  (taker)  Up= 4490.7 Down= 7623.5
+[09:42:34] BUY  Down   25.0 @ 0.350  (taker)  Up= 4490.7 Down= 7648.5
+[09:42:34] BUY  Down   35.0 @ 0.350  (taker)  Up= 4490.7 Down= 7683.5
+[09:42:34] BUY  Down   21.3 @ 0.390  (maker)  Up= 4490.7 Down= 7704.8
+[09:42:34] BUY  Down  113.3 @ 0.390  (maker)  Up= 4490.7 Down= 7818.1
+[09:42:34] BUY  Down  301.0 @ 0.363  (maker)  Up= 4490.7 Down= 8119.1
+[09:42:34] BUY  Down    6.3 @ 0.390  (maker)  Up= 4490.7 Down= 8125.4
+[09:42:34] BUY  Down   30.0 @ 0.390  (maker)  Up= 4490.7 Down= 8155.4
+[09:42:34] BUY  Down    2.1 @ 0.390  (maker)  Up= 4490.7 Down= 8157.4
+[09:42:44] BUY  Up      3.9 @ 0.490  (maker)  Up= 4494.6 Down= 8157.4
+[09:42:44] BUY  Up     15.5 @ 0.490  (maker)  Up= 4510.1 Down= 8157.4
+[09:42:46] BUY  Up    244.1 @ 0.490  (maker)  Up= 4754.2 Down= 8157.4
+[09:42:46] BUY  Up    183.9 @ 0.470  (maker)  Up= 4938.1 Down= 8157.4
+[09:42:46] BUY  Up      1.5 @ 0.460  (maker)  Up= 4939.6 Down= 8157.4
+[09:42:46] BUY  Up      1.2 @ 0.490  (maker)  Up= 4940.8 Down= 8157.4
+[09:42:46] BUY  Up     18.0 @ 0.490  (maker)  Up= 4958.8 Down= 8157.4
+[09:42:46] BUY  Up    117.0 @ 0.470  (maker)  Up= 5075.9 Down= 8157.4
+[09:42:46] BUY  Up     18.3 @ 0.490  (maker)  Up= 5094.1 Down= 8157.4
+[09:42:48] BUY  Down   58.7 @ 0.560  (maker)  Up= 5094.1 Down= 8216.2
+[09:42:48] BUY  Down   25.0 @ 0.560  (maker)  Up= 5094.1 Down= 8241.2
+[09:42:48] BUY  Down   21.8 @ 0.560  (maker)  Up= 5094.1 Down= 8263.0
+[09:42:52] BUY  Up     31.4 @ 0.560  (taker)  Up= 5125.5 Down= 8263.0
+[09:42:52] BUY  Up      8.9 @ 0.560  (taker)  Up= 5134.4 Down= 8263.0
+[09:42:52] BUY  Up     25.0 @ 0.560  (taker)  Up= 5159.4 Down= 8263.0
+[09:42:52] BUY  Up     10.0 @ 0.560  (taker)  Up= 5169.4 Down= 8263.0
+[09:42:52] BUY  Up      8.0 @ 0.490  (taker)  Up= 5177.4 Down= 8263.0
+[09:42:52] BUY  Up      8.0 @ 0.490  (taker)  Up= 5185.4 Down= 8263.0
+[09:42:52] BUY  Up     35.0 @ 0.470  (taker)  Up= 5220.4 Down= 8263.0
+[09:42:52] BUY  Up     14.7 @ 0.470  (taker)  Up= 5235.1 Down= 8263.0
+[09:42:52] BUY  Up      8.6 @ 0.580  (taker)  Up= 5243.7 Down= 8263.0
+[09:42:52] BUY  Up     25.0 @ 0.580  (taker)  Up= 5268.7 Down= 8263.0
+[09:42:52] BUY  Up     25.0 @ 0.580  (taker)  Up= 5293.7 Down= 8263.0
+[09:42:52] BUY  Up     25.0 @ 0.540  (taker)  Up= 5318.7 Down= 8263.0
+[09:42:52] BUY  Up      3.8 @ 0.550  (maker)  Up= 5322.5 Down= 8263.0
+[09:42:52] BUY  Up    301.0 @ 0.552  (maker)  Up= 5623.5 Down= 8263.0
+[09:42:52] BUY  Up    119.4 @ 0.478  (maker)  Up= 5742.9 Down= 8263.0
+[09:42:52] BUY  Up     42.4 @ 0.570  (maker)  Up= 5785.4 Down= 8263.0
+[09:42:52] BUY  Up      3.0 @ 0.550  (maker)  Up= 5788.4 Down= 8263.0
+[09:42:52] BUY  Up      2.0 @ 0.570  (maker)  Up= 5790.4 Down= 8263.0
+[09:42:52] BUY  Up    301.0 @ 0.580  (maker)  Up= 6091.4 Down= 8263.0
+[09:42:52] BUY  Up     93.0 @ 0.542  (maker)  Up= 6184.4 Down= 8263.0
+[09:42:52] BUY  Up     20.0 @ 0.570  (maker)  Up= 6204.4 Down= 8263.0
+[09:42:52] BUY  Up      5.0 @ 0.570  (maker)  Up= 6209.4 Down= 8263.0
+[09:42:52] BUY  Up    231.6 @ 0.569  (maker)  Up= 6440.9 Down= 8263.0
+[09:42:52] SELL Down   12.8 @ 0.440  (taker)  Up= 6440.9 Down= 8250.2
+[09:42:52] SELL Down   18.0 @ 0.450  (taker)  Up= 6440.9 Down= 8232.2
+[09:42:52] SELL Down    5.2 @ 0.460  (taker)  Up= 6440.9 Down= 8227.0
+[09:42:52] SELL Down   40.0 @ 0.440  (taker)  Up= 6440.9 Down= 8187.0
+[09:42:52] SELL Down   10.9 @ 0.470  (taker)  Up= 6440.9 Down= 8176.2
+[09:42:52] SELL Down    2.3 @ 0.470  (taker)  Up= 6440.9 Down= 8173.9
+[09:42:52] SELL Down   40.0 @ 0.450  (taker)  Up= 6440.9 Down= 8133.9
+[09:42:52] SELL Down    5.3 @ 0.450  (taker)  Up= 6440.9 Down= 8128.6
+[09:42:52] SELL Down   40.0 @ 0.460  (taker)  Up= 6440.9 Down= 8088.6
+[09:42:52] SELL Down   35.0 @ 0.450  (taker)  Up= 6440.9 Down= 8053.6
+[09:42:52] SELL Down   11.0 @ 0.450  (taker)  Up= 6440.9 Down= 8042.6
+[09:42:52] SELL Down    5.3 @ 0.440  (taker)  Up= 6440.9 Down= 8037.3
+[09:42:52] SELL Down   39.0 @ 0.520  (taker)  Up= 6440.9 Down= 7998.3
+[09:42:52] SELL Down    5.2 @ 0.490  (taker)  Up= 6440.9 Down= 7993.1
+[09:42:52] SELL Down    9.6 @ 0.520  (taker)  Up= 6440.9 Down= 7983.5
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7978.5
+[09:42:52] SELL Down   18.0 @ 0.420  (taker)  Up= 6440.9 Down= 7960.5
+[09:42:52] SELL Down    0.7 @ 0.410  (taker)  Up= 6440.9 Down= 7959.8
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7954.8
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7949.8
+[09:42:52] SELL Down    7.4 @ 0.420  (taker)  Up= 6440.9 Down= 7942.4
+[09:42:52] SELL Down    5.3 @ 0.420  (taker)  Up= 6440.9 Down= 7937.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7932.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7927.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7922.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7917.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7912.1
+[09:42:52] SELL Down   11.9 @ 0.420  (taker)  Up= 6440.9 Down= 7900.2
+[09:42:52] SELL Down   35.0 @ 0.420  (taker)  Up= 6440.9 Down= 7865.2
+[09:42:52] SELL Down    5.9 @ 0.420  (taker)  Up= 6440.9 Down= 7859.3
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7854.3
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7849.3
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7844.3
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7839.3
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7834.3
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7829.3
+[09:42:52] SELL Down   40.0 @ 0.420  (taker)  Up= 6440.9 Down= 7789.3
+[09:42:52] SELL Down   18.2 @ 0.420  (taker)  Up= 6440.9 Down= 7771.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7766.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7761.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7756.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7751.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7746.1
+[09:42:52] SELL Down    5.0 @ 0.420  (taker)  Up= 6440.9 Down= 7741.1
+[09:42:52] SELL Down   25.0 @ 0.460  (taker)  Up= 6440.9 Down= 7716.1
+[09:42:52] SELL Down   25.0 @ 0.460  (taker)  Up= 6440.9 Down= 7691.1
+[09:42:52] SELL Down   18.0 @ 0.450  (taker)  Up= 6440.9 Down= 7673.1
+[09:42:52] SELL Down    5.3 @ 0.430  (taker)  Up= 6440.9 Down= 7667.8
+[09:42:52] SELL Down   12.2 @ 0.440  (taker)  Up= 6440.9 Down= 7655.6
+[09:42:52] SELL Down   35.0 @ 0.430  (taker)  Up= 6440.9 Down= 7620.6
+[09:42:52] SELL Down   70.0 @ 0.430  (taker)  Up= 6440.9 Down= 7550.6
+[09:42:52] SELL Down   49.0 @ 0.430  (taker)  Up= 6440.9 Down= 7501.6
+[09:42:52] SELL Down   40.0 @ 0.430  (taker)  Up= 6440.9 Down= 7461.6
+[09:42:52] SELL Down   20.0 @ 0.430  (taker)  Up= 6440.9 Down= 7441.6
+[09:42:54] BUY  Up     10.5 @ 0.600  (taker)  Up= 6451.4 Down= 7441.6
+[09:42:54] BUY  Up     30.6 @ 0.550  (maker)  Up= 6482.0 Down= 7441.6
+[09:42:54] BUY  Up     14.1 @ 0.550  (maker)  Up= 6496.1 Down= 7441.6
+[09:42:54] BUY  Up     13.0 @ 0.550  (maker)  Up= 6509.1 Down= 7441.6
+[09:42:54] BUY  Up     25.0 @ 0.550  (maker)  Up= 6534.1 Down= 7441.6
+[09:42:54] BUY  Up     25.0 @ 0.550  (maker)  Up= 6559.1 Down= 7441.6
+[09:42:54] BUY  Up     25.0 @ 0.550  (maker)  Up= 6584.1 Down= 7441.6
+[09:42:54] BUY  Up    301.0 @ 0.598  (maker)  Up= 6885.1 Down= 7441.6
+[09:42:54] SELL Down  187.2 @ 0.400  (taker)  Up= 6885.1 Down= 7254.4
+[09:42:54] SELL Down    5.4 @ 0.400  (taker)  Up= 6885.1 Down= 7249.0
+[09:42:54] SELL Down    5.0 @ 0.420  (taker)  Up= 6885.1 Down= 7244.0
+[09:42:54] SELL Down   40.0 @ 0.410  (taker)  Up= 6885.1 Down= 7204.0
+[09:42:54] SELL Down   12.9 @ 0.410  (taker)  Up= 6885.1 Down= 7191.1
+[09:42:54] SELL Down   40.0 @ 0.400  (taker)  Up= 6885.1 Down= 7151.1
+[09:42:56] SELL Up     25.0 @ 0.520  (taker)  Up= 6860.1 Down= 7151.1
+[09:42:56] SELL Up     19.0 @ 0.520  (taker)  Up= 6841.1 Down= 7151.1
+[09:42:56] SELL Up    253.3 @ 0.520  (taker)  Up= 6587.8 Down= 7151.1
+[09:42:56] SELL Up    301.0 @ 0.520  (taker)  Up= 6286.8 Down= 7151.1
+[09:42:56] BUY  Down    3.7 @ 0.480  (taker)  Up= 6286.8 Down= 7154.8
+[09:42:56] BUY  Down  301.0 @ 0.480  (maker)  Up= 6286.8 Down= 7455.8
+[09:42:56] BUY  Down  301.0 @ 0.480  (maker)  Up= 6286.8 Down= 7756.8
+[09:42:58] BUY  Up     26.0 @ 0.510  (maker)  Up= 6312.8 Down= 7756.8
+[09:43:06] BUY  Down   35.5 @ 0.610  (maker)  Up= 6312.8 Down= 7792.3
+[09:43:06] BUY  Down    2.6 @ 0.610  (maker)  Up= 6312.8 Down= 7794.9
+[09:43:06] BUY  Down    2.6 @ 0.610  (maker)  Up= 6312.8 Down= 7797.4
+[09:43:06] BUY  Down   18.9 @ 0.610  (maker)  Up= 6312.8 Down= 7816.3
+[09:43:06] BUY  Down    5.0 @ 0.610  (maker)  Up= 6312.8 Down= 7821.3
+[09:43:06] BUY  Down    5.0 @ 0.610  (maker)  Up= 6312.8 Down= 7826.3
+[09:43:06] BUY  Down   34.9 @ 0.610  (maker)  Up= 6312.8 Down= 7861.3
+[09:43:06] BUY  Down    5.0 @ 0.610  (maker)  Up= 6312.8 Down= 7866.3
+[09:43:06] BUY  Down    5.0 @ 0.610  (maker)  Up= 6312.8 Down= 7871.3
+[09:43:06] BUY  Down    5.0 @ 0.610  (maker)  Up= 6312.8 Down= 7876.3
+[09:43:06] BUY  Down    5.0 @ 0.610  (maker)  Up= 6312.8 Down= 7881.3
+[09:43:06] BUY  Down    5.4 @ 0.610  (maker)  Up= 6312.8 Down= 7886.6
+[09:43:06] BUY  Down    2.6 @ 0.610  (maker)  Up= 6312.8 Down= 7889.2
+[09:43:06] BUY  Down   12.8 @ 0.610  (maker)  Up= 6312.8 Down= 7902.0
+[09:43:06] BUY  Down   16.0 @ 0.610  (maker)  Up= 6312.8 Down= 7918.0
+[09:43:06] BUY  Down   18.5 @ 0.610  (maker)  Up= 6312.8 Down= 7936.5
+[09:43:16] BUY  Up     10.0 @ 0.210  (maker)  Up= 6322.8 Down= 7936.5
+[09:43:16] BUY  Up      2.6 @ 0.220  (maker)  Up= 6325.5 Down= 7936.5
+[09:43:16] BUY  Up      5.0 @ 0.200  (maker)  Up= 6330.5 Down= 7936.5
+[09:43:16] BUY  Up      5.0 @ 0.220  (maker)  Up= 6335.5 Down= 7936.5
+[09:43:16] BUY  Up     19.4 @ 0.200  (maker)  Up= 6354.9 Down= 7936.5
+[09:43:16] BUY  Up    136.0 @ 0.210  (maker)  Up= 6490.9 Down= 7936.5
+[09:43:16] BUY  Up     80.0 @ 0.210  (maker)  Up= 6570.9 Down= 7936.5
+[09:43:16] BUY  Up     10.1 @ 0.220  (maker)  Up= 6581.0 Down= 7936.5
+[09:43:16] BUY  Up     50.0 @ 0.210  (maker)  Up= 6631.0 Down= 7936.5
+[09:43:16] BUY  Up     20.0 @ 0.220  (maker)  Up= 6651.0 Down= 7936.5
+[09:43:16] BUY  Up     10.0 @ 0.200  (maker)  Up= 6661.0 Down= 7936.5
+[09:43:16] BUY  Up     10.0 @ 0.200  (maker)  Up= 6671.0 Down= 7936.5
+[09:43:16] BUY  Up     25.0 @ 0.210  (maker)  Up= 6696.0 Down= 7936.5
+[09:43:16] BUY  Up     10.0 @ 0.200  (maker)  Up= 6706.0 Down= 7936.5
+[09:43:18] BUY  Up     25.0 @ 0.220  (taker)  Up= 6731.0 Down= 7936.5
+[09:43:18] BUY  Up     10.0 @ 0.220  (taker)  Up= 6741.0 Down= 7936.5
+[09:43:18] BUY  Up     10.5 @ 0.220  (taker)  Up= 6751.5 Down= 7936.5
+[09:43:18] BUY  Up     19.1 @ 0.220  (taker)  Up= 6770.6 Down= 7936.5
+[09:43:18] BUY  Up     19.0 @ 0.220  (taker)  Up= 6789.6 Down= 7936.5
+[09:43:18] BUY  Up     19.0 @ 0.220  (taker)  Up= 6808.6 Down= 7936.5
+[09:43:18] BUY  Up     19.0 @ 0.220  (taker)  Up= 6827.6 Down= 7936.5
+[09:43:18] BUY  Up     15.0 @ 0.220  (taker)  Up= 6842.6 Down= 7936.5
+[09:43:18] BUY  Up     15.0 @ 0.220  (taker)  Up= 6857.6 Down= 7936.5
+[09:43:18] BUY  Up    263.3 @ 0.220  (maker)  Up= 7120.9 Down= 7936.5
+[09:43:18] BUY  Up     62.5 @ 0.200  (maker)  Up= 7183.4 Down= 7936.5
+[09:43:18] BUY  Up     74.1 @ 0.200  (maker)  Up= 7257.4 Down= 7936.5
+[09:43:18] SELL Down   25.0 @ 0.780  (taker)  Up= 7257.4 Down= 7911.5
+[09:43:18] SELL Down   50.7 @ 0.780  (taker)  Up= 7257.4 Down= 7860.8
+[09:43:18] SELL Down   20.0 @ 0.780  (taker)  Up= 7257.4 Down= 7840.8
+[09:43:18] SELL Down   16.0 @ 0.780  (taker)  Up= 7257.4 Down= 7824.8
+[09:43:20] BUY  Up    301.0 @ 0.190  (maker)  Up= 7558.4 Down= 7824.8
+[09:43:22] BUY  Up      3.4 @ 0.250  (maker)  Up= 7561.8 Down= 7824.8
+[09:43:22] BUY  Up      3.7 @ 0.250  (maker)  Up= 7565.5 Down= 7824.8
+[09:43:22] BUY  Up     27.7 @ 0.250  (maker)  Up= 7593.2 Down= 7824.8
+[09:43:22] BUY  Up     16.0 @ 0.250  (maker)  Up= 7609.2 Down= 7824.8
+[09:43:22] BUY  Up     20.0 @ 0.250  (maker)  Up= 7629.2 Down= 7824.8
+[09:43:22] BUY  Up     10.0 @ 0.250  (maker)  Up= 7639.2 Down= 7824.8
+[09:43:22] BUY  Up     10.5 @ 0.250  (maker)  Up= 7649.7 Down= 7824.8
+[09:43:22] BUY  Up     49.7 @ 0.250  (maker)  Up= 7699.4 Down= 7824.8
+[09:43:24] BUY  Up      9.5 @ 0.290  (taker)  Up= 7708.9 Down= 7824.8
+[09:43:24] BUY  Up     35.0 @ 0.290  (taker)  Up= 7743.9 Down= 7824.8
+[09:43:24] BUY  Up     35.0 @ 0.280  (taker)  Up= 7778.9 Down= 7824.8
+[09:43:24] BUY  Up      6.0 @ 0.290  (taker)  Up= 7784.9 Down= 7824.8
+[09:43:24] BUY  Up     16.0 @ 0.230  (taker)  Up= 7800.9 Down= 7824.8
+[09:43:24] BUY  Up     10.0 @ 0.270  (taker)  Up= 7810.9 Down= 7824.8
+[09:43:24] BUY  Up     50.0 @ 0.230  (taker)  Up= 7860.9 Down= 7824.8
+[09:43:24] BUY  Up     10.8 @ 0.260  (taker)  Up= 7871.7 Down= 7824.8
+[09:43:24] BUY  Up    301.0 @ 0.289  (maker)  Up= 8172.7 Down= 7824.8
+[09:43:24] BUY  Up     40.0 @ 0.250  (maker)  Up= 8212.7 Down= 7824.8
+[09:43:24] BUY  Up    301.0 @ 0.234  (maker)  Up= 8513.7 Down= 7824.8
+[09:43:24] BUY  Up    301.0 @ 0.249  (maker)  Up= 8814.7 Down= 7824.8
+[09:43:24] BUY  Up     20.0 @ 0.250  (maker)  Up= 8834.7 Down= 7824.8
+[09:43:24] BUY  Up    100.0 @ 0.250  (maker)  Up= 8934.7 Down= 7824.8
+[09:43:24] SELL Down   17.0 @ 0.710  (taker)  Up= 8934.7 Down= 7807.8
+[09:43:24] SELL Down   10.5 @ 0.710  (taker)  Up= 8934.7 Down= 7797.3
+[09:43:24] SELL Down    8.6 @ 0.720  (taker)  Up= 8934.7 Down= 7788.7
+[09:43:24] SELL Down    6.3 @ 0.710  (taker)  Up= 8934.7 Down= 7782.4
+[09:43:24] SELL Down    9.5 @ 0.710  (taker)  Up= 8934.7 Down= 7772.9
+[09:43:24] SELL Down   17.0 @ 0.710  (taker)  Up= 8934.7 Down= 7755.9
+[09:43:24] SELL Down   15.0 @ 0.720  (taker)  Up= 8934.7 Down= 7740.9
+[09:43:24] SELL Down   20.0 @ 0.710  (taker)  Up= 8934.7 Down= 7720.9
+[09:43:24] SELL Down   17.0 @ 0.710  (taker)  Up= 8934.7 Down= 7703.9
+[09:43:24] SELL Down    6.2 @ 0.700  (taker)  Up= 8934.7 Down= 7697.7
+[09:43:24] SELL Down   17.0 @ 0.710  (taker)  Up= 8934.7 Down= 7680.7
+[09:43:24] SELL Down   17.0 @ 0.710  (taker)  Up= 8934.7 Down= 7663.7
+[09:43:24] SELL Down   17.0 @ 0.720  (taker)  Up= 8934.7 Down= 7646.7
+[09:43:24] SELL Down   20.0 @ 0.700  (taker)  Up= 8934.7 Down= 7626.7
+[09:43:24] SELL Down    5.0 @ 0.700  (taker)  Up= 8934.7 Down= 7621.7
+[09:43:24] SELL Down    6.0 @ 0.700  (taker)  Up= 8934.7 Down= 7615.7
+[09:43:24] SELL Down    6.4 @ 0.720  (taker)  Up= 8934.7 Down= 7609.3
+[09:43:24] SELL Down    6.5 @ 0.770  (taker)  Up= 8934.7 Down= 7602.8
+[09:43:24] SELL Down   20.0 @ 0.760  (taker)  Up= 8934.7 Down= 7582.8
+[09:43:24] SELL Down   25.0 @ 0.760  (taker)  Up= 8934.7 Down= 7557.8
+[09:43:24] SELL Down    5.0 @ 0.760  (taker)  Up= 8934.7 Down= 7552.8
+[09:43:24] SELL Down   29.8 @ 0.770  (taker)  Up= 8934.7 Down= 7523.0
+[09:43:24] SELL Down   57.8 @ 0.760  (taker)  Up= 8934.7 Down= 7465.3
+[09:43:24] SELL Down   26.0 @ 0.770  (taker)  Up= 8934.7 Down= 7439.3
+[09:43:24] SELL Down   15.0 @ 0.760  (taker)  Up= 8934.7 Down= 7424.3
+[09:43:24] SELL Down  100.0 @ 0.770  (taker)  Up= 8934.7 Down= 7324.3
+[09:43:24] SELL Down    6.6 @ 0.730  (taker)  Up= 8934.7 Down= 7317.7
+[09:43:24] SELL Down    5.0 @ 0.720  (taker)  Up= 8934.7 Down= 7312.7
+[09:43:24] SELL Down   11.0 @ 0.730  (taker)  Up= 8934.7 Down= 7301.7
+[09:43:24] SELL Down  143.2 @ 0.760  (taker)  Up= 8934.7 Down= 7158.4
+[09:43:24] SELL Down   20.0 @ 0.730  (taker)  Up= 8934.7 Down= 7138.4
+[09:43:24] SELL Down    5.0 @ 0.730  (taker)  Up= 8934.7 Down= 7133.4
+[09:43:24] SELL Down   39.4 @ 0.730  (taker)  Up= 8934.7 Down= 7094.0
+[09:43:26] BUY  Up      1.4 @ 0.260  (maker)  Up= 8936.0 Down= 7094.0
+[09:43:26] BUY  Up     10.0 @ 0.260  (maker)  Up= 8946.0 Down= 7094.0
+[09:43:26] BUY  Up      3.5 @ 0.260  (maker)  Up= 8949.5 Down= 7094.0
+[09:43:26] BUY  Up      5.0 @ 0.260  (maker)  Up= 8954.5 Down= 7094.0
+[09:43:26] BUY  Up      5.0 @ 0.260  (maker)  Up= 8959.5 Down= 7094.0
+[09:43:26] BUY  Up     27.0 @ 0.260  (maker)  Up= 8986.5 Down= 7094.0
+[09:43:26] BUY  Up      2.8 @ 0.260  (maker)  Up= 8989.3 Down= 7094.0
+[09:43:26] BUY  Up      2.1 @ 0.260  (maker)  Up= 8991.4 Down= 7094.0
+[09:43:26] BUY  Up      4.5 @ 0.260  (maker)  Up= 8995.8 Down= 7094.0
+[09:43:26] BUY  Up     18.0 @ 0.260  (maker)  Up= 9013.8 Down= 7094.0
+[09:43:26] BUY  Up      5.0 @ 0.260  (maker)  Up= 9018.8 Down= 7094.0
+[09:43:26] BUY  Up      5.0 @ 0.260  (maker)  Up= 9023.8 Down= 7094.0
+[09:43:26] BUY  Up      5.0 @ 0.260  (maker)  Up= 9028.8 Down= 7094.0
+[09:43:26] BUY  Up      8.9 @ 0.260  (maker)  Up= 9037.7 Down= 7094.0
+[09:43:26] BUY  Up     10.0 @ 0.260  (maker)  Up= 9047.7 Down= 7094.0
+[09:43:26] SELL Down    2.8 @ 0.740  (taker)  Up= 9047.7 Down= 7091.3
+[09:43:28] BUY  Up    187.9 @ 0.260  (maker)  Up= 9235.6 Down= 7091.3
+[09:43:28] BUY  Up    138.6 @ 0.270  (maker)  Up= 9374.2 Down= 7091.3
+[09:43:28] BUY  Up     18.5 @ 0.270  (maker)  Up= 9392.8 Down= 7091.3
+[09:43:28] BUY  Up      1.4 @ 0.270  (maker)  Up= 9394.1 Down= 7091.3
+[09:43:28] BUY  Up      2.1 @ 0.270  (maker)  Up= 9396.2 Down= 7091.3
+[09:43:28] BUY  Up     10.3 @ 0.270  (maker)  Up= 9406.5 Down= 7091.3
+[09:43:28] BUY  Up     10.0 @ 0.270  (maker)  Up= 9416.5 Down= 7091.3
+[09:43:30] BUY  Up     10.0 @ 0.270  (maker)  Up= 9426.5 Down= 7091.3
+[09:43:30] BUY  Up      2.0 @ 0.270  (maker)  Up= 9428.5 Down= 7091.3
+[09:43:30] BUY  Up     10.0 @ 0.270  (maker)  Up= 9438.5 Down= 7091.3
+[09:43:30] BUY  Up      2.1 @ 0.270  (maker)  Up= 9440.7 Down= 7091.3
+[09:43:36] BUY  Up    301.0 @ 0.310  (maker)  Up= 9741.7 Down= 7091.3
+[09:43:36] BUY  Up     22.2 @ 0.320  (maker)  Up= 9763.9 Down= 7091.3
+[09:43:36] BUY  Up      1.5 @ 0.320  (maker)  Up= 9765.3 Down= 7091.3
+[09:43:36] BUY  Up    301.0 @ 0.312  (maker)  Up=10066.3 Down= 7091.3
+[09:43:36] BUY  Up     29.4 @ 0.320  (maker)  Up=10095.8 Down= 7091.3
+[09:43:36] SELL Down  301.0 @ 0.690  (taker)  Up=10095.8 Down= 6790.3
+[09:43:36] SELL Down    6.0 @ 0.680  (taker)  Up=10095.8 Down= 6784.3
+[09:43:36] SELL Down    8.7 @ 0.680  (taker)  Up=10095.8 Down= 6775.6
+[09:43:36] SELL Down  205.7 @ 0.690  (taker)  Up=10095.8 Down= 6569.9
+[09:43:36] SELL Down   15.2 @ 0.680  (taker)  Up=10095.8 Down= 6554.7
+[09:43:36] SELL Down    5.0 @ 0.690  (taker)  Up=10095.8 Down= 6549.7
+[09:43:36] SELL Down   44.6 @ 0.680  (taker)  Up=10095.8 Down= 6505.1
+[09:43:36] SELL Down   10.8 @ 0.690  (taker)  Up=10095.8 Down= 6494.3
+[09:43:36] SELL Down    5.0 @ 0.690  (taker)  Up=10095.8 Down= 6489.3
+[09:43:38] BUY  Up    200.0 @ 0.320  (maker)  Up=10295.8 Down= 6489.3
+[09:43:42] BUY  Up      5.7 @ 0.320  (maker)  Up=10301.5 Down= 6489.3
+[09:43:44] BUY  Up      2.1 @ 0.320  (maker)  Up=10303.6 Down= 6489.3
+[09:43:44] BUY  Up     40.0 @ 0.320  (maker)  Up=10343.6 Down= 6489.3
+[09:43:46] BUY  Up     25.0 @ 0.470  (taker)  Up=10368.6 Down= 6489.3
+[09:43:46] BUY  Up     25.6 @ 0.330  (taker)  Up=10394.2 Down= 6489.3
+[09:43:46] BUY  Up     25.0 @ 0.340  (taker)  Up=10419.2 Down= 6489.3
+[09:43:46] BUY  Up      5.0 @ 0.440  (taker)  Up=10424.2 Down= 6489.3
+[09:43:46] BUY  Up     39.7 @ 0.490  (maker)  Up=10463.9 Down= 6489.3
+[09:43:46] BUY  Up     75.0 @ 0.490  (maker)  Up=10538.9 Down= 6489.3
+[09:43:46] BUY  Up     54.0 @ 0.490  (maker)  Up=10592.9 Down= 6489.3
+[09:43:46] BUY  Up     25.0 @ 0.470  (maker)  Up=10617.9 Down= 6489.3
+[09:43:46] BUY  Up     85.6 @ 0.336  (maker)  Up=10703.5 Down= 6489.3
+[09:43:46] BUY  Up    172.4 @ 0.426  (maker)  Up=10876.0 Down= 6489.3
+[09:43:46] BUY  Up     39.2 @ 0.490  (maker)  Up=10915.2 Down= 6489.3
+[09:43:46] BUY  Up     50.0 @ 0.340  (maker)  Up=10965.2 Down= 6489.3
+[09:43:46] SELL Down    5.0 @ 0.660  (taker)  Up=10965.2 Down= 6484.3
+[09:43:46] SELL Down   25.0 @ 0.660  (taker)  Up=10965.2 Down= 6459.3
+[09:43:46] SELL Down    5.0 @ 0.670  (taker)  Up=10965.2 Down= 6454.3
+[09:43:46] SELL Down   20.0 @ 0.570  (taker)  Up=10965.2 Down= 6434.3
+[09:43:46] SELL Down    5.3 @ 0.570  (taker)  Up=10965.2 Down= 6429.0
+[09:43:46] SELL Down    5.3 @ 0.550  (taker)  Up=10965.2 Down= 6423.7
+[09:43:46] SELL Down    5.0 @ 0.600  (taker)  Up=10965.2 Down= 6418.6
+[09:43:46] SELL Down   11.0 @ 0.550  (taker)  Up=10965.2 Down= 6407.6
+[09:43:46] SELL Down    5.4 @ 0.600  (taker)  Up=10965.2 Down= 6402.2
+[09:43:46] SELL Down    5.3 @ 0.580  (taker)  Up=10965.2 Down= 6396.9
+[09:43:46] SELL Down    5.0 @ 0.600  (taker)  Up=10965.2 Down= 6391.9
+[09:43:46] SELL Down    5.0 @ 0.600  (taker)  Up=10965.2 Down= 6386.9
+[09:43:46] SELL Down   20.0 @ 0.580  (taker)  Up=10965.2 Down= 6366.9
+[09:43:46] SELL Down    5.3 @ 0.560  (taker)  Up=10965.2 Down= 6361.6
+[09:43:46] SELL Down   20.0 @ 0.560  (taker)  Up=10965.2 Down= 6341.6
+[09:43:46] SELL Down    9.4 @ 0.600  (taker)  Up=10965.2 Down= 6332.2
+[09:43:46] SELL Down    5.4 @ 0.590  (taker)  Up=10965.2 Down= 6326.8
+[09:43:46] SELL Down   20.0 @ 0.590  (taker)  Up=10965.2 Down= 6306.8
+[09:43:46] SELL Down   20.0 @ 0.550  (taker)  Up=10965.2 Down= 6286.8
+[09:43:48] BUY  Up     68.0 @ 0.490  (maker)  Up=11033.2 Down= 6286.8
+[09:43:50] BUY  Down  301.0 @ 0.370  (maker)  Up=11033.2 Down= 6587.8
+[09:43:54] SELL Up     25.0 @ 0.420  (taker)  Up=11008.2 Down= 6587.8
+[09:43:54] SELL Up     25.0 @ 0.410  (taker)  Up=10983.2 Down= 6587.8
+[09:43:54] SELL Up     10.0 @ 0.410  (taker)  Up=10973.2 Down= 6587.8
+[09:43:54] SELL Up     16.0 @ 0.490  (taker)  Up=10957.2 Down= 6587.8
+[09:43:54] SELL Up     16.4 @ 0.560  (taker)  Up=10940.9 Down= 6587.8
+[09:43:54] SELL Up     16.0 @ 0.490  (taker)  Up=10924.9 Down= 6587.8
+[09:43:54] SELL Up     16.0 @ 0.490  (taker)  Up=10908.9 Down= 6587.8
+[09:43:54] SELL Up     16.0 @ 0.500  (taker)  Up=10892.9 Down= 6587.8
+[09:43:54] SELL Up     11.0 @ 0.530  (taker)  Up=10881.9 Down= 6587.8
+[09:43:54] SELL Up     16.0 @ 0.490  (taker)  Up=10865.9 Down= 6587.8
+[09:43:54] SELL Up     16.0 @ 0.510  (taker)  Up=10849.9 Down= 6587.8
+[09:43:54] SELL Up     16.0 @ 0.490  (taker)  Up=10833.9 Down= 6587.8
+[09:43:54] SELL Up     20.0 @ 0.490  (taker)  Up=10813.9 Down= 6587.8
+[09:43:54] SELL Up      5.0 @ 0.500  (taker)  Up=10808.9 Down= 6587.8
+[09:43:54] SELL Up     20.0 @ 0.500  (taker)  Up=10788.9 Down= 6587.8
+[09:43:54] SELL Up     16.0 @ 0.480  (taker)  Up=10772.9 Down= 6587.8
+[09:43:54] SELL Up     20.0 @ 0.470  (taker)  Up=10752.9 Down= 6587.8
+[09:43:54] SELL Up     38.8 @ 0.480  (taker)  Up=10714.1 Down= 6587.8
+[09:43:54] SELL Up    157.0 @ 0.470  (taker)  Up=10557.1 Down= 6587.8
+[09:43:54] SELL Up     33.0 @ 0.480  (taker)  Up=10524.1 Down= 6587.8
+[09:43:54] SELL Up     16.0 @ 0.480  (taker)  Up=10508.1 Down= 6587.8
+[09:43:54] SELL Up     20.0 @ 0.450  (taker)  Up=10488.1 Down= 6587.8
+[09:43:54] SELL Up     35.0 @ 0.440  (taker)  Up=10453.1 Down= 6587.8
+[09:43:54] SELL Up     20.0 @ 0.460  (taker)  Up=10433.1 Down= 6587.8
+[09:43:54] SELL Up     35.0 @ 0.470  (taker)  Up=10398.1 Down= 6587.8
+[09:43:54] SELL Up     44.0 @ 0.470  (taker)  Up=10354.1 Down= 6587.8
+[09:43:54] SELL Up     35.0 @ 0.450  (taker)  Up=10319.1 Down= 6587.8
+[09:43:54] SELL Up     20.0 @ 0.440  (taker)  Up=10299.1 Down= 6587.8
+[09:43:54] SELL Up     20.0 @ 0.430  (taker)  Up=10279.1 Down= 6587.8
+[09:43:54] SELL Up     35.0 @ 0.430  (taker)  Up=10244.1 Down= 6587.8
+[09:43:54] BUY  Down   23.0 @ 0.580  (taker)  Up=10244.1 Down= 6610.8
+[09:43:54] BUY  Down   10.0 @ 0.590  (taker)  Up=10244.1 Down= 6620.8
+[09:43:54] BUY  Down   15.9 @ 0.440  (taker)  Up=10244.1 Down= 6636.7
+[09:43:54] BUY  Down   20.2 @ 0.530  (taker)  Up=10244.1 Down= 6656.9
+[09:43:54] BUY  Down    2.0 @ 0.580  (taker)  Up=10244.1 Down= 6658.9
+[09:43:54] BUY  Down   25.0 @ 0.580  (taker)  Up=10244.1 Down= 6683.9
+[09:43:54] BUY  Down   10.0 @ 0.540  (taker)  Up=10244.1 Down= 6693.9
+[09:43:54] BUY  Down  100.0 @ 0.600  (maker)  Up=10244.1 Down= 6793.9
+[09:43:54] BUY  Down   42.4 @ 0.600  (maker)  Up=10244.1 Down= 6836.4
+[09:43:54] BUY  Down   42.8 @ 0.590  (maker)  Up=10244.1 Down= 6879.2
+[09:43:54] BUY  Down   23.0 @ 0.590  (maker)  Up=10244.1 Down= 6902.1
+[09:43:54] BUY  Down   65.6 @ 0.600  (maker)  Up=10244.1 Down= 6967.7
+[09:43:54] BUY  Down   93.0 @ 0.585  (maker)  Up=10244.1 Down= 7060.7
+[09:43:54] BUY  Down  200.2 @ 0.493  (maker)  Up=10244.1 Down= 7260.9
+[09:43:54] BUY  Down    5.0 @ 0.590  (maker)  Up=10244.1 Down= 7265.9
+[09:43:54] BUY  Down    3.0 @ 0.590  (maker)  Up=10244.1 Down= 7268.9
+[09:43:54] BUY  Down   37.1 @ 0.590  (maker)  Up=10244.1 Down= 7306.0
+[09:43:54] BUY  Down  301.0 @ 0.527  (maker)  Up=10244.1 Down= 7607.0
+[09:43:54] BUY  Down  301.0 @ 0.552  (maker)  Up=10244.1 Down= 7908.0
+[09:43:56] BUY  Down   68.1 @ 0.590  (maker)  Up=10244.1 Down= 7976.1
+[09:43:56] BUY  Down    2.0 @ 0.590  (maker)  Up=10244.1 Down= 7978.1
+[09:43:56] BUY  Down   36.0 @ 0.590  (maker)  Up=10244.1 Down= 8014.1
+[09:43:56] BUY  Down  110.4 @ 0.640  (maker)  Up=10244.1 Down= 8124.5
+[09:43:56] BUY  Down   25.6 @ 0.590  (maker)  Up=10244.1 Down= 8150.1
+[09:43:56] BUY  Down    6.0 @ 0.590  (maker)  Up=10244.1 Down= 8156.2
+[09:43:56] BUY  Down   24.4 @ 0.590  (maker)  Up=10244.1 Down= 8180.6
+[09:43:56] BUY  Down   18.0 @ 0.590  (maker)  Up=10244.1 Down= 8198.6
+[09:43:56] BUY  Down   10.0 @ 0.590  (maker)  Up=10244.1 Down= 8208.6
+[09:43:58] SELL Up      6.8 @ 0.330  (taker)  Up=10237.4 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.330  (taker)  Up=10232.4 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.330  (taker)  Up=10227.4 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.330  (taker)  Up=10222.4 Down= 8208.6
+[09:43:58] SELL Up      6.3 @ 0.330  (taker)  Up=10216.1 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10211.1 Down= 8208.6
+[09:43:58] SELL Up     44.2 @ 0.310  (taker)  Up=10166.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10161.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10156.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10151.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10146.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10141.9 Down= 8208.6
+[09:43:58] SELL Up     13.9 @ 0.320  (taker)  Up=10127.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10122.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.310  (taker)  Up=10117.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10112.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10107.9 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10102.9 Down= 8208.6
+[09:43:58] SELL Up     27.9 @ 0.320  (taker)  Up=10075.1 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10070.1 Down= 8208.6
+[09:43:58] SELL Up      5.0 @ 0.320  (taker)  Up=10065.1 Down= 8208.6
+[09:43:58] BUY  Down  100.0 @ 0.690  (taker)  Up=10065.1 Down= 8308.6
+[09:43:58] BUY  Down   50.0 @ 0.690  (taker)  Up=10065.1 Down= 8358.6
+[09:43:58] BUY  Down   51.5 @ 0.640  (maker)  Up=10065.1 Down= 8410.0
+[09:43:58] BUY  Down   28.0 @ 0.670  (maker)  Up=10065.1 Down= 8438.0
+[09:43:58] BUY  Down  301.0 @ 0.687  (maker)  Up=10065.1 Down= 8739.0
+[09:43:58] BUY  Down   11.9 @ 0.640  (maker)  Up=10065.1 Down= 8750.9
+[09:44:02] BUY  Down   40.0 @ 0.700  (maker)  Up=10065.1 Down= 8790.9
+[09:44:02] BUY  Down   40.0 @ 0.700  (maker)  Up=10065.1 Down= 8830.9
+[09:44:02] BUY  Down   40.0 @ 0.700  (maker)  Up=10065.1 Down= 8870.9
+[09:44:02] BUY  Down   91.6 @ 0.700  (maker)  Up=10065.1 Down= 8962.6
+[09:44:04] BUY  Up     58.6 @ 0.360  (maker)  Up=10123.7 Down= 8962.6
+[09:44:04] BUY  Up     10.0 @ 0.360  (maker)  Up=10133.7 Down= 8962.6
+[09:44:04] BUY  Up      6.0 @ 0.360  (maker)  Up=10139.7 Down= 8962.6
+[09:44:04] BUY  Down   40.0 @ 0.700  (maker)  Up=10139.7 Down= 9002.6
+[09:44:04] BUY  Down   25.0 @ 0.700  (maker)  Up=10139.7 Down= 9027.6
+[09:44:04] BUY  Down   16.6 @ 0.700  (maker)  Up=10139.7 Down= 9044.2
+[09:44:04] BUY  Down    2.8 @ 0.700  (maker)  Up=10139.7 Down= 9046.9
+[09:44:04] BUY  Down    5.0 @ 0.700  (maker)  Up=10139.7 Down= 9051.9
+[09:44:06] BUY  Up     35.0 @ 0.340  (taker)  Up=10174.7 Down= 9051.9
+[09:44:06] BUY  Up      5.0 @ 0.350  (taker)  Up=10179.7 Down= 9051.9
+[09:44:06] BUY  Up     25.0 @ 0.340  (taker)  Up=10204.7 Down= 9051.9
+[09:44:06] BUY  Up     35.0 @ 0.350  (taker)  Up=10239.7 Down= 9051.9
+[09:44:06] BUY  Up     25.0 @ 0.350  (taker)  Up=10264.7 Down= 9051.9
+[09:44:06] BUY  Up     16.0 @ 0.340  (taker)  Up=10280.7 Down= 9051.9
+[09:44:06] BUY  Up      6.0 @ 0.350  (taker)  Up=10286.7 Down= 9051.9
+[09:44:06] BUY  Up     35.0 @ 0.330  (taker)  Up=10321.7 Down= 9051.9
+[09:44:06] BUY  Up     35.0 @ 0.310  (taker)  Up=10356.7 Down= 9051.9
+[09:44:06] BUY  Up     10.0 @ 0.320  (taker)  Up=10366.7 Down= 9051.9
+[09:44:06] BUY  Up    301.0 @ 0.346  (maker)  Up=10667.7 Down= 9051.9
+[09:44:06] BUY  Up     21.9 @ 0.360  (maker)  Up=10689.5 Down= 9051.9
+[09:44:06] BUY  Up      7.0 @ 0.360  (maker)  Up=10696.5 Down= 9051.9
+[09:44:06] BUY  Up     35.0 @ 0.360  (maker)  Up=10731.5 Down= 9051.9
+[09:44:06] BUY  Up     38.2 @ 0.490  (maker)  Up=10769.7 Down= 9051.9
+[09:44:06] BUY  Up      5.8 @ 0.490  (maker)  Up=10775.5 Down= 9051.9
+[09:44:06] BUY  Up     17.8 @ 0.490  (maker)  Up=10793.3 Down= 9051.9
+[09:44:06] BUY  Up    126.0 @ 0.360  (maker)  Up=10919.3 Down= 9051.9
+[09:44:06] BUY  Up    158.2 @ 0.320  (maker)  Up=11077.5 Down= 9051.9
+[09:44:06] BUY  Up     35.0 @ 0.360  (maker)  Up=11112.5 Down= 9051.9
+[09:44:06] BUY  Up      1.6 @ 0.360  (maker)  Up=11114.1 Down= 9051.9
+[09:44:06] SELL Down   15.0 @ 0.650  (taker)  Up=11114.1 Down= 9036.9
+[09:44:06] SELL Down   25.0 @ 0.660  (taker)  Up=11114.1 Down= 9011.9
+[09:44:06] SELL Down   25.0 @ 0.660  (taker)  Up=11114.1 Down= 8986.9
+[09:44:06] SELL Down   25.0 @ 0.650  (taker)  Up=11114.1 Down= 8961.9
+[09:44:06] SELL Down   70.0 @ 0.650  (taker)  Up=11114.1 Down= 8891.9
+[09:44:06] SELL Down   17.8 @ 0.510  (taker)  Up=11114.1 Down= 8874.2
+[09:44:06] SELL Down   15.0 @ 0.640  (taker)  Up=11114.1 Down= 8859.2
+[09:44:06] SELL Down   15.0 @ 0.640  (taker)  Up=11114.1 Down= 8844.2
+[09:44:06] SELL Down   10.0 @ 0.640  (taker)  Up=11114.1 Down= 8834.2
+[09:44:06] SELL Down   15.0 @ 0.640  (taker)  Up=11114.1 Down= 8819.2
+[09:44:06] SELL Down   15.0 @ 0.640  (taker)  Up=11114.1 Down= 8804.2
+[09:44:06] SELL Down   15.0 @ 0.640  (taker)  Up=11114.1 Down= 8789.2
+[09:44:06] SELL Down   15.0 @ 0.640  (taker)  Up=11114.1 Down= 8774.2
+[09:44:06] SELL Down    5.0 @ 0.640  (taker)  Up=11114.1 Down= 8769.2
+[09:44:06] SELL Down   15.0 @ 0.640  (taker)  Up=11114.1 Down= 8754.2
+[09:44:06] SELL Down   20.0 @ 0.680  (taker)  Up=11114.1 Down= 8734.2
+[09:44:06] SELL Down   20.0 @ 0.670  (taker)  Up=11114.1 Down= 8714.2
+[09:44:06] SELL Down    8.2 @ 0.670  (taker)  Up=11114.1 Down= 8705.9
+[09:44:06] SELL Down   20.0 @ 0.690  (taker)  Up=11114.1 Down= 8685.9
+[09:44:06] SELL Down    5.0 @ 0.690  (taker)  Up=11114.1 Down= 8680.9
+[09:44:06] SELL Down    5.0 @ 0.690  (taker)  Up=11114.1 Down= 8675.9
+[09:44:08] SELL Up     15.0 @ 0.510  (taker)  Up=11099.1 Down= 8675.9
+[09:44:08] SELL Up      5.7 @ 0.520  (taker)  Up=11093.4 Down= 8675.9
+[09:44:08] SELL Up     20.0 @ 0.520  (taker)  Up=11073.4 Down= 8675.9
+[09:44:08] SELL Up     15.0 @ 0.510  (taker)  Up=11058.4 Down= 8675.9
+[09:44:08] SELL Up     15.0 @ 0.510  (taker)  Up=11043.4 Down= 8675.9
+[09:44:08] BUY  Up     16.0 @ 0.490  (maker)  Up=11059.4 Down= 8675.9
+[09:44:08] BUY  Down   35.0 @ 0.510  (taker)  Up=11059.4 Down= 8710.9
+[09:44:08] BUY  Down    1.8 @ 0.500  (taker)  Up=11059.4 Down= 8712.7
+[09:44:08] BUY  Down   35.0 @ 0.520  (taker)  Up=11059.4 Down= 8747.7
+[09:44:08] BUY  Down   35.0 @ 0.490  (taker)  Up=11059.4 Down= 8782.7
+[09:44:08] BUY  Down   71.8 @ 0.515  (maker)  Up=11059.4 Down= 8854.5
+[09:44:08] BUY  Down  105.7 @ 0.488  (maker)  Up=11059.4 Down= 8960.2
+[09:44:10] BUY  Up     63.3 @ 0.350  (maker)  Up=11122.7 Down= 8960.2
+[09:44:10] BUY  Down   50.0 @ 0.520  (maker)  Up=11122.7 Down= 9010.2
+[09:44:10] BUY  Down   22.0 @ 0.520  (maker)  Up=11122.7 Down= 9032.2
+[09:44:10] BUY  Down   20.0 @ 0.520  (maker)  Up=11122.7 Down= 9052.2
+[09:44:12] BUY  Up      5.0 @ 0.590  (maker)  Up=11127.7 Down= 9052.2
+[09:44:12] BUY  Up      8.2 @ 0.470  (maker)  Up=11135.9 Down= 9052.2
+[09:44:12] BUY  Down    2.3 @ 0.520  (maker)  Up=11135.9 Down= 9054.5
+[09:44:12] BUY  Down   16.0 @ 0.520  (maker)  Up=11135.9 Down= 9070.5
+[09:44:12] BUY  Down  100.0 @ 0.520  (maker)  Up=11135.9 Down= 9170.5
+[09:44:16] BUY  Down   20.0 @ 0.240  (maker)  Up=11135.9 Down= 9190.5
+[09:44:16] BUY  Down  118.7 @ 0.240  (maker)  Up=11135.9 Down= 9309.1
+[09:44:16] BUY  Down   20.0 @ 0.240  (maker)  Up=11135.9 Down= 9329.1
+[09:44:16] BUY  Down   10.0 @ 0.240  (maker)  Up=11135.9 Down= 9339.1
+[09:44:16] BUY  Down   27.0 @ 0.240  (maker)  Up=11135.9 Down= 9366.1
+[09:44:16] BUY  Down   20.0 @ 0.240  (maker)  Up=11135.9 Down= 9386.1
+[09:44:16] BUY  Down   20.0 @ 0.240  (maker)  Up=11135.9 Down= 9406.1
+[09:44:16] BUY  Down   50.7 @ 0.240  (maker)  Up=11135.9 Down= 9456.8
+[09:44:18] BUY  Down   12.9 @ 0.240  (maker)  Up=11135.9 Down= 9469.8
+[09:44:18] BUY  Down    1.7 @ 0.240  (maker)  Up=11135.9 Down= 9471.5
+[09:44:26] BUY  Down    5.0 @ 0.140  (maker)  Up=11135.9 Down= 9476.5
+[09:44:26] BUY  Down    7.9 @ 0.140  (maker)  Up=11135.9 Down= 9484.4
+[09:44:26] BUY  Down   25.9 @ 0.140  (maker)  Up=11135.9 Down= 9510.3
+[09:44:26] BUY  Down   39.5 @ 0.140  (maker)  Up=11135.9 Down= 9549.7
+[09:44:28] BUY  Down  301.0 @ 0.120  (maker)  Up=11135.9 Down= 9850.7
+[09:44:28] BUY  Down  222.7 @ 0.140  (maker)  Up=11135.9 Down=10073.5
+[09:44:32] BUY  Down    5.6 @ 0.110  (maker)  Up=11135.9 Down=10079.1
+[09:44:32] BUY  Down  224.7 @ 0.110  (maker)  Up=11135.9 Down=10303.8
+[09:44:32] BUY  Down    7.3 @ 0.100  (maker)  Up=11135.9 Down=10311.1
+[09:44:32] BUY  Down   70.7 @ 0.110  (maker)  Up=11135.9 Down=10381.7
+[09:44:32] BUY  Down   10.2 @ 0.100  (maker)  Up=11135.9 Down=10391.9
+[09:44:34] BUY  Down   78.0 @ 0.100  (maker)  Up=11135.9 Down=10469.9
+[09:44:34] BUY  Down    1.1 @ 0.100  (maker)  Up=11135.9 Down=10471.0
+[09:44:34] BUY  Down   11.1 @ 0.100  (maker)  Up=11135.9 Down=10482.1
+[09:44:34] BUY  Down   10.0 @ 0.100  (maker)  Up=11135.9 Down=10492.1
+[09:44:34] BUY  Down   20.0 @ 0.100  (maker)  Up=11135.9 Down=10512.1
+[09:44:34] BUY  Down   22.2 @ 0.100  (maker)  Up=11135.9 Down=10534.4
+[09:44:36] SELL Up     20.0 @ 0.880  (taker)  Up=11115.9 Down=10534.4
+[09:44:36] SELL Up     15.0 @ 0.870  (taker)  Up=11100.9 Down=10534.4
+[09:44:36] SELL Up     20.1 @ 0.880  (taker)  Up=11080.8 Down=10534.4
+[09:44:36] SELL Up     10.0 @ 0.860  (taker)  Up=11070.8 Down=10534.4
+[09:44:36] SELL Up    135.0 @ 0.860  (taker)  Up=10935.8 Down=10534.4
+[09:44:36] SELL Up     12.0 @ 0.870  (taker)  Up=10923.8 Down=10534.4
+[09:44:36] SELL Up     13.0 @ 0.870  (taker)  Up=10910.8 Down=10534.4
+[09:44:36] SELL Up     15.0 @ 0.870  (taker)  Up=10895.8 Down=10534.4
+[09:44:36] SELL Up     29.9 @ 0.850  (taker)  Up=10865.9 Down=10534.4
+[09:44:36] BUY  Down   10.0 @ 0.130  (taker)  Up=10865.9 Down=10544.4
+[09:44:36] BUY  Down   11.0 @ 0.120  (taker)  Up=10865.9 Down=10555.4
+[09:44:36] BUY  Down   10.0 @ 0.120  (taker)  Up=10865.9 Down=10565.4
+[09:44:36] BUY  Down   99.5 @ 0.100  (maker)  Up=10865.9 Down=10664.9
+[09:44:36] BUY  Down  301.0 @ 0.135  (maker)  Up=10865.9 Down=10965.9
+
+### btc-updown-15m-1768036500
+[09:17:34] BUY  Up      5.0 @ 0.570  (maker)  Up=    5.0 Down=    0.0
+[09:17:34] BUY  Up     10.0 @ 0.570  (maker)  Up=   15.0 Down=    0.0
+[09:17:34] BUY  Up     40.9 @ 0.570  (maker)  Up=   55.9 Down=    0.0
+[09:17:34] BUY  Up     39.2 @ 0.570  (maker)  Up=   95.1 Down=    0.0
+[09:17:34] BUY  Up      2.6 @ 0.570  (maker)  Up=   97.7 Down=    0.0
+[09:17:34] BUY  Up      2.6 @ 0.570  (maker)  Up=  100.2 Down=    0.0
+[09:17:34] BUY  Up     10.5 @ 0.570  (maker)  Up=  110.7 Down=    0.0
+[09:17:34] BUY  Up      5.0 @ 0.570  (maker)  Up=  115.7 Down=    0.0
+[09:17:34] SELL Down   26.0 @ 0.430  (taker)  Up=  115.7 Down=  -26.0
+[09:17:34] SELL Down   13.2 @ 0.430  (taker)  Up=  115.7 Down=  -39.2
+[09:17:36] BUY  Up      8.2 @ 0.570  (maker)  Up=  123.9 Down=  -39.2
+[09:18:06] BUY  Up    141.3 @ 0.610  (maker)  Up=  265.2 Down=  -39.2
+[09:18:06] BUY  Up     73.4 @ 0.600  (maker)  Up=  338.6 Down=  -39.2
+[09:18:06] SELL Down   26.0 @ 0.390  (taker)  Up=  338.6 Down=  -65.2
+[09:18:06] SELL Down   63.3 @ 0.390  (taker)  Up=  338.6 Down= -128.5
+[09:18:06] SELL Down   26.0 @ 0.390  (taker)  Up=  338.6 Down= -154.5
+[09:18:06] SELL Down   26.0 @ 0.390  (taker)  Up=  338.6 Down= -180.5
+[09:18:08] BUY  Up      9.5 @ 0.600  (taker)  Up=  348.1 Down= -180.5
+[09:18:08] BUY  Up      8.3 @ 0.600  (taker)  Up=  356.4 Down= -180.5
+[09:18:08] BUY  Up     10.0 @ 0.610  (maker)  Up=  366.4 Down= -180.5
+[09:18:08] BUY  Up      6.3 @ 0.610  (maker)  Up=  372.6 Down= -180.5
+[09:18:08] BUY  Up    197.6 @ 0.600  (maker)  Up=  570.2 Down= -180.5
+[09:18:08] BUY  Up     25.6 @ 0.610  (maker)  Up=  595.9 Down= -180.5
+[09:18:08] BUY  Up      5.3 @ 0.610  (maker)  Up=  601.1 Down= -180.5
+[09:18:08] BUY  Up      6.5 @ 0.610  (maker)  Up=  607.6 Down= -180.5
+[09:18:08] BUY  Up      7.5 @ 0.610  (maker)  Up=  615.2 Down= -180.5
+[09:18:08] SELL Down    8.0 @ 0.400  (taker)  Up=  615.2 Down= -188.5
+[09:18:08] SELL Down   13.9 @ 0.400  (taker)  Up=  615.2 Down= -202.4
+[09:18:08] SELL Down    5.0 @ 0.400  (taker)  Up=  615.2 Down= -207.4
+[09:18:08] SELL Down   20.0 @ 0.400  (taker)  Up=  615.2 Down= -227.4
+[09:18:08] SELL Down   13.0 @ 0.400  (taker)  Up=  615.2 Down= -240.4
+[09:18:08] SELL Down   20.0 @ 0.400  (taker)  Up=  615.2 Down= -260.4
+[09:18:08] SELL Down   15.0 @ 0.400  (taker)  Up=  615.2 Down= -275.4
+[09:18:08] SELL Down    5.0 @ 0.400  (taker)  Up=  615.2 Down= -280.4
+[09:18:08] SELL Down    5.0 @ 0.400  (taker)  Up=  615.2 Down= -285.4
+[09:18:08] SELL Down   15.0 @ 0.400  (taker)  Up=  615.2 Down= -300.4
+[09:18:08] SELL Down    9.4 @ 0.400  (taker)  Up=  615.2 Down= -309.8
+[09:18:08] SELL Down   22.5 @ 0.400  (taker)  Up=  615.2 Down= -332.3
+[09:18:08] SELL Down    5.0 @ 0.400  (taker)  Up=  615.2 Down= -337.3
+[09:18:08] SELL Down   15.0 @ 0.400  (taker)  Up=  615.2 Down= -352.3
+[09:18:08] SELL Down    8.0 @ 0.400  (taker)  Up=  615.2 Down= -360.3
+[09:18:18] BUY  Up    200.0 @ 0.620  (maker)  Up=  815.2 Down= -360.3
+[09:18:18] BUY  Up     10.0 @ 0.620  (maker)  Up=  825.2 Down= -360.3
+[09:18:18] BUY  Up     13.3 @ 0.620  (maker)  Up=  838.5 Down= -360.3
+[09:18:18] BUY  Up      2.0 @ 0.620  (maker)  Up=  840.5 Down= -360.3
+[09:18:20] BUY  Up      6.6 @ 0.620  (maker)  Up=  847.0 Down= -360.3
+[09:19:38] BUY  Down   14.5 @ 0.340  (maker)  Up=  847.0 Down= -345.8
+[09:19:38] BUY  Down   25.0 @ 0.340  (maker)  Up=  847.0 Down= -320.8
+[09:19:40] BUY  Down   10.0 @ 0.340  (maker)  Up=  847.0 Down= -310.8
+[09:19:40] BUY  Down   21.7 @ 0.340  (maker)  Up=  847.0 Down= -289.1
+[09:19:40] BUY  Down    5.7 @ 0.340  (maker)  Up=  847.0 Down= -283.4
+[09:19:40] BUY  Down    1.2 @ 0.340  (maker)  Up=  847.0 Down= -282.2
+[09:21:32] SELL Up      6.5 @ 0.770  (taker)  Up=  840.5 Down= -282.2
+[09:21:32] SELL Up     11.6 @ 0.770  (taker)  Up=  828.9 Down= -282.2
+[09:21:32] SELL Up      6.0 @ 0.770  (taker)  Up=  822.9 Down= -282.2
+[09:21:32] SELL Up      7.0 @ 0.770  (taker)  Up=  815.9 Down= -282.2
+[09:21:32] SELL Up      7.0 @ 0.770  (taker)  Up=  808.9 Down= -282.2
+[09:21:32] BUY  Down   21.7 @ 0.230  (taker)  Up=  808.9 Down= -260.4
+[09:21:32] BUY  Down   21.7 @ 0.230  (taker)  Up=  808.9 Down= -238.7
+[09:21:32] BUY  Down   81.7 @ 0.230  (maker)  Up=  808.9 Down= -157.0
+
+### eth-updown-15m-1768035600
+[09:04:22] BUY  Down   10.6 @ 0.520  (maker)  Up=    0.0 Down=   10.6
+[09:04:24] BUY  Down  128.7 @ 0.500  (maker)  Up=    0.0 Down=  139.3
+[09:04:24] BUY  Down   10.0 @ 0.520  (maker)  Up=    0.0 Down=  149.3
+[09:04:24] BUY  Down   12.0 @ 0.500  (maker)  Up=    0.0 Down=  161.3
+[09:04:24] BUY  Down   20.0 @ 0.520  (maker)  Up=    0.0 Down=  181.3
+[09:04:24] BUY  Down   45.8 @ 0.520  (maker)  Up=    0.0 Down=  227.2
+[09:04:24] BUY  Down   21.2 @ 0.520  (maker)  Up=    0.0 Down=  248.4
+[09:04:24] BUY  Down   40.0 @ 0.510  (maker)  Up=    0.0 Down=  288.4
+[09:04:24] BUY  Down  132.3 @ 0.510  (maker)  Up=    0.0 Down=  420.7
+[09:04:24] BUY  Down   10.6 @ 0.520  (maker)  Up=    0.0 Down=  431.3
+[09:04:24] BUY  Down    3.7 @ 0.510  (maker)  Up=    0.0 Down=  435.1
+[09:04:24] BUY  Down   25.0 @ 0.510  (maker)  Up=    0.0 Down=  460.1
+[09:04:24] BUY  Down  119.3 @ 0.490  (maker)  Up=    0.0 Down=  579.3
+[09:04:24] BUY  Down   81.7 @ 0.490  (maker)  Up=    0.0 Down=  661.1
+[09:04:24] BUY  Down   60.3 @ 0.500  (maker)  Up=    0.0 Down=  721.3
+[09:04:24] BUY  Down   50.0 @ 0.520  (maker)  Up=    0.0 Down=  771.3
+[09:04:24] BUY  Down   11.4 @ 0.520  (maker)  Up=    0.0 Down=  782.7
+[09:04:24] BUY  Down   21.2 @ 0.520  (maker)  Up=    0.0 Down=  804.0
+[09:06:16] BUY  Up    201.0 @ 0.712  (maker)  Up=  201.0 Down=  804.0
+[09:06:16] SELL Down   56.0 @ 0.280  (taker)  Up=  201.0 Down=  748.0
+[09:06:16] SELL Down  137.1 @ 0.290  (taker)  Up=  201.0 Down=  610.9
+[09:06:16] SELL Down    7.9 @ 0.320  (taker)  Up=  201.0 Down=  603.0
+[09:06:18] BUY  Up      8.6 @ 0.720  (taker)  Up=  209.6 Down=  603.0
+[09:06:18] BUY  Up     13.7 @ 0.710  (maker)  Up=  223.3 Down=  603.0
+[09:06:18] BUY  Up    201.0 @ 0.693  (maker)  Up=  424.3 Down=  603.0
+[09:06:18] BUY  Up     30.0 @ 0.710  (maker)  Up=  454.3 Down=  603.0
+[09:06:18] BUY  Up     13.1 @ 0.710  (maker)  Up=  467.4 Down=  603.0
+[09:06:18] BUY  Up      8.8 @ 0.710  (maker)  Up=  476.3 Down=  603.0
+[09:06:18] BUY  Up    201.0 @ 0.721  (maker)  Up=  677.3 Down=  603.0
+[09:06:18] BUY  Up      7.5 @ 0.710  (maker)  Up=  684.8 Down=  603.0
+[09:06:18] BUY  Up     16.1 @ 0.710  (maker)  Up=  700.8 Down=  603.0
+[09:06:18] SELL Down   12.0 @ 0.320  (taker)  Up=  700.8 Down=  591.0
+[09:06:18] SELL Down   12.0 @ 0.320  (taker)  Up=  700.8 Down=  579.0
+[09:06:18] SELL Down   12.0 @ 0.320  (taker)  Up=  700.8 Down=  567.0
+[09:06:18] SELL Down   71.0 @ 0.290  (taker)  Up=  700.8 Down=  496.0
+[09:06:18] SELL Down    7.1 @ 0.320  (taker)  Up=  700.8 Down=  488.9
+[09:06:18] SELL Down    7.5 @ 0.320  (taker)  Up=  700.8 Down=  481.4
+[09:06:18] SELL Down    5.0 @ 0.310  (taker)  Up=  700.8 Down=  476.4
+[09:06:18] SELL Down   12.0 @ 0.320  (taker)  Up=  700.8 Down=  464.4
+[09:06:18] SELL Down   12.0 @ 0.310  (taker)  Up=  700.8 Down=  452.4
+[09:06:18] SELL Down    4.9 @ 0.290  (taker)  Up=  700.8 Down=  447.5
+[09:06:18] SELL Down   12.0 @ 0.320  (taker)  Up=  700.8 Down=  435.5
+[09:06:18] SELL Down   12.0 @ 0.320  (taker)  Up=  700.8 Down=  423.5
+[09:06:18] SELL Down    9.5 @ 0.300  (taker)  Up=  700.8 Down=  414.0
+[09:06:18] SELL Down   12.0 @ 0.320  (taker)  Up=  700.8 Down=  402.0
+[09:06:18] SELL Down   80.2 @ 0.280  (taker)  Up=  700.8 Down=  321.8
+[09:06:18] SELL Down   12.0 @ 0.280  (taker)  Up=  700.8 Down=  309.8
+[09:06:18] SELL Down   29.2 @ 0.270  (taker)  Up=  700.8 Down=  280.6
+[09:06:18] SELL Down   71.0 @ 0.280  (taker)  Up=  700.8 Down=  209.6
+[09:06:30] BUY  Up     12.0 @ 0.760  (maker)  Up=  712.8 Down=  209.6
+[09:06:30] BUY  Up     12.0 @ 0.770  (maker)  Up=  724.8 Down=  209.6
+[09:06:30] BUY  Up      5.0 @ 0.770  (maker)  Up=  729.9 Down=  209.6
+[09:06:30] BUY  Up     21.0 @ 0.770  (maker)  Up=  750.9 Down=  209.6
+[09:06:30] BUY  Up    201.0 @ 0.780  (maker)  Up=  951.9 Down=  209.6
+[09:06:30] SELL Down   12.0 @ 0.240  (taker)  Up=  951.9 Down=  197.6
+[09:06:30] SELL Down   12.0 @ 0.230  (taker)  Up=  951.9 Down=  185.6
+[09:06:30] SELL Down   59.0 @ 0.220  (taker)  Up=  951.9 Down=  126.6
+[09:06:30] SELL Down  142.0 @ 0.220  (taker)  Up=  951.9 Down=  -15.4
+[09:09:06] BUY  Down   44.8 @ 0.490  (maker)  Up=  951.9 Down=   29.4
+[09:09:08] SELL Up     10.0 @ 0.520  (taker)  Up=  941.9 Down=   29.4
+[09:09:08] SELL Up     20.0 @ 0.520  (taker)  Up=  921.9 Down=   29.4
+[09:09:08] SELL Up      7.5 @ 0.520  (taker)  Up=  914.4 Down=   29.4
+[09:09:08] SELL Up    137.8 @ 0.520  (taker)  Up=  776.6 Down=   29.4
+[09:09:08] SELL Up     10.0 @ 0.510  (taker)  Up=  766.6 Down=   29.4
+[09:09:08] SELL Up     10.0 @ 0.510  (taker)  Up=  756.6 Down=   29.4
+[09:09:08] SELL Up      7.5 @ 0.510  (taker)  Up=  749.1 Down=   29.4
+[09:09:08] SELL Up     10.0 @ 0.520  (taker)  Up=  739.1 Down=   29.4
+[09:09:08] BUY  Down    5.7 @ 0.480  (taker)  Up=  739.1 Down=   35.1
+[09:09:08] BUY  Down   10.0 @ 0.480  (taker)  Up=  739.1 Down=   45.1
+[09:09:08] BUY  Down   10.0 @ 0.480  (taker)  Up=  739.1 Down=   55.1
+[09:09:08] BUY  Down   10.0 @ 0.490  (taker)  Up=  739.1 Down=   65.1
+[09:09:08] BUY  Down   10.0 @ 0.490  (taker)  Up=  739.1 Down=   75.1
+[09:09:08] BUY  Down   14.3 @ 0.480  (taker)  Up=  739.1 Down=   89.4
+[09:09:08] BUY  Down   20.0 @ 0.480  (taker)  Up=  739.1 Down=  109.4
+[09:09:08] BUY  Down    4.5 @ 0.490  (maker)  Up=  739.1 Down=  113.8
+[09:09:08] BUY  Down   60.0 @ 0.490  (maker)  Up=  739.1 Down=  173.8
+[09:09:08] BUY  Down  201.0 @ 0.480  (maker)  Up=  739.1 Down=  374.8
+[09:09:08] BUY  Down   91.8 @ 0.485  (maker)  Up=  739.1 Down=  466.6
+[09:09:08] BUY  Down    9.6 @ 0.480  (maker)  Up=  739.1 Down=  476.2
+[09:12:42] BUY  Up      5.9 @ 0.330  (maker)  Up=  745.1 Down=  476.2
+[09:12:42] SELL Down    5.9 @ 0.670  (taker)  Up=  745.1 Down=  470.3
+[09:12:44] BUY  Up      4.3 @ 0.330  (maker)  Up=  749.3 Down=  470.3
+[09:12:44] BUY  Up      4.3 @ 0.330  (maker)  Up=  753.6 Down=  470.3
+[09:12:44] BUY  Up      5.0 @ 0.330  (maker)  Up=  758.6 Down=  470.3
+[09:12:44] BUY  Up      7.8 @ 0.330  (maker)  Up=  766.4 Down=  470.3
+[09:12:46] BUY  Up      4.3 @ 0.330  (maker)  Up=  770.7 Down=  470.3
+[09:12:46] BUY  Up      1.9 @ 0.330  (maker)  Up=  772.6 Down=  470.3
+[09:12:46] BUY  Up      1.4 @ 0.330  (maker)  Up=  774.0 Down=  470.3
+[09:12:46] BUY  Up    161.1 @ 0.330  (maker)  Up=  935.1 Down=  470.3
+[09:12:46] BUY  Up      5.0 @ 0.330  (maker)  Up=  940.1 Down=  470.3
+[09:12:50] BUY  Up      5.0 @ 0.320  (maker)  Up=  945.1 Down=  470.3
+[09:14:00] BUY  Up      1.7 @ 0.130  (maker)  Up=  946.8 Down=  470.3
