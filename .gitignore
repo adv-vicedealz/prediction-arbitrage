@@ -16,6 +16,7 @@ node_modules/
 !package-lock.json
 !tsconfig.json
 !tsconfig.node.json
+*.db
 
 # OS
 .DS_Store
