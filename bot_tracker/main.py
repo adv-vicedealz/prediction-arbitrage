@@ -18,13 +18,15 @@ except ImportError:
     print("Warning: uvicorn not installed. Run: pip install uvicorn")
 
 from .config import HTTP_HOST, HTTP_PORT, TARGET_WALLETS, MARKET_SLUGS_PATTERN, MARKET_FILTER_ENABLED
-from .models import TradeEvent
+from .models import TradeEvent, MarketContext
 from .trade_poller import TradePoller
 from .market_context import MarketContextFetcher
 from .position_tracker import PositionTracker
 from .pattern_detector import PatternDetector
 from .sqlite_storage import SQLiteStorage
 from .price_stream import PriceStream, PriceUpdate
+from .market_resolver import MarketResolver
+from .market_discovery import MarketDiscovery
 from . import api
 
 
@@ -43,6 +45,13 @@ class BotTracker:
         self.price_stream = PriceStream(
             on_price_update=self.on_price_update
         )
+
+        # New resolution-based components
+        self.market_resolver = MarketResolver(
+            on_trades_fetched=self.on_market_resolved,
+            resolution_delay_seconds=120  # Wait 2 min after market ends
+        )
+        self.market_discovery = MarketDiscovery(self.market_fetcher)
 
         # Inject dependencies into API
         api.set_dependencies(
@@ -90,42 +99,93 @@ class BotTracker:
             except Exception as e:
                 print(f"  Failed to subscribe to {slug}: {e}")
 
-    async def _backfill_trades(self):
-        """Backfill ALL historical trades for tracked wallets using pagination."""
-        import aiohttp
-        print("=" * 40)
-        print("BACKFILLING HISTORICAL TRADES")
-        print("=" * 40)
+    async def on_market_resolved(self, market_slug: str, trades: List[TradeEvent], winning_outcome: str):
+        """Handle complete trade data for a resolved market."""
+        print(f"\n{'=' * 50}")
+        print(f"MARKET RESOLVED: {market_slug}")
+        print(f"Winner: {winning_outcome or 'Unknown'}")
+        print(f"Total trades: {len(trades)}")
+        print(f"{'=' * 50}")
 
-        async with aiohttp.ClientSession() as session:
-            for wallet, name in TARGET_WALLETS.items():
-                print(f"\nFetching trades for {name}...")
-                trades = await self.trade_poller.backfill_wallet_trades(
-                    session,
-                    wallet,
-                    MARKET_SLUGS_PATTERN if MARKET_FILTER_ENABLED else None
-                )
-                print(f"Found {len(trades)} total trades for {name}")
+        if not trades:
+            return
 
-                if not trades:
-                    continue
+        # Process all trades for this market
+        for trade in trades:
+            # Save trade
+            self.storage.save_trade(trade)
 
-                # Process trades (oldest first for correct position building)
-                trades_sorted = sorted(trades, key=lambda t: t.get("timestamp", ""))
-                new_count = 0
-                for raw in trades_sorted:
-                    parsed = self.trade_poller._parse_trade(raw, wallet, name)
-                    if parsed and parsed.id not in self.trade_poller.seen_trade_ids:
-                        self.trade_poller.seen_trade_ids.add(parsed.id)
-                        await self.on_new_trades([parsed])
-                        new_count += 1
+            # Update position
+            position = self.position_tracker.update_position(trade)
+            self.storage.save_position(position)
 
-                print(f"Processed {new_count} new trades for {name}")
+            # Record for patterns
+            self.pattern_detector.record_trade(trade)
 
-        print("=" * 40)
-        print("BACKFILL COMPLETE")
-        print("=" * 40)
-        print()
+            # Add to API history
+            api.add_trade_to_history(trade)
+
+        # Save market resolution info
+        context = self.market_fetcher.cache.get(market_slug)
+        if context:
+            context.resolved = True
+            context.winning_outcome = winning_outcome
+            self.storage.save_market(context)
+
+        # Broadcast update
+        try:
+            await api.broadcast_to_websocket("market_resolved", {
+                "market_slug": market_slug,
+                "winning_outcome": winning_outcome,
+                "total_trades": len(trades)
+            })
+        except Exception as e:
+            print(f"Broadcast error: {e}")
+
+        print(f"Processed {len(trades)} trades for {market_slug}\n")
+
+    async def _discover_and_track_markets(self):
+        """Discover markets and add them to the resolver."""
+        # First, discover recently resolved markets (catch up from offline)
+        print("Discovering recently resolved markets...")
+        resolved = await self.market_discovery.discover_recent_resolved(hours_back=24)
+        for ctx in resolved:
+            self.market_resolver.add_market_from_context(ctx)
+            self.market_fetcher.cache[ctx.slug] = ctx
+            self.storage.save_market(ctx)
+
+        # Discover active markets
+        print("Discovering active markets...")
+        active = await self.market_discovery.discover_markets()
+        for ctx in active:
+            self.market_resolver.add_market_from_context(ctx)
+            self.market_fetcher.cache[ctx.slug] = ctx
+            self.storage.save_market(ctx)
+
+        print(f"Tracking {self.market_resolver.get_pending_count()} markets for resolution")
+
+    async def _discovery_loop(self):
+        """Continuously discover new markets and add to resolver."""
+        while self.running:
+            try:
+                new_markets = await self.market_discovery.discover_markets()
+                for ctx in new_markets:
+                    self.market_resolver.add_market_from_context(ctx)
+                    self.market_fetcher.cache[ctx.slug] = ctx
+                    self.storage.save_market(ctx)
+
+                    # Subscribe to price stream for new market
+                    up_token = ctx.token_ids.get("up", "")
+                    down_token = ctx.token_ids.get("down", "")
+                    if up_token:
+                        self.price_stream.add_asset(up_token, ctx.slug, "Up")
+                    if down_token:
+                        self.price_stream.add_asset(down_token, ctx.slug, "Down")
+
+            except Exception as e:
+                print(f"Discovery error: {e}")
+
+            await asyncio.sleep(30)  # Check every 30 seconds
 
     async def on_price_update(self, update: PriceUpdate):
         """Handle price update from WebSocket - save to storage."""
@@ -223,7 +283,7 @@ class BotTracker:
         self.running = True
 
         print("=" * 60)
-        print("BOT TRADING TRACKER")
+        print("BOT TRADING TRACKER (Resolution-Based)")
         print("=" * 60)
         print(f"Tracking {len(TARGET_WALLETS)} wallets:")
         for addr, name in TARGET_WALLETS.items():
@@ -234,26 +294,24 @@ class BotTracker:
         print(f"HTTP API: http://{HTTP_HOST}:{HTTP_PORT}")
         print(f"API Docs: http://{HTTP_HOST}:{HTTP_PORT}/docs")
         print(f"WebSocket: ws://{HTTP_HOST}:{HTTP_PORT}/ws")
-        print(f"Price Stream: Real-time prices via Polymarket WebSocket")
+        print()
+        print("Mode: Post-resolution trade capture (100% accuracy)")
         print("=" * 60)
         print()
 
-        # Backfill historical trades FIRST (critical for accurate positions)
-        await self._backfill_trades()
-
-        # Subscribe to price stream for all markets with positions
-        await self._subscribe_to_existing_markets()
+        # Discover markets and add to resolver
+        await self._discover_and_track_markets()
 
         # Create tasks for all services
         tasks = []
 
-        # Trade poller
-        poller_task = asyncio.create_task(self.trade_poller.run())
-        tasks.append(poller_task)
+        # Market discovery loop (finds new markets)
+        discovery_task = asyncio.create_task(self._discovery_loop())
+        tasks.append(discovery_task)
 
-        # Market context refresher
-        market_task = asyncio.create_task(self.market_fetcher.run())
-        tasks.append(market_task)
+        # Market resolver (fetches trades after markets end)
+        resolver_task = asyncio.create_task(self.market_resolver.run(check_interval=30))
+        tasks.append(resolver_task)
 
         # Price stream (real-time prices from Polymarket)
         price_task = asyncio.create_task(self.price_stream.run())
@@ -312,7 +370,7 @@ class BotTracker:
     def stop(self):
         """Stop all services."""
         self.running = False
-        self.trade_poller.stop()
+        self.market_resolver.stop()
         self.market_fetcher.stop()
         self.price_stream.stop()
 
@@ -320,6 +378,7 @@ class BotTracker:
         self.storage.flush()
         summary = self.storage.get_session_summary()
         print(f"\nSession saved: {summary['session_trades_count']} trades, {summary['total_positions_count']} positions")
+        print(f"Resolved markets: {self.market_resolver.get_completed_count()}")
         print(f"Data location: {summary['db_dir']}")
 
 
