@@ -92,13 +92,23 @@ export function LiveTradesFeed() {
     });
   }, [state.trades, assetFilter, selectedMarket]);
 
-  const formatTime = (ts: number) => {
+  const formatTimeET = (ts: number) => {
     return new Date(ts * 1000).toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
       hour12: false,
       timeZone: 'America/New_York'
+    });
+  };
+
+  const formatTimeUTC1 = (ts: number) => {
+    return new Date(ts * 1000).toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'Europe/Paris'
     });
   };
 
@@ -292,6 +302,7 @@ export function LiveTradesFeed() {
           <thead className="sticky top-0 bg-gray-800">
             <tr className="text-gray-400 border-b border-gray-700">
               <th className="text-left py-2 px-2">Time (ET)</th>
+              <th className="text-left py-2 px-2">UTC+1</th>
               <th className="text-left py-2 px-2">Market</th>
               <th className="text-left py-2 px-2">Side</th>
               <th className="text-left py-2 px-2">Outcome</th>
@@ -312,7 +323,10 @@ export function LiveTradesFeed() {
                   onClick={() => selectWallet(trade.wallet)}
                 >
                   <td className="py-2 px-2 text-gray-300 font-mono text-xs">
-                    {formatTime(trade.timestamp)}
+                    {formatTimeET(trade.timestamp)}
+                  </td>
+                  <td className="py-2 px-2 text-yellow-400 font-mono text-xs">
+                    {formatTimeUTC1(trade.timestamp)}
                   </td>
                   <td className="py-2 px-2" title={trade.market_slug}>
                     <div className="flex flex-col">
@@ -361,7 +375,7 @@ export function LiveTradesFeed() {
             })}
             {state.trades.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-gray-500">
+                <td colSpan={8} className="py-8 text-center text-gray-500">
                   Waiting for resolved markets...
                 </td>
               </tr>
@@ -374,7 +388,7 @@ export function LiveTradesFeed() {
       {state.trades.length > 0 && (
         <div className="mt-4 pt-3 border-t border-gray-700 flex items-center gap-6 text-xs">
           <div className="text-gray-400">
-            Last trade: <span className="text-white font-mono">{formatTime(state.trades[0]?.timestamp)}</span>
+            Last trade: <span className="text-white font-mono">{formatTimeET(state.trades[0]?.timestamp)}</span>
           </div>
           <div className="text-gray-400">
             Avg price: <span className="text-white font-mono">
