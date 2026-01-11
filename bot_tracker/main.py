@@ -64,6 +64,7 @@ class BotTracker:
         api.set_trade_poller(self.trade_poller)
         api.set_price_stream(self.price_stream)
         api.set_storage(self.storage)
+        api.set_market_resolver(self.market_resolver)
 
         self.running = False
         self.price_update_count = 0

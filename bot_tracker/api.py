@@ -130,6 +130,15 @@ def set_price_stream(stream):
     price_stream = stream
 
 
+# Market resolver reference
+market_resolver = None
+
+def set_market_resolver(resolver):
+    """Set reference to market resolver for status endpoint."""
+    global market_resolver
+    market_resolver = resolver
+
+
 def set_storage(store):
     """Set reference to storage for price endpoint."""
     global storage, trade_history
@@ -324,6 +333,35 @@ def get_price_stream_status():
         "running": price_stream.running,
         "subscribed_assets": len(price_stream.subscribed_assets),
         "assets": list(price_stream.asset_metadata.keys())
+    }
+
+
+@app.get("/api/resolver/status")
+def get_resolver_status():
+    """Get market resolver status - useful for debugging."""
+    if not market_resolver:
+        return {
+            "running": False,
+            "pending_count": 0,
+            "completed_count": 0,
+            "pending_markets": [],
+            "error": "Resolver not initialized"
+        }
+
+    pending = []
+    for slug, market in market_resolver.pending_markets.items():
+        pending.append({
+            "slug": slug,
+            "end_timestamp": market.end_timestamp,
+            "condition_id": market.condition_id[:20] + "..."
+        })
+
+    return {
+        "running": market_resolver.running,
+        "pending_count": len(market_resolver.pending_markets),
+        "completed_count": len(market_resolver.completed_markets),
+        "pending_markets": pending[:10],  # Limit to first 10
+        "resolution_delay_seconds": market_resolver.resolution_delay
     }
 
 
