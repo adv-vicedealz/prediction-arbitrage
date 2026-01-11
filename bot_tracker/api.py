@@ -628,6 +628,86 @@ def toggle_tracker():
     raise HTTPException(status_code=503, detail="Trade poller not available")
 
 
+# ===== Top Traders =====
+
+class TopTrader(BaseModel):
+    name: str
+    wallet: str
+    link: str
+    all_time_profit: float
+
+
+def _get_traders_file() -> Path:
+    """Get path to traders JSON file."""
+    if storage:
+        return Path(storage.db_dir) / "top_traders.json"
+    return Path(__file__).parent / "db" / "top_traders.json"
+
+
+def _load_traders() -> list:
+    """Load traders from JSON file."""
+    filepath = _get_traders_file()
+    if not filepath.exists():
+        return []
+    try:
+        with open(filepath, 'r') as f:
+            return json.load(f)
+    except:
+        return []
+
+
+def _save_traders(traders: list):
+    """Save traders to JSON file."""
+    filepath = _get_traders_file()
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    with open(filepath, 'w') as f:
+        json.dump(traders, f, indent=2)
+
+
+@app.get("/api/traders")
+def get_traders():
+    """Get list of top traders."""
+    return _load_traders()
+
+
+@app.post("/api/traders")
+def add_trader(trader: TopTrader):
+    """Add a new top trader."""
+    traders = _load_traders()
+
+    # Check if wallet already exists
+    for t in traders:
+        if t["wallet"].lower() == trader.wallet.lower():
+            raise HTTPException(status_code=400, detail="Trader with this wallet already exists")
+
+    traders.append({
+        "name": trader.name,
+        "wallet": trader.wallet.lower(),
+        "link": trader.link,
+        "all_time_profit": trader.all_time_profit
+    })
+
+    # Sort by profit descending
+    traders.sort(key=lambda x: x["all_time_profit"], reverse=True)
+    _save_traders(traders)
+
+    return {"success": True, "trader": trader}
+
+
+@app.delete("/api/traders/{wallet}")
+def delete_trader(wallet: str):
+    """Delete a trader by wallet address."""
+    traders = _load_traders()
+    original_count = len(traders)
+    traders = [t for t in traders if t["wallet"].lower() != wallet.lower()]
+
+    if len(traders) == original_count:
+        raise HTTPException(status_code=404, detail="Trader not found")
+
+    _save_traders(traders)
+    return {"success": True}
+
+
 # ===== Dashboard Static Files =====
 
 # Mount static files for dashboard (if built)
