@@ -38,6 +38,7 @@ function PositionCard({ position }: { position: WalletPosition }) {
   const slugParts = position.market_slug.split('-');
   const marketTimestamp = parseInt(slugParts[slugParts.length - 1]);
   const marketEndTime = new Date((marketTimestamp + 15 * 60) * 1000);
+  const isLive = new Date() < marketEndTime;
 
   // Calculate financials
   const totalCost = position.up_cost + position.down_cost;
@@ -58,16 +59,24 @@ function PositionCard({ position }: { position: WalletPosition }) {
       {/* Header Row */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700/50 bg-gray-800/50">
         <div className="flex items-center gap-3">
-          {/* Live pulse indicator */}
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          {/* Live pulse indicator or ended dot */}
+          {isLive ? (
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          ) : (
+            <div className="w-2 h-2 rounded-full bg-gray-500" />
+          )}
           <span className="text-xs font-bold text-gray-400 w-8">{marketType}</span>
           <span className="text-sm text-white">{position.wallet_name}</span>
           <span className="text-xs text-gray-500 font-mono">{position.market_slug}</span>
         </div>
         <div className="flex items-center gap-4 text-xs">
-          <span className="text-green-400 font-medium">
-            <TimeRemaining endTime={marketEndTime} />
-          </span>
+          {isLive ? (
+            <span className="text-green-400 font-medium">
+              <TimeRemaining endTime={marketEndTime} />
+            </span>
+          ) : (
+            <span className="text-gray-500">Ended</span>
+          )}
         </div>
       </div>
 
@@ -95,13 +104,15 @@ function PositionCard({ position }: { position: WalletPosition }) {
             <div className="text-xs text-gray-500">{position.total_trades} trades</div>
           </div>
 
-          {/* Edge */}
+          {/* Edge & Coverage */}
           <div>
             <div className="text-xs text-gray-500 mb-1">Edge</div>
             <div className={position.edge > 0 ? 'text-green-400' : 'text-red-400'}>
               {formatPercent(position.edge)}
             </div>
-            <div className="text-xs text-gray-500">Covered: {coveragePercent.toFixed(0)}%</div>
+            <div className="text-xs text-gray-500">
+              Hedge: {formatPercent(position.hedge_ratio)} | Cov: {coveragePercent.toFixed(0)}%
+            </div>
           </div>
 
           {/* Complete Sets */}
@@ -129,30 +140,47 @@ function PositionCard({ position }: { position: WalletPosition }) {
 
 export function PositionsPanel() {
   const { state, selectWallet } = useTracker();
+  const [expanded, setExpanded] = useState(false);
+  const LIMIT = 10;
 
   const positions = Object.values(state.positions);
 
-  // Filter to only show live markets
+  // Count live positions
   const now = Date.now();
-  const livePositions = positions.filter((p) => {
+  const liveCount = positions.filter((p) => {
     const timestamp = parseInt(p.market_slug.split('-').pop() || '0');
     const endTime = (timestamp + 15 * 60) * 1000;
     return now < endTime;
-  });
+  }).length;
 
   const filteredPositions = state.selectedWallet
-    ? livePositions.filter((p) => p.wallet.toLowerCase() === state.selectedWallet?.toLowerCase())
-    : livePositions;
+    ? positions.filter((p) => p.wallet.toLowerCase() === state.selectedWallet?.toLowerCase())
+    : positions;
 
-  // Sort by trades count
-  const sortedPositions = [...filteredPositions].sort((a, b) => b.total_trades - a.total_trades);
+  // Sort: live markets first, then by trades count
+  const sortedPositions = [...filteredPositions].sort((a, b) => {
+    const aTimestamp = parseInt(a.market_slug.split('-').pop() || '0');
+    const bTimestamp = parseInt(b.market_slug.split('-').pop() || '0');
+    const aEndTime = (aTimestamp + 15 * 60) * 1000;
+    const bEndTime = (bTimestamp + 15 * 60) * 1000;
+    const aIsLive = now < aEndTime;
+    const bIsLive = now < bEndTime;
 
-  // Calculate totals (for live positions only)
-  const totalProfit = livePositions.reduce((sum, p) => sum + (p.complete_sets * p.edge), 0);
-  const totalTrades = livePositions.reduce((sum, p) => sum + p.total_trades, 0);
-  const totalVolume = livePositions.reduce((sum, p) => sum + p.up_cost + p.down_cost, 0);
-  const avgEdge = livePositions.length > 0
-    ? livePositions.reduce((sum, p) => sum + p.edge, 0) / livePositions.length
+    if (aIsLive && !bIsLive) return -1;
+    if (!aIsLive && bIsLive) return 1;
+    return b.total_trades - a.total_trades;
+  });
+
+  // Apply limit unless expanded
+  const displayedPositions = expanded ? sortedPositions : sortedPositions.slice(0, LIMIT);
+  const hasMore = sortedPositions.length > LIMIT;
+
+  // Calculate totals (for all positions)
+  const totalProfit = positions.reduce((sum, p) => sum + (p.complete_sets * p.edge), 0);
+  const totalTrades = positions.reduce((sum, p) => sum + p.total_trades, 0);
+  const totalVolume = positions.reduce((sum, p) => sum + p.up_cost + p.down_cost, 0);
+  const avgEdge = positions.length > 0
+    ? positions.reduce((sum, p) => sum + p.edge, 0) / positions.length
     : 0;
 
   return (
@@ -170,11 +198,12 @@ export function PositionsPanel() {
       </div>
 
       {/* Summary Row */}
-      {livePositions.length > 0 && (
+      {positions.length > 0 && (
         <div className="mb-4 flex items-center gap-6 text-sm border-b border-gray-700 pb-3">
           <div>
-            <span className="text-gray-500">Live Markets:</span>
-            <span className="text-white ml-2">{livePositions.length}</span>
+            <span className="text-gray-500">Markets:</span>
+            <span className="text-white ml-2">{positions.length}</span>
+            <span className="text-green-400 ml-1">({liveCount} live)</span>
           </div>
           <div>
             <span className="text-gray-500">Trades:</span>
@@ -204,14 +233,28 @@ export function PositionsPanel() {
           No positions yet
         </div>
       ) : (
-        <div className="space-y-2 max-h-[600px] overflow-y-auto">
-          {sortedPositions.map((position) => (
-            <PositionCard
-              key={`${position.wallet}:${position.market_slug}`}
-              position={position}
-            />
-          ))}
-        </div>
+        <>
+          <div className="space-y-2 max-h-[600px] overflow-y-auto">
+            {displayedPositions.map((position) => (
+              <PositionCard
+                key={`${position.wallet}:${position.market_slug}`}
+                position={position}
+              />
+            ))}
+          </div>
+          {hasMore && (
+            <div className="mt-3 text-center">
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="px-4 py-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                {expanded
+                  ? 'Show less'
+                  : `Show all ${sortedPositions.length} positions`}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
