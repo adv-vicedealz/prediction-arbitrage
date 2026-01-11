@@ -629,12 +629,14 @@ class SQLiteStorage:
             except Exception as be:
                 print(f"Backup failed (continuing anyway): {be}")
 
-            # Clear all tables
-            self.conn.execute("DELETE FROM trades")
-            self.conn.execute("DELETE FROM positions")
-            self.conn.execute("DELETE FROM markets")
-            self.conn.execute("DELETE FROM prices")
-            self.conn.execute("DELETE FROM sessions")
+            # Clear all tables (use try/except for each in case table doesn't exist)
+            tables = ["trades", "positions", "markets", "prices", "sessions"]
+            for table in tables:
+                try:
+                    self.conn.execute(f"DELETE FROM {table}")
+                except Exception as te:
+                    print(f"Could not clear {table}: {te}")
+
             self.conn.commit()
 
             # Clear in-memory cache
