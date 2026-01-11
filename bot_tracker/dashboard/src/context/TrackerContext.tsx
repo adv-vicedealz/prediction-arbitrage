@@ -135,6 +135,7 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
   }, [isConnected]);
 
   // Poll for new trades every 3 seconds as fallback
+  // Note: refreshDataRef is defined after refreshData callback below
   useEffect(() => {
     const pollTrades = async () => {
       try {
@@ -143,7 +144,8 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
           const trades = await res.json();
           if (trades.length > 0 && trades[0].id !== lastTradeIdRef.current) {
             lastTradeIdRef.current = trades[0].id;
-            dispatch({ type: 'SET_TRADES', payload: trades });
+            // Trigger full refresh to get all trades, not just 50
+            refreshDataRef.current();
           }
         }
       } catch (e) {
@@ -201,6 +203,10 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, [fetchConfig]);
+
+  // Ref for polling to access latest refreshData
+  const refreshDataRef = useRef(refreshData);
+  refreshDataRef.current = refreshData;
 
   // Initial data fetch
   useEffect(() => {
