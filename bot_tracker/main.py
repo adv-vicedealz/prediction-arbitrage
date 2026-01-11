@@ -174,6 +174,33 @@ class BotTracker:
         print(f"Tracking {self.market_resolver.get_pending_count()} markets for resolution")
         print(f"Subscribed to {len(active)} markets for price updates")
 
+    async def _cleanup_loop(self):
+        """Periodically cleanup old data to prevent memory leaks."""
+        while self.running:
+            await asyncio.sleep(300)  # Every 5 minutes
+
+            try:
+                # Cleanup old resolved markets from cache
+                removed_slugs = self.market_fetcher.cleanup_old_markets(hours_back=2)
+
+                # Remove price stream assets for cleaned up markets
+                for slug in removed_slugs:
+                    # We don't have token IDs after removal, but price_stream
+                    # will ignore updates for non-tracked assets anyway
+                    pass
+
+                # Cleanup old discovered slugs
+                self.market_discovery.cleanup_old_slugs(hours_back=24)
+
+                # Log memory stats
+                print(f"[Cleanup] Active: {len(self.market_fetcher.cache)} markets, "
+                      f"{len(self.price_stream.subscribed_assets)} price assets, "
+                      f"{self.market_resolver.get_pending_count()} pending, "
+                      f"{self.market_resolver.get_completed_count()} completed")
+
+            except Exception as e:
+                print(f"[Cleanup] Error: {e}")
+
     async def _discovery_loop(self):
         """Continuously discover new markets and add to resolver."""
         while self.running:
@@ -326,6 +353,10 @@ class BotTracker:
         # Price stream (real-time prices from Polymarket)
         price_task = asyncio.create_task(self.price_stream.run())
         tasks.append(price_task)
+
+        # Cleanup loop (prevents memory leaks)
+        cleanup_task = asyncio.create_task(self._cleanup_loop())
+        tasks.append(cleanup_task)
 
         # HTTP server (uvicorn)
         if UVICORN_AVAILABLE:

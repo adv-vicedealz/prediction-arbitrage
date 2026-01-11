@@ -24,10 +24,13 @@ class PatternDetector:
         self.trade_history: Dict[str, Dict[str, List[TradeEvent]]] = defaultdict(lambda: defaultdict(list))
 
     def record_trade(self, trade: TradeEvent):
-        """Record a trade for pattern analysis."""
+        """Record a trade for pattern analysis (keeps last 100 per wallet/market)."""
         wallet = trade.wallet.lower()
         market = trade.market_slug
         self.trade_history[wallet][market].append(trade)
+        # Limit memory: keep last 100 trades per wallet/market
+        if len(self.trade_history[wallet][market]) > 100:
+            self.trade_history[wallet][market] = self.trade_history[wallet][market][-100:]
 
     def get_trades(self, wallet: str, market_slug: str) -> List[TradeEvent]:
         """Get all trades for a wallet in a market."""

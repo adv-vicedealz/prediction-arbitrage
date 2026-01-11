@@ -270,3 +270,29 @@ class MarketContextFetcher:
     def get_active_markets(self) -> List[MarketContext]:
         """Get all active (non-resolved) markets."""
         return [m for m in self.cache.values() if not m.resolved]
+
+    def cleanup_old_markets(self, hours_back: int = 2) -> List[str]:
+        """Remove old resolved markets from cache to prevent memory bloat.
+
+        Returns list of removed market slugs.
+        """
+        now = datetime.now(timezone.utc)
+        cutoff_seconds = hours_back * 3600
+        removed = []
+
+        for slug in list(self.cache.keys()):
+            ctx = self.cache.get(slug)
+            if ctx and ctx.resolved and ctx.end_date:
+                # Make sure end_date is timezone-aware
+                end_date = ctx.end_date
+                if end_date.tzinfo is None:
+                    end_date = end_date.replace(tzinfo=timezone.utc)
+                age_seconds = (now - end_date).total_seconds()
+                if age_seconds > cutoff_seconds:
+                    del self.cache[slug]
+                    removed.append(slug)
+
+        if removed:
+            print(f"[MarketContext] Cleaned up {len(removed)} old markets from cache")
+
+        return removed

@@ -52,6 +52,7 @@ class MarketResolver:
 
         self.pending_markets: Dict[str, PendingMarket] = {}  # slug -> PendingMarket
         self.completed_markets: Set[str] = set()
+        self._completion_times: Dict[str, int] = {}  # slug -> completion timestamp
         self.running = False
 
     def add_market(self, slug: str, condition_id: str, end_timestamp: int, question: str = ""):
@@ -232,9 +233,23 @@ class MarketResolver:
                 if self.on_trades_fetched:
                     await self.on_trades_fetched(slug, trades, winning_outcome)
 
-            # Mark as completed
+            # Mark as completed with timestamp
             self.completed_markets.add(slug)
+            self._completion_times[slug] = int(time.time())
             del self.pending_markets[slug]
+
+            # Cleanup old completed markets (keep last 24h)
+            self._cleanup_old_completed()
+
+    def _cleanup_old_completed(self):
+        """Keep only markets completed in last 24 hours to prevent memory bloat."""
+        cutoff = int(time.time()) - (24 * 3600)
+        old_slugs = [s for s, t in self._completion_times.items() if t < cutoff]
+        for slug in old_slugs:
+            self.completed_markets.discard(slug)
+            self._completion_times.pop(slug, None)
+        if old_slugs:
+            print(f"[Resolver] Cleaned up {len(old_slugs)} old completed markets")
 
     async def run(self, check_interval: int = 30):
         """Main loop - periodically check for resolved markets."""

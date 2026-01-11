@@ -71,6 +71,13 @@ class PriceStream:
         if self.ws:
             asyncio.create_task(self.subscribe([asset_id]))
 
+    def remove_asset(self, asset_id: str):
+        """Remove an asset from tracking (for cleanup of resolved markets)."""
+        self.subscribed_assets.discard(asset_id)
+        self.asset_metadata.pop(asset_id, None)
+        self.latest_prices.pop(asset_id, None)
+        self.last_save_time.pop(asset_id, None)
+
     async def subscribe(self, asset_ids: list):
         """Subscribe to price updates for assets."""
         if not self.ws:

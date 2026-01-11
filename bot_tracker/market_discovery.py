@@ -166,3 +166,25 @@ class MarketDiscovery:
     def mark_as_discovered(self, slug: str):
         """Mark a market as already discovered (e.g., from storage)."""
         self.discovered_slugs.add(slug)
+
+    def cleanup_old_slugs(self, hours_back: int = 24):
+        """Remove old slugs to prevent memory bloat (keep last 24h)."""
+        now = int(time.time())
+        interval = 900  # 15 minutes
+        cutoff_ts = now - (hours_back * 3600)
+
+        old_slugs = []
+        for slug in self.discovered_slugs:
+            # Extract timestamp from slug (format: btc-updown-15m-{timestamp})
+            try:
+                ts = int(slug.split('-')[-1])
+                if ts < cutoff_ts:
+                    old_slugs.append(slug)
+            except (ValueError, IndexError):
+                continue
+
+        for slug in old_slugs:
+            self.discovered_slugs.discard(slug)
+
+        if old_slugs:
+            print(f"[Discovery] Cleaned up {len(old_slugs)} old slugs")
