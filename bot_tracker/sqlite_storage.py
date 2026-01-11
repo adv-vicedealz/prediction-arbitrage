@@ -622,8 +622,12 @@ class SQLiteStorage:
     def clear_all(self) -> dict:
         """Clear all data from the database."""
         try:
-            # Create backup first
-            backup_path = self._create_backup("pre_clear")
+            # Try to create backup first (but don't fail if it doesn't work)
+            backup_path = None
+            try:
+                backup_path = self._create_backup("pre_clear")
+            except Exception as be:
+                print(f"Backup failed (continuing anyway): {be}")
 
             # Clear all tables
             self.conn.execute("DELETE FROM trades")
