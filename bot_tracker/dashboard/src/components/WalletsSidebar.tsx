@@ -1,49 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTracker } from '../context/TrackerContext';
-import { formatMarketNameFull } from '../utils/formatMarket';
-
-const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
-
-interface MarketInfo {
-  slug: string;
-  question: string;
-  trades_captured: number;
-  first_trade_time: string;
-  last_trade_time: string;
-  tracking_duration_mins: number;
-  market_end_time?: string;
-  resolved?: boolean;
-  winning_outcome?: string;
-  tracking_coverage?: string;
-  coverage_percent?: number;
-}
-
-interface TrackingInfo {
-  tracking_started: string;
-  uptime_seconds: number;
-  total_trades_captured: number;
-  markets: MarketInfo[];
-}
 
 export function WalletsSidebar() {
   const { state, selectWallet, refreshData } = useTracker();
-  const [trackingInfo, setTrackingInfo] = useState<TrackingInfo | null>(null);
-
-  useEffect(() => {
-    const fetchTrackingInfo = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/tracking-info`);
-        if (res.ok) {
-          setTrackingInfo(await res.json());
-        }
-      } catch (e) {
-        console.error('Failed to fetch tracking info');
-      }
-    };
-    fetchTrackingInfo();
-    const interval = setInterval(fetchTrackingInfo, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   const getWalletStats = (address: string) => {
     const walletPositions = Object.values(state.positions).filter(
@@ -195,74 +154,125 @@ export function WalletsSidebar() {
         </div>
       </div>
 
-      {/* Market Coverage */}
-      {trackingInfo && trackingInfo.markets.length > 0 && (
-        <div className="bg-gray-800 rounded-lg p-4">
-          <h2 className="text-lg font-semibold text-white mb-3">Market Coverage</h2>
+      {/* Live Markets */}
+      <LiveMarketsCard />
+    </div>
+  );
+}
 
-          <div className="text-xs text-gray-400 mb-3">
-            Tracking since: {new Date(trackingInfo.tracking_started).toLocaleTimeString()}
-          </div>
+// Live Markets Card Component
+function LiveMarketsCard() {
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
-          <div className="space-y-3">
-            {trackingInfo.markets
-              .filter((market) => {
-                // Parse timestamp from slug (e.g., "btc-updown-15m-1736553600")
-                const slugParts = market.slug.split('-');
-                const marketTimestamp = parseInt(slugParts[slugParts.length - 1]);
-                const marketEndTime = (marketTimestamp + 15 * 60) * 1000;
-                return Date.now() < marketEndTime;
-              })
-              .map((market) => (
-              <div key={market.slug} className="border border-gray-700 rounded-lg p-3">
-                <div className="text-sm text-blue-400 font-medium mb-1" title={market.slug}>
-                  {formatMarketNameFull(market.slug)}
-                </div>
+  // Update every second for countdown
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentTime(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white font-medium">{market.trades_captured} trades</span>
-                  {market.coverage_percent !== undefined && (
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      market.coverage_percent >= 80
-                        ? 'bg-green-500/20 text-green-400'
-                        : market.coverage_percent >= 40
-                        ? 'bg-yellow-500/20 text-yellow-400'
-                        : 'bg-red-500/20 text-red-400'
-                    }`}>
-                      {market.coverage_percent.toFixed(0)}% covered
-                    </span>
-                  )}
-                </div>
+  // Calculate current 15-min slot
+  const nowSec = Math.floor(currentTime / 1000);
+  const interval = 15 * 60; // 15 minutes
+  const currentSlotStart = Math.floor(nowSec / interval) * interval;
+  const currentSlotEnd = currentSlotStart + interval;
+  const timeLeftSec = currentSlotEnd - nowSec;
 
-                {/* Coverage bar */}
-                {market.coverage_percent !== undefined && (
-                  <div className="w-full bg-gray-700 rounded-full h-1.5">
-                    <div
-                      className={`h-1.5 rounded-full ${
-                        market.coverage_percent >= 80
-                          ? 'bg-green-500'
-                          : market.coverage_percent >= 40
-                          ? 'bg-yellow-500'
-                          : 'bg-red-500'
-                      }`}
-                      style={{ width: `${Math.min(100, market.coverage_percent)}%` }}
-                    />
-                  </div>
-                )}
+  // Format time remaining
+  const mins = Math.floor(timeLeftSec / 60);
+  const secs = timeLeftSec % 60;
+  const countdown = `${mins}:${secs.toString().padStart(2, '0')}`;
 
-                <div className="flex justify-between text-xs text-gray-500 mt-2">
-                  <span>{market.tracking_duration_mins.toFixed(1)} min tracked</span>
-                  {market.resolved && (
-                    <span className="text-purple-400">
-                      Won: {market.winning_outcome}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+  // Format slot times in ET and UTC+1
+  const slotStartET = new Date(currentSlotStart * 1000).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'America/New_York'
+  });
+  const slotEndET = new Date(currentSlotEnd * 1000).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'America/New_York'
+  });
+  const slotStartUTC1 = new Date(currentSlotStart * 1000).toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Europe/Paris'
+  });
+  const slotEndUTC1 = new Date(currentSlotEnd * 1000).toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Europe/Paris'
+  });
+
+  // Market slugs
+  const btcSlug = `btc-updown-15m-${currentSlotStart}`;
+  const ethSlug = `eth-updown-15m-${currentSlotStart}`;
+
+  return (
+    <div className="bg-gray-800 rounded-lg p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg font-semibold text-white">Live Markets</h2>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          <span className="text-green-400 font-mono text-lg">{countdown}</span>
         </div>
-      )}
+      </div>
+
+      <div className="text-xs text-gray-400 mb-4">
+        {slotStartET}-{slotEndET} ET / {slotStartUTC1}-{slotEndUTC1} UTC+1
+      </div>
+
+      <div className="space-y-2">
+        {/* BTC Market */}
+        <a
+          href={`https://polymarket.com/event/${btcSlug}/${btcSlug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block border border-gray-700 rounded-lg p-3 hover:border-orange-500/50 transition-colors"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-orange-400 font-bold">BTC</span>
+              <span className="text-gray-300 text-sm">15min Up/Down</span>
+            </div>
+            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </div>
+        </a>
+
+        {/* ETH Market */}
+        <a
+          href={`https://polymarket.com/event/${ethSlug}/${ethSlug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block border border-gray-700 rounded-lg p-3 hover:border-purple-500/50 transition-colors"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-purple-400 font-bold">ETH</span>
+              <span className="text-gray-300 text-sm">15min Up/Down</span>
+            </div>
+            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </div>
+        </a>
+      </div>
+
+      {/* Progress bar */}
+      <div className="mt-4">
+        <div className="w-full bg-gray-700 rounded-full h-1.5">
+          <div
+            className="bg-green-500 h-1.5 rounded-full transition-all duration-1000"
+            style={{ width: `${((interval - timeLeftSec) / interval) * 100}%` }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
