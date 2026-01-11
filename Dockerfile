@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application
 COPY bot_tracker_v2/ ./bot_tracker_v2/
 COPY data/ ./data/
+COPY run.py ./
 
 # Copy built frontend
 COPY --from=frontend-builder /frontend/dist ./static/
