@@ -619,6 +619,36 @@ class SQLiteStorage:
         except Exception as e:
             print(f"Error during flush: {e}")
 
+    def clear_all(self) -> dict:
+        """Clear all data from the database."""
+        try:
+            # Create backup first
+            backup_path = self._create_backup("pre_clear")
+
+            # Clear all tables
+            self.conn.execute("DELETE FROM trades")
+            self.conn.execute("DELETE FROM positions")
+            self.conn.execute("DELETE FROM markets")
+            self.conn.execute("DELETE FROM prices")
+            self.conn.execute("DELETE FROM sessions")
+            self.conn.commit()
+
+            # Clear in-memory cache
+            self.session_trade_ids.clear()
+
+            print("Database cleared")
+            return {
+                "success": True,
+                "backup_path": backup_path,
+                "message": "All data cleared"
+            }
+        except Exception as e:
+            print(f"Error clearing database: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
     def close(self):
         """Close database connection."""
         self.flush()

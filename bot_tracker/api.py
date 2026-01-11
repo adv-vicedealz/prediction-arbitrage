@@ -789,6 +789,33 @@ def delete_trader(wallet: str):
     return {"success": True}
 
 
+@app.delete("/api/data/clear")
+def clear_all_data():
+    """Clear all data from the database (creates backup first)."""
+    if _storage is None:
+        raise HTTPException(status_code=500, detail="Storage not initialized")
+
+    result = _storage.clear_all()
+
+    # Also clear in-memory trade history
+    global _trade_history
+    _trade_history = []
+
+    # Clear position tracker
+    if _position_tracker:
+        _position_tracker.positions.clear()
+
+    # Clear pattern detector
+    if _pattern_detector:
+        _pattern_detector.trade_history.clear()
+
+    # Clear market context cache
+    if _market_fetcher:
+        _market_fetcher.cache.clear()
+
+    return result
+
+
 # ===== Dashboard Static Files =====
 
 # Mount static files for dashboard (if built)
