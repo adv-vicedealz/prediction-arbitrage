@@ -20,6 +20,7 @@ interface State {
   isLoading: boolean;
   priceStreamStatus: PriceStreamStatus | null;
   prices: PricePoint[];
+  pricesByMarket: Record<string, number>;
 }
 
 type Action =
@@ -35,7 +36,8 @@ type Action =
   | { type: 'SET_CONFIG'; payload: TrackerConfig }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_PRICE_STREAM_STATUS'; payload: PriceStreamStatus }
-  | { type: 'SET_PRICES'; payload: PricePoint[] };
+  | { type: 'SET_PRICES'; payload: PricePoint[] }
+  | { type: 'SET_PRICES_BY_MARKET'; payload: Record<string, number> };
 
 const initialState: State = {
   trades: [],
@@ -49,6 +51,7 @@ const initialState: State = {
   isLoading: false,
   priceStreamStatus: null,
   prices: [],
+  pricesByMarket: {},
 };
 
 function reducer(state: State, action: Action): State {
@@ -100,6 +103,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, priceStreamStatus: action.payload };
     case 'SET_PRICES':
       return { ...state, prices: action.payload };
+    case 'SET_PRICES_BY_MARKET':
+      return { ...state, pricesByMarket: action.payload };
     default:
       return state;
   }
@@ -196,6 +201,13 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
       if (positionsRes.ok) {
         const positions = await positionsRes.json();
         dispatch({ type: 'SET_POSITIONS', payload: positions });
+      }
+
+      // Fetch price counts by market
+      const pricesByMarketRes = await fetch(`${API_BASE}/api/prices/by-market`);
+      if (pricesByMarketRes.ok) {
+        const pricesByMarket = await pricesByMarketRes.json();
+        dispatch({ type: 'SET_PRICES_BY_MARKET', payload: pricesByMarket });
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);

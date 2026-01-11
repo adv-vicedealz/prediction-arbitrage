@@ -225,6 +225,14 @@ def get_prices(limit: int = Query(50, le=1000)):
     return db.get_prices(limit=limit)
 
 
+@app.get("/api/prices/by-market")
+def get_prices_by_market():
+    """Get price counts per market."""
+    if not db:
+        return {}
+    return db.get_price_counts_by_market()
+
+
 @app.get("/api/price-stream/status")
 def get_price_stream_status():
     """Get price stream status."""

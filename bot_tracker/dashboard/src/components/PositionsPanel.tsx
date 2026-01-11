@@ -29,7 +29,7 @@ function TimeRemaining({ endTime }: { endTime: Date }) {
   return <span className="font-mono text-gray-300">{timeLeft}</span>;
 }
 
-function PositionCard({ position, market }: { position: WalletPosition; market?: MarketContext }) {
+function PositionCard({ position, market, priceCount }: { position: WalletPosition; market?: MarketContext; priceCount: number }) {
   const formatPercent = (value: number) => `${(value * 100).toFixed(1)}%`;
   const formatShares = (value: number) => value.toFixed(2);
   const formatPrice = (value: number) => `$${value.toFixed(3)}`;
@@ -60,10 +60,6 @@ function PositionCard({ position, market }: { position: WalletPosition; market?:
   const completeSets = position.complete_sets;
   const estimatedProfit = completeSets * position.edge;
   const profitMargin = totalCost > 0 ? (estimatedProfit / totalCost) * 100 : 0;
-
-  // Calculate coverage percentage (how much of the position is hedged)
-  const maxShares = Math.max(position.up_shares, position.down_shares);
-  const coveragePercent = maxShares > 0 ? (completeSets / maxShares) * 100 : 0;
 
   // Determine win/loss for ended markets
   const isResolved = market?.resolved && market?.winning_outcome;
@@ -103,6 +99,26 @@ function PositionCard({ position, market }: { position: WalletPosition; market?:
           <span className="text-sm text-blue-400 font-medium">{formatMarketName(position.market_slug)}</span>
           <span className="text-xs text-yellow-400 font-mono" title="Market time (UTC+1)">
             {marketTimeUTC1}-{marketEndTimeUTC1}
+          </span>
+          {/* Price capture indicator */}
+          <span
+            className={`text-xs ${priceCount > 0 ? 'text-green-400' : 'text-gray-500'}`}
+            title={priceCount > 0 ? `${priceCount} price snapshots captured` : 'No prices captured'}
+          >
+            {priceCount > 0 ? (
+              <span className="flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                </svg>
+                {priceCount}
+              </span>
+            ) : (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clipRule="evenodd" />
+                <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.742L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+              </svg>
+            )}
           </span>
         </div>
         <div className="flex items-center gap-4 text-xs">
@@ -168,7 +184,7 @@ function PositionCard({ position, market }: { position: WalletPosition; market?:
               {formatPercent(position.edge)}
             </div>
             <div className="text-xs text-gray-500">
-              Hedge: {formatPercent(position.hedge_ratio)} | Cov: {coveragePercent.toFixed(0)}%
+              Hedge: {formatPercent(position.hedge_ratio)}
             </div>
           </div>
 
@@ -299,6 +315,7 @@ export function PositionsPanel() {
                 key={`${position.wallet}:${position.market_slug}`}
                 position={position}
                 market={state.markets[position.market_slug]}
+                priceCount={state.pricesByMarket[position.market_slug] || 0}
               />
             ))}
           </div>

@@ -414,6 +414,16 @@ class Database:
             conn.commit()
             return cursor.rowcount
 
+    def get_price_counts_by_market(self) -> Dict[str, int]:
+        """Get count of price snapshots per market."""
+        with self._get_conn() as conn:
+            rows = conn.execute("""
+                SELECT market_slug, COUNT(*) as count
+                FROM prices
+                GROUP BY market_slug
+            """).fetchall()
+            return {row["market_slug"]: row["count"] for row in rows}
+
     # =========================================================================
     # WALLET OPERATIONS
     # =========================================================================
