@@ -44,6 +44,46 @@ export function LiveTradesFeed() {
     }
   }, [currentPage, totalPages]);
 
+  // Download CSV for last 20 markets
+  const downloadCSV = () => {
+    if (state.trades.length === 0) return;
+
+    // Get unique market slugs (in order of appearance) and take last 20
+    const recentMarkets = [...new Set(state.trades.map(t => t.market_slug))].slice(0, 20);
+
+    // Filter trades to only those markets
+    const filteredTrades = state.trades.filter(t => recentMarkets.includes(t.market_slug));
+
+    // Build CSV with proper escaping
+    const headers = ['Time', 'Market', 'Side', 'Outcome', 'Shares', 'Price', 'USDC', 'Wallet', 'TxHash'];
+    const rows = filteredTrades.map(t => [
+      new Date(t.timestamp * 1000).toISOString(),
+      t.market_slug,
+      t.side,
+      t.outcome,
+      t.shares.toFixed(4),
+      t.price.toFixed(4),
+      t.usdc.toFixed(2),
+      t.wallet_name,
+      t.tx_hash
+    ]);
+
+    const csv = [headers, ...rows].map(row =>
+      row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+
+    // Download file
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trades_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="bg-gray-800 rounded-lg p-4">
       <div className="flex items-center justify-between mb-4">
@@ -82,6 +122,18 @@ export function LiveTradesFeed() {
                 Next
               </button>
             </div>
+          )}
+          {state.trades.length > 0 && (
+            <button
+              onClick={downloadCSV}
+              className="px-2 py-1 text-xs rounded bg-gray-700 text-white hover:bg-gray-600 flex items-center gap-1"
+              title="Download CSV (last 20 markets)"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              CSV
+            </button>
           )}
         </div>
       </div>
