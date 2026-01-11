@@ -135,15 +135,18 @@ def set_storage(store):
     global storage, trade_history
     storage = store
 
-    # Load historical trades from storage on startup
+    # Load historical data from storage on startup
     if store:
         try:
+            # Load ALL trades from storage
             stored_trades = store.get_all_trades()
+            all_trade_ids = set()
+
             if stored_trades:
                 # Convert stored dicts back to TradeEvent objects
                 from .models import TradeEvent
-                loaded_trades = []
-                for trade_dict in stored_trades[-2000:]:  # Load last 2000
+
+                for trade_dict in stored_trades:
                     try:
                         trade = TradeEvent(
                             id=trade_dict.get("id", ""),
@@ -161,31 +164,54 @@ def set_storage(store):
                             market_slug=trade_dict.get("market_slug", ""),
                             market_question=trade_dict.get("market_question", "")
                         )
-                        loaded_trades.append(trade)
                         trade_history.append(trade)
+                        all_trade_ids.add(trade.id)
                     except Exception as e:
                         print(f"Error loading trade: {e}")
 
                 # Sort by timestamp descending (newest first) for trade_history
                 trade_history.sort(key=lambda t: t.timestamp, reverse=True)
-                print(f"Loaded {len(trade_history)} historical trades from storage")
-
-                # Rebuild positions from loaded trades (oldest first for correct calculation)
-                if position_tracker and loaded_trades:
-                    loaded_trades.sort(key=lambda t: t.timestamp)  # Oldest first
-                    for trade in loaded_trades:
-                        if trade.market_slug:  # Only process trades with valid market_slug
-                            position_tracker.update_position(trade)
-                    positions_count = len(position_tracker.get_all_positions())
-                    print(f"Rebuilt {positions_count} positions from historical trades")
+                # Keep only last 2000 for in-memory history (but we loaded all for positions)
+                trade_history = trade_history[:2000]
+                print(f"Loaded {len(trade_history)} trades for history (total in storage: {len(stored_trades)})")
 
                 # Populate trade_poller's seen_trade_ids to prevent duplicate processing
-                if trade_poller and loaded_trades:
-                    for trade in loaded_trades:
-                        trade_poller.seen_trade_ids.add(trade.id)
-                    print(f"Added {len(loaded_trades)} trade IDs to seen_trade_ids")
+                if trade_poller:
+                    trade_poller.seen_trade_ids.update(all_trade_ids)
+                    print(f"Added {len(all_trade_ids)} trade IDs to seen_trade_ids")
+
+            # Load positions directly from storage (more reliable than rebuilding)
+            stored_positions = store.get_all_positions()
+            if stored_positions and position_tracker:
+                from .models import WalletPosition
+                positions_loaded = 0
+                for key, pos_dict in stored_positions.items():
+                    try:
+                        position = WalletPosition(
+                            wallet=pos_dict.get("wallet", ""),
+                            wallet_name=pos_dict.get("wallet_name", ""),
+                            market_slug=pos_dict.get("market_slug", ""),
+                            up_shares=float(pos_dict.get("up_shares", 0)),
+                            down_shares=float(pos_dict.get("down_shares", 0)),
+                            up_cost=float(pos_dict.get("up_cost", 0)),
+                            down_cost=float(pos_dict.get("down_cost", 0)),
+                            complete_sets=float(pos_dict.get("complete_sets", 0)),
+                            edge=float(pos_dict.get("edge", 0)),
+                            hedge_ratio=float(pos_dict.get("hedge_ratio", 0)),
+                            total_trades=int(pos_dict.get("total_trades", 0)),
+                            avg_up_price=float(pos_dict.get("avg_up_price", 0)),
+                            avg_down_price=float(pos_dict.get("avg_down_price", 0)),
+                            combined_price=float(pos_dict.get("combined_price", 0))
+                        )
+                        # Add to position tracker's internal dict
+                        position_tracker.positions[key] = position
+                        positions_loaded += 1
+                    except Exception as e:
+                        print(f"Error loading position {key}: {e}")
+                print(f"Loaded {positions_loaded} positions from storage")
+
         except Exception as e:
-            print(f"Error loading trades from storage: {e}")
+            print(f"Error loading data from storage: {e}")
 
 
 def add_trade_to_history(trade: TradeEvent):
