@@ -204,7 +204,15 @@ export function WalletsSidebar() {
           </div>
 
           <div className="space-y-3">
-            {trackingInfo.markets.map((market) => (
+            {trackingInfo.markets
+              .filter((market) => {
+                // Parse timestamp from slug (e.g., "btc-updown-15m-1736553600")
+                const slugParts = market.slug.split('-');
+                const marketTimestamp = parseInt(slugParts[slugParts.length - 1]);
+                const marketEndTime = (marketTimestamp + 15 * 60) * 1000;
+                return Date.now() < marketEndTime;
+              })
+              .map((market) => (
               <div key={market.slug} className="border border-gray-700 rounded-lg p-3">
                 <div className="text-xs text-gray-400 mb-1 truncate" title={market.question}>
                   {market.question.replace('Bitcoin Up or Down - ', 'BTC ')}
