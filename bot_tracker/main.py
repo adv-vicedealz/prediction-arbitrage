@@ -154,7 +154,7 @@ class BotTracker:
             self.market_fetcher.cache[ctx.slug] = ctx
             self.storage.save_market(ctx)
 
-        # Discover active markets
+        # Discover active markets and subscribe to prices
         print("Discovering active markets...")
         active = await self.market_discovery.discover_markets()
         for ctx in active:
@@ -162,7 +162,17 @@ class BotTracker:
             self.market_fetcher.cache[ctx.slug] = ctx
             self.storage.save_market(ctx)
 
+            # Subscribe to price stream for active (non-closed) markets
+            if not ctx.resolved:
+                up_token = ctx.token_ids.get("up", "")
+                down_token = ctx.token_ids.get("down", "")
+                if up_token:
+                    self.price_stream.add_asset(up_token, ctx.slug, "Up")
+                if down_token:
+                    self.price_stream.add_asset(down_token, ctx.slug, "Down")
+
         print(f"Tracking {self.market_resolver.get_pending_count()} markets for resolution")
+        print(f"Subscribed to {len(active)} markets for price updates")
 
     async def _discovery_loop(self):
         """Continuously discover new markets and add to resolver."""
