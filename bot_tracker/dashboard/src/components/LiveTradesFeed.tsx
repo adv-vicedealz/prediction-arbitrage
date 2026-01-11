@@ -3,10 +3,18 @@ import { useTracker } from '../context/TrackerContext';
 
 const TRADES_PER_PAGE = 100;
 
+type MarketFilter = 'all' | 'btc' | 'eth';
+
 export function LiveTradesFeed() {
   const { state, selectWallet } = useTracker();
   const [currentPage, setCurrentPage] = useState(1);
+  const [marketFilter, setMarketFilter] = useState<MarketFilter>('all');
   const prevTradesLengthRef = useRef(state.trades.length);
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [marketFilter]);
 
   // Reset to page 1 when new trades arrive (length increases)
   useEffect(() => {
@@ -18,6 +26,13 @@ export function LiveTradesFeed() {
     }
     prevTradesLengthRef.current = state.trades.length;
   }, [state.trades.length, currentPage]);
+
+  // Filter trades by market type
+  const filteredTrades = marketFilter === 'all'
+    ? state.trades
+    : state.trades.filter(t =>
+        t.market_slug?.toLowerCase().includes(marketFilter)
+      );
 
   const formatTime = (ts: number) => {
     return new Date(ts * 1000).toLocaleTimeString();
@@ -31,11 +46,11 @@ export function LiveTradesFeed() {
     return shares.toFixed(2);
   };
 
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(state.trades.length / TRADES_PER_PAGE));
+  // Pagination (based on filtered trades)
+  const totalPages = Math.max(1, Math.ceil(filteredTrades.length / TRADES_PER_PAGE));
   const startIndex = (currentPage - 1) * TRADES_PER_PAGE;
-  const endIndex = Math.min(startIndex + TRADES_PER_PAGE, state.trades.length);
-  const displayedTrades = state.trades.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + TRADES_PER_PAGE, filteredTrades.length);
+  const displayedTrades = filteredTrades.slice(startIndex, endIndex);
 
   // Ensure current page is valid
   useEffect(() => {
@@ -88,41 +103,79 @@ export function LiveTradesFeed() {
     <div className="bg-gray-800 rounded-lg p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-white">Live Trades</h2>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {/* Market Type Filter */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setMarketFilter('all')}
+              className={`px-2 py-1 text-xs rounded ${
+                marketFilter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setMarketFilter('btc')}
+              className={`px-2 py-1 text-xs rounded ${
+                marketFilter === 'btc'
+                  ? 'bg-orange-600 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              BTC
+            </button>
+            <button
+              onClick={() => setMarketFilter('eth')}
+              className={`px-2 py-1 text-xs rounded ${
+                marketFilter === 'eth'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              ETH
+            </button>
+          </div>
+
+          {/* Count */}
           <span className="text-sm text-gray-400">
-            {state.trades.length > 0
-              ? `${startIndex + 1}-${endIndex} of ${state.trades.length}`
+            {filteredTrades.length > 0
+              ? `${startIndex + 1}-${endIndex} of ${filteredTrades.length}`
               : '0 trades'}
+            {marketFilter !== 'all' && ` (${state.trades.length} total)`}
           </span>
-          {totalPages > 1 && (
-            <div className="flex items-center gap-2">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(p => p - 1)}
-                className={`px-2 py-1 text-xs rounded ${
-                  currentPage === 1
-                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
-                }`}
-              >
-                Prev
-              </button>
-              <span className="text-sm text-gray-300">
-                {currentPage} / {totalPages}
-              </span>
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(p => p + 1)}
-                className={`px-2 py-1 text-xs rounded ${
-                  currentPage === totalPages
-                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-700 text-white hover:bg-gray-600'
-                }`}
-              >
-                Next
-              </button>
-            </div>
-          )}
+
+          {/* Pagination */}
+          <div className="flex items-center gap-2">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(p => p - 1)}
+              className={`px-2 py-1 text-xs rounded ${
+                currentPage === 1
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-700 text-white hover:bg-gray-600'
+              }`}
+            >
+              Prev
+            </button>
+            <span className="text-sm text-gray-300">
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(p => p + 1)}
+              className={`px-2 py-1 text-xs rounded ${
+                currentPage === totalPages
+                  ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-700 text-white hover:bg-gray-600'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+
+          {/* CSV Download */}
           {state.trades.length > 0 && (
             <button
               onClick={downloadCSV}
