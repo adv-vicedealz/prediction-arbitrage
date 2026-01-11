@@ -115,6 +115,7 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
     market: (data: unknown) => dispatch({ type: 'UPDATE_MARKET', payload: data as MarketContext }),
     stats: (data: unknown) => dispatch({ type: 'UPDATE_STATS', payload: data as TrackerStats }),
     connected: () => console.log('WebSocket connected'),
+    ping: () => {}, // Keepalive ping, ignore
   }), []);
 
   const { isConnected } = useWebSocket(WS_URL, handlers);

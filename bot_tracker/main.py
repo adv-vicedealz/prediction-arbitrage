@@ -22,7 +22,6 @@ from .trade_poller import TradePoller
 from .market_context import MarketContextFetcher
 from .position_tracker import PositionTracker
 from .pattern_detector import PatternDetector
-from .websocket_server import WebSocketServer
 from .storage import JSONStorage
 from .price_stream import PriceStream, PriceUpdate
 from . import api
@@ -38,7 +37,6 @@ class BotTracker:
         self.position_tracker = PositionTracker()
         self.pattern_detector = PatternDetector()
         self.market_fetcher = MarketContextFetcher()
-        self.ws_server = WebSocketServer()
         self.trade_poller = TradePoller(self.on_new_trades)
         self.storage = JSONStorage()  # JSON file storage
         self.price_stream = PriceStream(
@@ -50,7 +48,7 @@ class BotTracker:
             self.position_tracker,
             self.pattern_detector,
             self.market_fetcher,
-            self.ws_server,
+            None,  # WebSocket now handled by FastAPI
             self.start_time
         )
         api.set_trade_poller(self.trade_poller)
@@ -85,7 +83,7 @@ class BotTracker:
                 context = await self.market_fetcher.get_or_fetch_context(slug=trade.market_slug)
                 if context:
                     self.storage.save_market(context)  # Save market metadata
-                    await self.ws_server.broadcast_market(context)
+                    await api.broadcast_to_websocket("market", context.model_dump())
 
                     # Subscribe to price stream for this market
                     up_token = context.token_ids.get("up", "")
@@ -108,9 +106,9 @@ class BotTracker:
             # Add to API trade history
             api.add_trade_to_history(trade)
 
-            # Broadcast via WebSocket
-            await self.ws_server.broadcast_trade(trade)
-            await self.ws_server.broadcast_position(position)
+            # Broadcast via WebSocket (using FastAPI WebSocket)
+            await api.broadcast_to_websocket("trade", trade.model_dump())
+            await api.broadcast_to_websocket("position", position.model_dump())
 
             # Analyze and broadcast patterns
             market = self.market_fetcher.cache.get(trade.market_slug)
@@ -119,16 +117,16 @@ class BotTracker:
             hedge = self.pattern_detector.analyze_hedge(position)
 
             if timing:
-                await self.ws_server.broadcast_pattern("timing", timing)
+                await api.broadcast_to_websocket("timing", timing.model_dump())
             if price:
-                await self.ws_server.broadcast_pattern("price", price)
+                await api.broadcast_to_websocket("price", price.model_dump())
             if hedge:
-                await self.ws_server.broadcast_pattern("hedge", hedge)
+                await api.broadcast_to_websocket("hedge", hedge.model_dump())
 
         # Broadcast updated stats
         stats = self.position_tracker.get_summary()
-        stats["connected_clients"] = self.ws_server.get_client_count()
-        await self.ws_server.broadcast_stats(stats)
+        stats["connected_clients"] = api.ws_manager.get_count()
+        await api.broadcast_to_websocket("stats", stats)
 
     async def run(self):
         """Start all services."""
@@ -145,17 +143,13 @@ class BotTracker:
         print()
         print(f"HTTP API: http://{HTTP_HOST}:{HTTP_PORT}")
         print(f"API Docs: http://{HTTP_HOST}:{HTTP_PORT}/docs")
-        print(f"WebSocket: ws://localhost:8765")
+        print(f"WebSocket: ws://{HTTP_HOST}:{HTTP_PORT}/ws")
         print(f"Price Stream: Real-time prices via Polymarket WebSocket")
         print("=" * 60)
         print()
 
         # Create tasks for all services
         tasks = []
-
-        # WebSocket server (for dashboard)
-        ws_task = asyncio.create_task(self.ws_server.run())
-        tasks.append(ws_task)
 
         # Trade poller
         poller_task = asyncio.create_task(self.trade_poller.run())
@@ -194,7 +188,6 @@ class BotTracker:
         self.running = False
         self.trade_poller.stop()
         self.market_fetcher.stop()
-        self.ws_server.stop()
         self.price_stream.stop()
 
         # Save final data

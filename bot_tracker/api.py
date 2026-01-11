@@ -2,17 +2,81 @@
 FastAPI REST endpoints for the bot tracker dashboard.
 """
 
-from typing import List, Optional
+import os
+import secrets
+import asyncio
+import json
+from typing import List, Optional, Set
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel
 
 from .config import TARGET_WALLETS, MARKET_SLUGS_PATTERN, BUY_ONLY
+
+# Password protection (set via environment variable)
+AUTH_USERNAME = os.getenv("AUTH_USERNAME", "admin")
+AUTH_PASSWORD = os.getenv("AUTH_PASSWORD", "")  # Empty = no auth required
+
+security = HTTPBasic()
+
+
+def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)):
+    """Verify HTTP Basic Auth credentials."""
+    if not AUTH_PASSWORD:  # No password set = no auth required
+        return True
+
+    correct_username = secrets.compare_digest(credentials.username, AUTH_USERNAME)
+    correct_password = secrets.compare_digest(credentials.password, AUTH_PASSWORD)
+
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return True
+
+
+# WebSocket connection manager for real-time updates
+class ConnectionManager:
+    """Manages WebSocket connections."""
+
+    def __init__(self):
+        self.active_connections: Set[WebSocket] = set()
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.add(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.discard(websocket)
+
+    async def broadcast(self, message: dict):
+        """Broadcast message to all connected clients."""
+        dead_connections = set()
+        for connection in self.active_connections:
+            try:
+                await connection.send_json(message)
+            except Exception:
+                dead_connections.add(connection)
+
+        # Clean up dead connections
+        for conn in dead_connections:
+            self.active_connections.discard(conn)
+
+    def get_count(self) -> int:
+        return len(self.active_connections)
+
+
+ws_manager = ConnectionManager()
+
+
 from .models import (
     WalletPosition,
     MarketContext,
@@ -73,8 +137,15 @@ def add_trade_to_history(trade: TradeEvent):
 _dashboard_dist = Path(__file__).parent / "dashboard" / "dist"
 _dashboard_available = _dashboard_dist.exists()
 
+def optional_auth(credentials: HTTPBasicCredentials = Depends(security)):
+    """Optional auth - only enforced if AUTH_PASSWORD is set."""
+    if AUTH_PASSWORD:
+        return verify_credentials(credentials)
+    return True
+
+
 @app.get("/")
-def root():
+def root(auth: bool = Depends(optional_auth)):
     """Root endpoint - serve dashboard if available, otherwise API info."""
     if _dashboard_available:
         return FileResponse(_dashboard_dist / "index.html")
@@ -84,6 +155,38 @@ def root():
         "status": "running",
         "docs": "/docs"
     }
+
+
+# ===== WebSocket Endpoint =====
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """WebSocket endpoint for real-time updates."""
+    # Check auth via query param if password is set
+    if AUTH_PASSWORD:
+        token = websocket.query_params.get("token", "")
+        if token != AUTH_PASSWORD:
+            await websocket.close(code=4001)
+            return
+
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            # Keep connection alive, wait for messages (we don't expect any)
+            try:
+                await asyncio.wait_for(websocket.receive_text(), timeout=30)
+            except asyncio.TimeoutError:
+                # Send ping to keep alive
+                await websocket.send_json({"type": "ping"})
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+    except Exception:
+        ws_manager.disconnect(websocket)
+
+
+async def broadcast_to_websocket(event_type: str, data: dict):
+    """Broadcast an event to all WebSocket clients."""
+    await ws_manager.broadcast({"type": event_type, "data": data})
 
 
 @app.get("/api/status", response_model=TrackerState)
@@ -98,7 +201,7 @@ def get_status():
         last_trade_ts = trade_history[0].timestamp
 
     return TrackerState(
-        connected_clients=ws_server.get_client_count() if ws_server else 0,
+        connected_clients=ws_manager.get_count() if ws_server else 0,
         tracked_wallets=len(TARGET_WALLETS),
         active_markets=len(market_fetcher.cache) if market_fetcher else 0,
         total_trades_seen=len(trade_history),
@@ -290,7 +393,7 @@ def get_summary():
         summary["markets"] = pos_summary.get("total_markets", 0)
 
     if ws_server:
-        summary["connected_clients"] = ws_server.get_client_count()
+        summary["connected_clients"] = ws_manager.get_count()
 
     return summary
 
