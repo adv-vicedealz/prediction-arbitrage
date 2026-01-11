@@ -128,7 +128,7 @@ export function WalletsSidebar() {
 
       {/* Live Stats */}
       <div className="bg-gray-800 rounded-lg p-4">
-        <h2 className="text-lg font-semibold text-white mb-3">Session Stats</h2>
+        <h2 className="text-lg font-semibold text-white mb-3">Displayed Data</h2>
 
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
