@@ -12,15 +12,16 @@ export function formatMarketName(slug: string): string {
   const asset = slug.toLowerCase().includes('btc') ? 'BTC' :
                 slug.toLowerCase().includes('eth') ? 'ETH' : '???';
 
-  // Convert timestamp to time
+  // Convert timestamp to time (UTC)
   if (!isNaN(timestamp) && timestamp > 1000000000) {
     const date = new Date(timestamp * 1000);
     const time = date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
+      timeZone: 'UTC'
     });
-    return `${asset} @ ${time}`;
+    return `${asset} @ ${time} UTC`;
   }
 
   return slug;
@@ -40,7 +41,7 @@ export function formatMarketNameFull(slug: string): string {
   const asset = slug.toLowerCase().includes('btc') ? 'BTC' :
                 slug.toLowerCase().includes('eth') ? 'ETH' : '???';
 
-  // Convert timestamp to time range
+  // Convert timestamp to time range (UTC)
   if (!isNaN(timestamp) && timestamp > 1000000000) {
     const startDate = new Date(timestamp * 1000);
     const endDate = new Date((timestamp + 15 * 60) * 1000);
@@ -48,10 +49,11 @@ export function formatMarketNameFull(slug: string): string {
     const formatTime = (d: Date) => d.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
+      timeZone: 'UTC'
     });
 
-    return `${asset} 15min @ ${formatTime(startDate)} - ${formatTime(endDate)}`;
+    return `${asset} 15min @ ${formatTime(startDate)} - ${formatTime(endDate)} UTC`;
   }
 
   return slug;
@@ -72,7 +74,8 @@ export function getMarketTime(slug: string): string {
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
+      timeZone: 'UTC'
     });
   }
 
