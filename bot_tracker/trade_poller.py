@@ -94,14 +94,20 @@ class TradePoller:
         self,
         session: aiohttp.ClientSession,
         wallet: str,
-        market_filter: str = None
+        market_filter: str = None,
+        max_api_calls: int = 20
     ) -> List[dict]:
-        """Fetch ALL historical trades for a wallet using offset pagination."""
+        """Fetch recent trades for a wallet using offset pagination.
+
+        Args:
+            max_api_calls: Maximum number of API calls to make (default 20 = 10,000 trades max)
+        """
         all_trades = []
         offset = 0
         limit = 500  # Max allowed by API
+        api_calls = 0
 
-        while True:
+        while api_calls < max_api_calls:
             params = {
                 "user": wallet,
                 "limit": limit,
@@ -118,25 +124,32 @@ class TradePoller:
                     if resp.status != 200:
                         print(f"Backfill error: status {resp.status}")
                         break
-                    trades = await resp.json()
+                    raw_trades = await resp.json()
             except Exception as e:
                 print(f"Backfill error: {e}")
                 break
 
-            if not trades:
+            api_calls += 1
+
+            if not raw_trades:
                 break
 
             # Filter to target markets if specified
             if market_filter:
-                trades = [t for t in trades if re.match(market_filter, t.get("slug", ""))]
+                filtered = [t for t in raw_trades if re.match(market_filter, t.get("slug", ""))]
+            else:
+                filtered = raw_trades
 
-            all_trades.extend(trades)
-            print(f"  Backfill: fetched {len(trades)} trades (offset {offset}, total {len(all_trades)})")
+            all_trades.extend(filtered)
+            print(f"  Backfill: {len(filtered)}/{len(raw_trades)} matching trades (offset {offset}, total {len(all_trades)})")
 
-            if len(trades) < limit:
-                break  # No more trades
+            if len(raw_trades) < limit:
+                break  # No more trades from API
 
             offset += limit
+
+        if api_calls >= max_api_calls:
+            print(f"  Backfill: stopped at {max_api_calls} API calls (safety limit)")
 
         return all_trades
 
