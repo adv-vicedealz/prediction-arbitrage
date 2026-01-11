@@ -60,75 +60,94 @@ class BotTracker:
 
     async def on_price_update(self, update: PriceUpdate):
         """Handle price update from WebSocket - save to storage."""
-        self.storage.save_price_update(
-            market_slug=update.market_slug,
-            outcome=update.outcome,
-            price=update.price,
-            best_bid=update.best_bid,
-            best_ask=update.best_ask,
-            timestamp=update.timestamp
-        )
-        self.price_update_count += 1
+        try:
+            self.storage.save_price_update(
+                market_slug=update.market_slug,
+                outcome=update.outcome,
+                price=update.price,
+                best_bid=update.best_bid,
+                best_ask=update.best_ask,
+                timestamp=update.timestamp
+            )
+            self.price_update_count += 1
 
-        # Log periodically
-        if self.price_update_count % 100 == 0:
-            print(f"Price updates saved: {self.price_update_count}")
+            # Log periodically
+            if self.price_update_count % 100 == 0:
+                print(f"Price updates saved: {self.price_update_count}")
+        except Exception as e:
+            print(f"Error saving price update: {e}")
 
     async def on_new_trades(self, trades: List[TradeEvent]):
         """Handle new trades from the poller."""
         for trade in trades:
-            # Save trade to JSON file
-            self.storage.save_trade(trade)
+            try:
+                # Save trade to JSON file
+                self.storage.save_trade(trade)
 
-            # Ensure we have market context
-            if trade.market_slug and trade.market_slug not in self.market_fetcher.cache:
-                context = await self.market_fetcher.get_or_fetch_context(slug=trade.market_slug)
-                if context:
-                    self.storage.save_market(context)  # Save market metadata
-                    await api.broadcast_to_websocket("market", context.model_dump())
+                # Ensure we have market context
+                if trade.market_slug and trade.market_slug not in self.market_fetcher.cache:
+                    try:
+                        context = await self.market_fetcher.get_or_fetch_context(slug=trade.market_slug)
+                        if context:
+                            self.storage.save_market(context)  # Save market metadata
+                            await api.broadcast_to_websocket("market", context.model_dump())
 
-                    # Subscribe to price stream for this market
-                    up_token = context.token_ids.get("up", "")
-                    down_token = context.token_ids.get("down", "")
-                    if up_token:
-                        self.price_stream.add_asset(up_token, context.slug, "Up")
-                    if down_token:
-                        self.price_stream.add_asset(down_token, context.slug, "Down")
-                    print(f"Subscribed to price stream: {context.slug}")
+                            # Subscribe to price stream for this market
+                            up_token = context.token_ids.get("up", "")
+                            down_token = context.token_ids.get("down", "")
+                            if up_token:
+                                self.price_stream.add_asset(up_token, context.slug, "Up")
+                            if down_token:
+                                self.price_stream.add_asset(down_token, context.slug, "Down")
+                            print(f"Subscribed to price stream: {context.slug}")
+                    except Exception as e:
+                        print(f"Error fetching market context for {trade.market_slug}: {e}")
 
-            # Update position
-            position = self.position_tracker.update_position(trade)
+                # Update position
+                position = self.position_tracker.update_position(trade)
 
-            # Save position snapshot
-            self.storage.save_position(position)
+                # Save position snapshot
+                self.storage.save_position(position)
 
-            # Record for pattern detection
-            self.pattern_detector.record_trade(trade)
+                # Record for pattern detection
+                self.pattern_detector.record_trade(trade)
 
-            # Add to API trade history
-            api.add_trade_to_history(trade)
+                # Add to API trade history
+                api.add_trade_to_history(trade)
 
-            # Broadcast via WebSocket (using FastAPI WebSocket)
-            await api.broadcast_to_websocket("trade", trade.model_dump())
-            await api.broadcast_to_websocket("position", position.model_dump())
+                # Broadcast via WebSocket (using FastAPI WebSocket)
+                try:
+                    await api.broadcast_to_websocket("trade", trade.model_dump())
+                    await api.broadcast_to_websocket("position", position.model_dump())
+                except Exception as e:
+                    print(f"WebSocket broadcast error: {e}")
 
-            # Analyze and broadcast patterns
-            market = self.market_fetcher.cache.get(trade.market_slug)
-            timing = self.pattern_detector.analyze_timing(trade.wallet, trade.market_slug, market)
-            price = self.pattern_detector.analyze_price(trade.wallet, trade.market_slug)
-            hedge = self.pattern_detector.analyze_hedge(position)
+                # Analyze and broadcast patterns
+                market = self.market_fetcher.cache.get(trade.market_slug)
+                timing = self.pattern_detector.analyze_timing(trade.wallet, trade.market_slug, market)
+                price = self.pattern_detector.analyze_price(trade.wallet, trade.market_slug)
+                hedge = self.pattern_detector.analyze_hedge(position)
 
-            if timing:
-                await api.broadcast_to_websocket("timing", timing.model_dump())
-            if price:
-                await api.broadcast_to_websocket("price", price.model_dump())
-            if hedge:
-                await api.broadcast_to_websocket("hedge", hedge.model_dump())
+                try:
+                    if timing:
+                        await api.broadcast_to_websocket("timing", timing.model_dump())
+                    if price:
+                        await api.broadcast_to_websocket("price", price.model_dump())
+                    if hedge:
+                        await api.broadcast_to_websocket("hedge", hedge.model_dump())
+                except Exception as e:
+                    print(f"Pattern broadcast error: {e}")
+
+            except Exception as e:
+                print(f"Error processing trade {trade.id}: {e}")
 
         # Broadcast updated stats
-        stats = self.position_tracker.get_summary()
-        stats["connected_clients"] = api.ws_manager.get_count()
-        await api.broadcast_to_websocket("stats", stats)
+        try:
+            stats = self.position_tracker.get_summary()
+            stats["connected_clients"] = api.ws_manager.get_count()
+            await api.broadcast_to_websocket("stats", stats)
+        except Exception as e:
+            print(f"Stats broadcast error: {e}")
 
     async def run(self):
         """Start all services."""
@@ -179,11 +198,41 @@ class BotTracker:
         else:
             print("HTTP server not started: uvicorn not installed")
 
-        # Wait for all tasks
-        try:
-            await asyncio.gather(*tasks)
-        except asyncio.CancelledError:
-            print("Shutting down...")
+        # Monitor tasks and restart if they fail
+        while self.running:
+            try:
+                # Wait for any task to complete
+                done, pending = await asyncio.wait(
+                    tasks,
+                    return_when=asyncio.FIRST_COMPLETED,
+                    timeout=60  # Check every minute
+                )
+
+                # Check for failed tasks
+                for task in done:
+                    task_name = task.get_name() if hasattr(task, 'get_name') else str(task)
+                    try:
+                        exc = task.exception()
+                        if exc:
+                            print(f"Task failed with error: {exc}")
+                            print(f"Task: {task_name}")
+                    except asyncio.CancelledError:
+                        print(f"Task was cancelled: {task_name}")
+
+                # Update tasks list to only include pending
+                tasks = list(pending)
+
+                # If all tasks are done, exit
+                if not tasks:
+                    print("All tasks completed, exiting...")
+                    break
+
+            except asyncio.CancelledError:
+                print("Shutting down...")
+                break
+            except Exception as e:
+                print(f"Error in task monitor: {e}")
+                await asyncio.sleep(5)  # Brief pause before retrying
 
     def stop(self):
         """Stop all services."""
