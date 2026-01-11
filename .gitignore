@@ -17,6 +17,8 @@ node_modules/
 !tsconfig.json
 !tsconfig.node.json
 *.db
+*.db-shm
+*.db-wal
 
 # OS
 .DS_Store
@@ -27,8 +29,9 @@ node_modules/
 .vscode/
 *.swp
 
-# Build artifacts (keep dashboard dist for deployment)
-# bot_tracker/dashboard/dist/
+# Build artifacts
+static/
+bot_tracker/dashboard/dist/
 
 # Lock files
 *.lock
