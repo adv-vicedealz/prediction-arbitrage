@@ -58,6 +58,31 @@ class BotTracker:
         self.running = False
         self.price_update_count = 0
 
+    async def _subscribe_to_existing_markets(self):
+        """Subscribe to price stream for all markets with existing positions."""
+        positions = self.position_tracker.get_all_positions()
+        if not positions:
+            return
+
+        # Get unique market slugs
+        market_slugs = set(p.market_slug for p in positions if p.market_slug)
+        print(f"Subscribing to prices for {len(market_slugs)} markets with positions...")
+
+        for slug in market_slugs:
+            try:
+                # Fetch market context to get token IDs
+                context = await self.market_fetcher.get_or_fetch_context(slug=slug)
+                if context:
+                    up_token = context.token_ids.get("up", "")
+                    down_token = context.token_ids.get("down", "")
+                    if up_token:
+                        self.price_stream.add_asset(up_token, context.slug, "Up")
+                    if down_token:
+                        self.price_stream.add_asset(down_token, context.slug, "Down")
+                    print(f"  Subscribed: {slug}")
+            except Exception as e:
+                print(f"  Failed to subscribe to {slug}: {e}")
+
     async def on_price_update(self, update: PriceUpdate):
         """Handle price update from WebSocket - save to storage."""
         try:
@@ -168,6 +193,9 @@ class BotTracker:
         print(f"Price Stream: Real-time prices via Polymarket WebSocket")
         print("=" * 60)
         print()
+
+        # Subscribe to price stream for all markets with positions
+        await self._subscribe_to_existing_markets()
 
         # Create tasks for all services
         tasks = []
