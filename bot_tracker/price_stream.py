@@ -85,7 +85,7 @@ class PriceStream:
 
         message = {
             "type": "market",
-            "assets_ids": asset_ids
+            "asset_ids": asset_ids
         }
 
         await self.ws.send(json.dumps(message))

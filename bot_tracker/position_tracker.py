@@ -157,3 +157,17 @@ class PositionTracker:
             "total_positions": len(all_positions),
             "total_trades": total_trades,
         }
+
+    def cleanup_resolved_markets(self, resolved_slugs: List[str]):
+        """Remove positions for resolved markets to prevent memory bloat."""
+        removed_count = 0
+        for wallet in list(self.positions.keys()):
+            for slug in resolved_slugs:
+                if slug in self.positions[wallet]:
+                    del self.positions[wallet][slug]
+                    removed_count += 1
+                self._up_shares_bought[wallet].pop(slug, None)
+                self._down_shares_bought[wallet].pop(slug, None)
+
+        if removed_count:
+            print(f"[PositionTracker] Cleaned up {removed_count} positions")

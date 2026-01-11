@@ -180,14 +180,16 @@ class BotTracker:
             await asyncio.sleep(300)  # Every 5 minutes
 
             try:
-                # Cleanup old resolved markets from cache
-                removed_slugs = self.market_fetcher.cleanup_old_markets(hours_back=2)
+                # Cleanup old resolved markets from cache (returns slugs AND token_ids)
+                removed_slugs, removed_token_ids = self.market_fetcher.cleanup_old_markets(hours_back=2)
 
                 # Remove price stream assets for cleaned up markets
-                for slug in removed_slugs:
-                    # We don't have token IDs after removal, but price_stream
-                    # will ignore updates for non-tracked assets anyway
-                    pass
+                for token_id in removed_token_ids:
+                    self.price_stream.remove_asset(token_id)
+
+                # Cleanup positions for removed markets
+                if removed_slugs:
+                    self.position_tracker.cleanup_resolved_markets(removed_slugs)
 
                 # Cleanup old discovered slugs
                 self.market_discovery.cleanup_old_slugs(hours_back=24)

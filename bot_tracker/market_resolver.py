@@ -251,6 +251,15 @@ class MarketResolver:
         if old_slugs:
             print(f"[Resolver] Cleaned up {len(old_slugs)} old completed markets")
 
+    def _cleanup_stale_pending(self, max_age_days: int = 7):
+        """Remove pending markets older than max_age_days (fallback for stuck markets)."""
+        cutoff = int(time.time()) - (max_age_days * 24 * 3600)
+        stale = [s for s, m in self.pending_markets.items() if m.end_timestamp < cutoff]
+        for slug in stale:
+            del self.pending_markets[slug]
+        if stale:
+            print(f"[Resolver] Removed {len(stale)} stale pending markets (>{max_age_days} days old)")
+
     def _get_next_resolution_time(self) -> int:
         """Get the timestamp when the next market will be ready for resolution."""
         if not self.pending_markets:
@@ -271,6 +280,8 @@ class MarketResolver:
         while self.running:
             try:
                 await self.check_and_resolve()
+                # Also cleanup any stale pending markets (older than 7 days)
+                self._cleanup_stale_pending()
             except Exception as e:
                 print(f"[Resolver] Error: {e}")
 
