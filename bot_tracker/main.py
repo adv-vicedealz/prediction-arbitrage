@@ -4,6 +4,7 @@ Orchestrates all components and runs the server.
 """
 
 import asyncio
+import re
 import signal
 import sys
 from datetime import datetime
@@ -16,7 +17,7 @@ except ImportError:
     UVICORN_AVAILABLE = False
     print("Warning: uvicorn not installed. Run: pip install uvicorn")
 
-from .config import HTTP_HOST, HTTP_PORT, TARGET_WALLETS
+from .config import HTTP_HOST, HTTP_PORT, TARGET_WALLETS, MARKET_SLUGS_PATTERN, MARKET_FILTER_ENABLED
 from .models import TradeEvent
 from .trade_poller import TradePoller
 from .market_context import MarketContextFetcher
@@ -59,14 +60,20 @@ class BotTracker:
         self.price_update_count = 0
 
     async def _subscribe_to_existing_markets(self):
-        """Subscribe to price stream for all markets with existing positions."""
+        """Subscribe to price stream for all 15-min markets with existing positions."""
         positions = self.position_tracker.get_all_positions()
         if not positions:
             return
 
-        # Get unique market slugs
-        market_slugs = set(p.market_slug for p in positions if p.market_slug)
-        print(f"Subscribing to prices for {len(market_slugs)} markets with positions...")
+        # Get unique market slugs, filtered to 15-min markets only
+        market_slugs = set(
+            p.market_slug for p in positions
+            if p.market_slug and (
+                not MARKET_FILTER_ENABLED or
+                re.match(MARKET_SLUGS_PATTERN, p.market_slug)
+            )
+        )
+        print(f"Subscribing to prices for {len(market_slugs)} 15-min markets...")
 
         for slug in market_slugs:
             try:
