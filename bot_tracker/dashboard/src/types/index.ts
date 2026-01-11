@@ -131,3 +131,21 @@ export interface TrackerConfig {
   buy_only: boolean;
   running: boolean;
 }
+
+export interface PriceStreamStatus {
+  connected: boolean;
+  running: boolean;
+  subscribed_assets: number;
+  assets: string[];
+}
+
+export interface PricePoint {
+  timestamp: number;
+  timestamp_iso: string;
+  market_slug: string;
+  outcome: string;
+  price: number;
+  best_bid: number;
+  best_ask: number;
+  session_id?: string;
+}

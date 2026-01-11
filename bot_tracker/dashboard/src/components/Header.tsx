@@ -39,6 +39,24 @@ export function Header() {
             {state.isConnected ? 'Connected' : 'Disconnected'}
           </div>
 
+          {/* Price Stream Status */}
+          <div
+            className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
+              state.priceStreamStatus?.connected
+                ? 'bg-purple-500/20 text-purple-400'
+                : 'bg-red-500/20 text-red-400'
+            }`}
+          >
+            <div
+              className={`w-2 h-2 rounded-full ${
+                state.priceStreamStatus?.connected ? 'bg-purple-400 animate-pulse' : 'bg-red-400'
+              }`}
+            />
+            Prices: {state.priceStreamStatus?.connected
+              ? `${state.priceStreamStatus.subscribed_assets} assets`
+              : 'Disconnected'}
+          </div>
+
           {/* Tracker Toggle */}
           <button
             onClick={toggleTracker}

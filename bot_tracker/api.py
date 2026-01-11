@@ -110,6 +110,8 @@ market_fetcher = None
 ws_server = None
 start_time = None
 trade_history: List[TradeEvent] = []
+price_stream = None
+storage = None
 
 
 def set_dependencies(pos_tracker, pat_detector, mkt_fetcher, websocket_server, start):
@@ -120,6 +122,18 @@ def set_dependencies(pos_tracker, pat_detector, mkt_fetcher, websocket_server, s
     market_fetcher = mkt_fetcher
     ws_server = websocket_server
     start_time = start
+
+
+def set_price_stream(stream):
+    """Set reference to price stream for status endpoint."""
+    global price_stream
+    price_stream = stream
+
+
+def set_storage(store):
+    """Set reference to storage for price endpoint."""
+    global storage
+    storage = store
 
 
 def add_trade_to_history(trade: TradeEvent):
@@ -205,6 +219,36 @@ def get_status():
         last_trade_ts=last_trade_ts,
         uptime_seconds=uptime
     )
+
+
+# ===== Price Stream Endpoints =====
+
+@app.get("/api/price-stream/status")
+def get_price_stream_status():
+    """Get price stream connection status."""
+    if not price_stream:
+        return {
+            "connected": False,
+            "running": False,
+            "subscribed_assets": 0,
+            "assets": []
+        }
+    return {
+        "connected": price_stream.ws is not None,
+        "running": price_stream.running,
+        "subscribed_assets": len(price_stream.subscribed_assets),
+        "assets": list(price_stream.asset_metadata.keys())
+    }
+
+
+@app.get("/api/prices")
+def get_recent_prices(limit: int = 50):
+    """Get recent price snapshots."""
+    if not storage:
+        raise HTTPException(status_code=503, detail="Storage not initialized")
+    all_prices = storage.get_all_prices()
+    # Return last N prices, newest first
+    return all_prices[-limit:][::-1]
 
 
 # ===== Wallet Endpoints =====

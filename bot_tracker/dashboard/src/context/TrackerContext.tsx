@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useMemo, useRef } from 'react';
-import { TradeEvent, WalletPosition, MarketContext, TrackerStats, Wallet, TrackerConfig } from '../types';
+import { TradeEvent, WalletPosition, MarketContext, TrackerStats, Wallet, TrackerConfig, PriceStreamStatus, PricePoint } from '../types';
 import { useWebSocket } from '../hooks/useWebSocket';
 
 // Use relative URL when served from same origin, or fallback to localhost for dev
@@ -18,6 +18,8 @@ interface State {
   isConnected: boolean;
   config: TrackerConfig | null;
   isLoading: boolean;
+  priceStreamStatus: PriceStreamStatus | null;
+  prices: PricePoint[];
 }
 
 type Action =
@@ -31,7 +33,9 @@ type Action =
   | { type: 'SET_TRADES'; payload: TradeEvent[] }
   | { type: 'SET_POSITIONS'; payload: WalletPosition[] }
   | { type: 'SET_CONFIG'; payload: TrackerConfig }
-  | { type: 'SET_LOADING'; payload: boolean };
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_PRICE_STREAM_STATUS'; payload: PriceStreamStatus }
+  | { type: 'SET_PRICES'; payload: PricePoint[] };
 
 const initialState: State = {
   trades: [],
@@ -43,6 +47,8 @@ const initialState: State = {
   isConnected: false,
   config: null,
   isLoading: false,
+  priceStreamStatus: null,
+  prices: [],
 };
 
 function reducer(state: State, action: Action): State {
@@ -90,6 +96,10 @@ function reducer(state: State, action: Action): State {
       return { ...state, config: action.payload };
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
+    case 'SET_PRICE_STREAM_STATUS':
+      return { ...state, priceStreamStatus: action.payload };
+    case 'SET_PRICES':
+      return { ...state, prices: action.payload };
     default:
       return state;
   }
@@ -200,6 +210,24 @@ export function TrackerProvider({ children }: { children: React.ReactNode }) {
     const interval = setInterval(fetchConfig, 5000);
     return () => clearInterval(interval);
   }, [refreshData, fetchConfig]);
+
+  // Poll for price stream status every 5 seconds
+  useEffect(() => {
+    const pollPriceStreamStatus = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/price-stream/status`);
+        if (res.ok) {
+          const status = await res.json();
+          dispatch({ type: 'SET_PRICE_STREAM_STATUS', payload: status });
+        }
+      } catch (e) {
+        // Silently fail polling
+      }
+    };
+    pollPriceStreamStatus();
+    const interval = setInterval(pollPriceStreamStatus, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Toggle tracker on/off
   const toggleTracker = useCallback(async () => {

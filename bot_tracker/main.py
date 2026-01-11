@@ -52,6 +52,8 @@ class BotTracker:
             self.start_time
         )
         api.set_trade_poller(self.trade_poller)
+        api.set_price_stream(self.price_stream)
+        api.set_storage(self.storage)
 
         self.running = False
         self.price_update_count = 0
