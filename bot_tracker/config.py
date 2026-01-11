@@ -29,9 +29,9 @@ WEBSOCKET_PORT = int(os.getenv("WEBSOCKET_PORT", "8765"))
 HTTP_HOST = os.getenv("HTTP_HOST", "0.0.0.0")
 HTTP_PORT = int(os.getenv("PORT", os.getenv("HTTP_PORT", "8000")))  # Railway uses PORT
 
-# Markets to track (BTC Up/Down 15-minute markets only)
-MARKET_SLUGS_PATTERN = r"btc-updown-15m-\d+"
-MARKET_FILTER_ENABLED = False  # Set to True to only track BTC 15m markets
+# Markets to track (BTC and ETH Up/Down 15-minute markets)
+MARKET_SLUGS_PATTERN = r"(btc|eth)-updown-15m-\d+"
+MARKET_FILTER_ENABLED = True  # Only track BTC/ETH 15m markets
 
 # Track only BUY trades (True) or all trades (False)
-BUY_ONLY = False  # Track all trades (BUY and SELL)
+BUY_ONLY = True  # Only track BUY trades
