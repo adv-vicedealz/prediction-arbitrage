@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useTracker } from '../context/TrackerContext';
-import { formatMarketName, getAssetType } from '../utils/formatMarket';
+import { getAssetType } from '../utils/formatMarket';
 
 const TRADES_PER_PAGE = 100;
 
