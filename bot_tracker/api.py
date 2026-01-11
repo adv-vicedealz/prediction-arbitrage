@@ -187,10 +187,15 @@ def set_storage(store):
                 positions_loaded = 0
                 for key, pos_dict in stored_positions.items():
                     try:
+                        wallet = pos_dict.get("wallet", "").lower()
+                        market_slug = pos_dict.get("market_slug", "")
+                        if not wallet or not market_slug:
+                            continue
+
                         position = WalletPosition(
-                            wallet=pos_dict.get("wallet", ""),
+                            wallet=wallet,
                             wallet_name=pos_dict.get("wallet_name", ""),
-                            market_slug=pos_dict.get("market_slug", ""),
+                            market_slug=market_slug,
                             up_shares=float(pos_dict.get("up_shares", 0)),
                             down_shares=float(pos_dict.get("down_shares", 0)),
                             up_cost=float(pos_dict.get("up_cost", 0)),
@@ -203,8 +208,8 @@ def set_storage(store):
                             avg_down_price=float(pos_dict.get("avg_down_price", 0)),
                             combined_price=float(pos_dict.get("combined_price", 0))
                         )
-                        # Add to position tracker's internal dict
-                        position_tracker.positions[key] = position
+                        # Add to position tracker's nested dict: positions[wallet][market_slug]
+                        position_tracker.positions[wallet][market_slug] = position
                         positions_loaded += 1
                     except Exception as e:
                         print(f"Error loading position {key}: {e}")
