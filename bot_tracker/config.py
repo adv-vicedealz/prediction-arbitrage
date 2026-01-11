@@ -31,7 +31,7 @@ HTTP_PORT = int(os.getenv("PORT", os.getenv("HTTP_PORT", "8000")))  # Railway us
 
 # Markets to track (BTC Up/Down 15-minute markets only)
 MARKET_SLUGS_PATTERN = r"btc-updown-15m-\d+"
-MARKET_FILTER_ENABLED = True  # Set to False to track all markets
+MARKET_FILTER_ENABLED = False  # Set to True to only track BTC 15m markets
 
 # Track only BUY trades (True) or all trades (False)
-BUY_ONLY = True
+BUY_ONLY = False  # Track all trades (BUY and SELL)
