@@ -142,6 +142,7 @@ def set_storage(store):
             if stored_trades:
                 # Convert stored dicts back to TradeEvent objects
                 from .models import TradeEvent
+                loaded_trades = []
                 for trade_dict in stored_trades[-2000:]:  # Load last 2000
                     try:
                         trade = TradeEvent(
@@ -160,12 +161,23 @@ def set_storage(store):
                             market_slug=trade_dict.get("market_slug", ""),
                             market_question=trade_dict.get("market_question", "")
                         )
+                        loaded_trades.append(trade)
                         trade_history.append(trade)
                     except Exception as e:
                         print(f"Error loading trade: {e}")
-                # Sort by timestamp descending (newest first)
+
+                # Sort by timestamp descending (newest first) for trade_history
                 trade_history.sort(key=lambda t: t.timestamp, reverse=True)
                 print(f"Loaded {len(trade_history)} historical trades from storage")
+
+                # Rebuild positions from loaded trades (oldest first for correct calculation)
+                if position_tracker and loaded_trades:
+                    loaded_trades.sort(key=lambda t: t.timestamp)  # Oldest first
+                    for trade in loaded_trades:
+                        if trade.market_slug:  # Only process trades with valid market_slug
+                            position_tracker.update_position(trade)
+                    positions_count = len(position_tracker.get_all_positions())
+                    print(f"Rebuilt {positions_count} positions from historical trades")
         except Exception as e:
             print(f"Error loading trades from storage: {e}")
 
