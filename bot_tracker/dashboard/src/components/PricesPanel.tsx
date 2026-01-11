@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PricePoint } from '../types';
+import { formatMarketName } from '../utils/formatMarket';
 
 const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
 
@@ -36,10 +37,7 @@ export function PricesPanel() {
   };
 
   const formatMarketSlug = (slug: string) => {
-    if (slug.length > 30) {
-      return slug.substring(0, 30) + '...';
-    }
-    return slug;
+    return formatMarketName(slug);
   };
 
   return (

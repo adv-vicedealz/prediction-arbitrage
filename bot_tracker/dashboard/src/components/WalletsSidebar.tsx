@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTracker } from '../context/TrackerContext';
+import { formatMarketNameFull } from '../utils/formatMarket';
 
 const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
 
@@ -214,8 +215,8 @@ export function WalletsSidebar() {
               })
               .map((market) => (
               <div key={market.slug} className="border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-400 mb-1 truncate" title={market.question}>
-                  {market.question.replace('Bitcoin Up or Down - ', 'BTC ')}
+                <div className="text-sm text-blue-400 font-medium mb-1" title={market.slug}>
+                  {formatMarketNameFull(market.slug)}
                 </div>
 
                 <div className="flex items-center justify-between mb-2">

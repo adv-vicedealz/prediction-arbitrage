@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTracker } from '../context/TrackerContext';
 import { WalletPosition, MarketContext } from '../types';
+import { formatMarketName } from '../utils/formatMarket';
 
 function TimeRemaining({ endTime }: { endTime: Date }) {
   const [timeLeft, setTimeLeft] = useState('');
@@ -50,10 +51,6 @@ function PositionCard({ position, market }: { position: WalletPosition; market?:
   const maxShares = Math.max(position.up_shares, position.down_shares);
   const coveragePercent = maxShares > 0 ? (completeSets / maxShares) * 100 : 0;
 
-  // Get market type
-  const marketType = position.market_slug.includes('btc') ? 'BTC' :
-                     position.market_slug.includes('eth') ? 'ETH' : '???';
-
   // Determine win/loss for ended markets
   const isResolved = market?.resolved && market?.winning_outcome;
   const winningOutcome = market?.winning_outcome?.toLowerCase();
@@ -88,9 +85,11 @@ function PositionCard({ position, market }: { position: WalletPosition; market?:
           ) : (
             <div className="w-2 h-2 rounded-full bg-gray-500" />
           )}
-          <span className="text-xs font-bold text-gray-400 w-8">{marketType}</span>
           <span className="text-sm text-white">{position.wallet_name}</span>
-          <span className="text-xs text-gray-500 font-mono">{position.market_slug}</span>
+          <span className="text-sm text-blue-400 font-medium">{formatMarketName(position.market_slug)}</span>
+          <span className="text-xs text-gray-500 font-mono" title={position.market_slug}>
+            {position.market_slug.split('-').pop()}
+          </span>
         </div>
         <div className="flex items-center gap-4 text-xs">
           {isLive ? (
