@@ -52,9 +52,7 @@ export function Header() {
                 state.priceStreamStatus?.connected ? 'bg-purple-400 animate-pulse' : 'bg-red-400'
               }`}
             />
-            Prices: {state.priceStreamStatus?.connected
-              ? `${state.priceStreamStatus.subscribed_assets} assets`
-              : 'Disconnected'}
+            Prices: {state.priceStreamStatus?.connected ? 'Live' : 'Offline'}
           </div>
 
           {/* Tracker Toggle */}
