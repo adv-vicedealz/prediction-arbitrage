@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrackerProvider } from './context/TrackerContext';
+import { TrackerProvider, useTracker } from './context/TrackerContext';
 import { Header } from './components/Header';
 import { WalletsSidebar } from './components/WalletsSidebar';
 import { LiveTradesFeed } from './components/LiveTradesFeed';
@@ -8,11 +8,27 @@ import { PricesPanel } from './components/PricesPanel';
 
 type TabType = 'trades' | 'positions' | 'prices';
 
+function LoadingOverlay() {
+  const { state } = useTracker();
+
+  if (!state.isLoading) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-white text-lg">Loading data...</p>
+      </div>
+    </div>
+  );
+}
+
 function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('trades');
 
   return (
     <div className="min-h-screen bg-gray-900">
+      <LoadingOverlay />
       <Header />
 
       <div className="flex">
