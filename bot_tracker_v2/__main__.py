@@ -19,6 +19,7 @@ from .database import Database
 from .services.discovery import MarketDiscovery
 from .services.fetcher import TradeFetcher
 from .services.prices import PriceStream
+from .services.prefetch import StartupPrefetch
 from .scheduler import Scheduler
 from . import api
 from .logger import setup_logger, log
@@ -40,6 +41,7 @@ class BotTracker:
         self.discovery = MarketDiscovery(self.db)
         self.fetcher = TradeFetcher(self.db)
         self.prices = PriceStream(self.db)
+        self.prefetch = StartupPrefetch(self.db, self.fetcher)
         self.scheduler = Scheduler(
             self.db,
             self.discovery,
@@ -61,6 +63,12 @@ class BotTracker:
 
         # Print startup banner
         self._print_banner()
+
+        # Run startup prefetch (load historical data)
+        try:
+            await self.prefetch.run(count=10)
+        except Exception as e:
+            logger.error(f"Prefetch error (continuing anyway): {e}")
 
         # Create tasks
         tasks = []
@@ -121,6 +129,7 @@ class BotTracker:
         print(f"Docs: http://{HTTP_HOST}:{HTTP_PORT}/docs")
         print(f"WebSocket: ws://{HTTP_HOST}:{HTTP_PORT}/ws")
         print()
+        print("Startup: Prefetch last 10 markets")
         print("Mode: User-based discovery + Post-resolution trade capture")
         print("=" * 60)
         print()
