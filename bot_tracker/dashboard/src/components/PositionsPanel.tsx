@@ -41,6 +41,20 @@ function PositionCard({ position, market }: { position: WalletPosition; market?:
   const marketEndTime = new Date((marketTimestamp + 15 * 60) * 1000);
   const isLive = new Date() < marketEndTime;
 
+  // Format market time in UTC+1 (CET)
+  const marketTimeUTC1 = new Date(marketTimestamp * 1000).toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Europe/Paris'
+  });
+  const marketEndTimeUTC1 = marketEndTime.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Europe/Paris'
+  });
+
   // Calculate financials
   const totalCost = position.up_cost + position.down_cost;
   const completeSets = position.complete_sets;
@@ -87,8 +101,8 @@ function PositionCard({ position, market }: { position: WalletPosition; market?:
           )}
           <span className="text-sm text-white">{position.wallet_name}</span>
           <span className="text-sm text-blue-400 font-medium">{formatMarketName(position.market_slug)}</span>
-          <span className="text-xs text-gray-500 font-mono" title={position.market_slug}>
-            {position.market_slug.split('-').pop()}
+          <span className="text-xs text-yellow-400 font-mono" title="Market time (UTC+1)">
+            {marketTimeUTC1}-{marketEndTimeUTC1}
           </span>
         </div>
         <div className="flex items-center gap-4 text-xs">

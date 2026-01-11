@@ -93,7 +93,13 @@ export function LiveTradesFeed() {
   }, [state.trades, assetFilter, selectedMarket]);
 
   const formatTime = (ts: number) => {
-    return new Date(ts * 1000).toLocaleTimeString();
+    return new Date(ts * 1000).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'America/New_York'
+    });
   };
 
   const formatPrice = (price: number) => {
@@ -285,7 +291,7 @@ export function LiveTradesFeed() {
         <table className="w-full text-sm">
           <thead className="sticky top-0 bg-gray-800">
             <tr className="text-gray-400 border-b border-gray-700">
-              <th className="text-left py-2 px-2">Trade Time</th>
+              <th className="text-left py-2 px-2">Time (ET)</th>
               <th className="text-left py-2 px-2">Market</th>
               <th className="text-left py-2 px-2">Side</th>
               <th className="text-left py-2 px-2">Outcome</th>
