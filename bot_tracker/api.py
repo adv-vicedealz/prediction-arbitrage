@@ -132,13 +132,50 @@ def set_price_stream(stream):
 
 def set_storage(store):
     """Set reference to storage for price endpoint."""
-    global storage
+    global storage, trade_history
     storage = store
+
+    # Load historical trades from storage on startup
+    if store:
+        try:
+            stored_trades = store.get_all_trades()
+            if stored_trades:
+                # Convert stored dicts back to TradeEvent objects
+                from .models import TradeEvent
+                for trade_dict in stored_trades[-2000:]:  # Load last 2000
+                    try:
+                        trade = TradeEvent(
+                            id=trade_dict.get("id", ""),
+                            tx_hash=trade_dict.get("tx_hash", ""),
+                            timestamp=trade_dict.get("timestamp", 0),
+                            wallet=trade_dict.get("wallet", ""),
+                            wallet_name=trade_dict.get("wallet_name", ""),
+                            role=trade_dict.get("role", "taker"),
+                            side=trade_dict.get("side", "BUY"),
+                            outcome=trade_dict.get("outcome", "Unknown"),
+                            shares=float(trade_dict.get("shares", 0)),
+                            usdc=float(trade_dict.get("usdc", 0)),
+                            price=float(trade_dict.get("price", 0)),
+                            fee=float(trade_dict.get("fee", 0)),
+                            market_slug=trade_dict.get("market_slug", ""),
+                            market_question=trade_dict.get("market_question", "")
+                        )
+                        trade_history.append(trade)
+                    except Exception as e:
+                        print(f"Error loading trade: {e}")
+                # Sort by timestamp descending (newest first)
+                trade_history.sort(key=lambda t: t.timestamp, reverse=True)
+                print(f"Loaded {len(trade_history)} historical trades from storage")
+        except Exception as e:
+            print(f"Error loading trades from storage: {e}")
 
 
 def add_trade_to_history(trade: TradeEvent):
     """Add a trade to the history (called from main.py)."""
     global trade_history
+    # Check if trade already exists (from loaded history)
+    if any(t.id == trade.id for t in trade_history[:100]):  # Only check recent
+        return
     trade_history.insert(0, trade)
     # Keep only last 2000 trades
     if len(trade_history) > 2000:
