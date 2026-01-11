@@ -67,7 +67,7 @@ class TradePoller:
         """Fetch recent trades for a wallet from Polymarket Data API."""
         params = {
             "user": wallet,
-            "limit": 100,
+            "limit": 500,  # Max allowed by API
             "takerOnly": "false",  # Get all trades, not just taker
         }
 
@@ -89,6 +89,56 @@ class TradePoller:
         except Exception as e:
             print(f"Error polling trades for {wallet[:10]}...: {e}")
             return []
+
+    async def backfill_wallet_trades(
+        self,
+        session: aiohttp.ClientSession,
+        wallet: str,
+        market_filter: str = None
+    ) -> List[dict]:
+        """Fetch ALL historical trades for a wallet using offset pagination."""
+        all_trades = []
+        offset = 0
+        limit = 500  # Max allowed by API
+
+        while True:
+            params = {
+                "user": wallet,
+                "limit": limit,
+                "offset": offset,
+                "takerOnly": "false"
+            }
+
+            try:
+                async with session.get(
+                    f"{POLYMARKET_DATA_API}/trades",
+                    params=params,
+                    timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT)
+                ) as resp:
+                    if resp.status != 200:
+                        print(f"Backfill error: status {resp.status}")
+                        break
+                    trades = await resp.json()
+            except Exception as e:
+                print(f"Backfill error: {e}")
+                break
+
+            if not trades:
+                break
+
+            # Filter to target markets if specified
+            if market_filter:
+                trades = [t for t in trades if re.match(market_filter, t.get("slug", ""))]
+
+            all_trades.extend(trades)
+            print(f"  Backfill: fetched {len(trades)} trades (offset {offset}, total {len(all_trades)})")
+
+            if len(trades) < limit:
+                break  # No more trades
+
+            offset += limit
+
+        return all_trades
 
     def _parse_trade(
         self,

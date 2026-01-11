@@ -34,4 +34,4 @@ MARKET_SLUGS_PATTERN = r"(btc|eth)-updown-15m-\d+"
 MARKET_FILTER_ENABLED = True  # Only track BTC/ETH 15m markets
 
 # Track only BUY trades (True) or all trades (False)
-BUY_ONLY = True  # Only track BUY trades
+BUY_ONLY = False  # Track ALL trades for accurate position calculation

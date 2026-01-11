@@ -90,6 +90,43 @@ class BotTracker:
             except Exception as e:
                 print(f"  Failed to subscribe to {slug}: {e}")
 
+    async def _backfill_trades(self):
+        """Backfill ALL historical trades for tracked wallets using pagination."""
+        import aiohttp
+        print("=" * 40)
+        print("BACKFILLING HISTORICAL TRADES")
+        print("=" * 40)
+
+        async with aiohttp.ClientSession() as session:
+            for wallet, name in TARGET_WALLETS.items():
+                print(f"\nFetching trades for {name}...")
+                trades = await self.trade_poller.backfill_wallet_trades(
+                    session,
+                    wallet,
+                    MARKET_SLUGS_PATTERN if MARKET_FILTER_ENABLED else None
+                )
+                print(f"Found {len(trades)} total trades for {name}")
+
+                if not trades:
+                    continue
+
+                # Process trades (oldest first for correct position building)
+                trades_sorted = sorted(trades, key=lambda t: t.get("timestamp", ""))
+                new_count = 0
+                for raw in trades_sorted:
+                    parsed = self.trade_poller._parse_trade(raw, wallet, name)
+                    if parsed and parsed.id not in self.trade_poller.seen_trade_ids:
+                        self.trade_poller.seen_trade_ids.add(parsed.id)
+                        await self.on_new_trades([parsed])
+                        new_count += 1
+
+                print(f"Processed {new_count} new trades for {name}")
+
+        print("=" * 40)
+        print("BACKFILL COMPLETE")
+        print("=" * 40)
+        print()
+
     async def on_price_update(self, update: PriceUpdate):
         """Handle price update from WebSocket - save to storage."""
         try:
@@ -200,6 +237,9 @@ class BotTracker:
         print(f"Price Stream: Real-time prices via Polymarket WebSocket")
         print("=" * 60)
         print()
+
+        # Backfill historical trades FIRST (critical for accurate positions)
+        await self._backfill_trades()
 
         # Subscribe to price stream for all markets with positions
         await self._subscribe_to_existing_markets()
