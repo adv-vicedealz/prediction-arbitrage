@@ -2,7 +2,7 @@
 # Enables both Python and Node.js
 
 [phases.setup]
-nixPkgs = ["python39", "nodejs-18_x", "npm"]
+nixPkgs = ["python39", "nodejs-18_x"]
 
 [phases.install]
 cmds = [
