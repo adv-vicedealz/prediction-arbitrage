@@ -251,10 +251,22 @@ class MarketResolver:
         if old_slugs:
             print(f"[Resolver] Cleaned up {len(old_slugs)} old completed markets")
 
+    def _get_next_resolution_time(self) -> int:
+        """Get the timestamp when the next market will be ready for resolution."""
+        if not self.pending_markets:
+            return 0
+
+        # Find the earliest end_timestamp + delay
+        earliest = min(
+            m.end_timestamp + self.resolution_delay
+            for m in self.pending_markets.values()
+        )
+        return earliest
+
     async def run(self, check_interval: int = 30):
-        """Main loop - periodically check for resolved markets."""
+        """Main loop - smart scheduling based on known market end times."""
         self.running = True
-        print(f"[Resolver] Started (delay: {self.resolution_delay}s, interval: {check_interval}s)")
+        print(f"[Resolver] Started (delay: {self.resolution_delay}s)")
 
         while self.running:
             try:
@@ -262,7 +274,19 @@ class MarketResolver:
             except Exception as e:
                 print(f"[Resolver] Error: {e}")
 
-            await asyncio.sleep(check_interval)
+            # Calculate optimal sleep time based on next market resolution
+            now = int(time.time())
+            next_resolution = self._get_next_resolution_time()
+
+            if next_resolution > 0 and next_resolution > now:
+                # Sleep until next market is ready (max 60s to pick up new markets)
+                sleep_time = min(next_resolution - now + 5, 60)  # +5s buffer
+                print(f"[Resolver] Next check in {sleep_time}s (market ready at {next_resolution - now}s)")
+            else:
+                # No pending markets or already past due - check again in 30s
+                sleep_time = check_interval
+
+            await asyncio.sleep(sleep_time)
 
     def stop(self):
         """Stop the resolver loop."""

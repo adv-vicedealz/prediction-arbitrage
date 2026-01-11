@@ -211,13 +211,14 @@ class BotTracker:
                     self.market_fetcher.cache[ctx.slug] = ctx
                     self.storage.save_market(ctx)
 
-                    # Subscribe to price stream for new market
-                    up_token = ctx.token_ids.get("up", "")
-                    down_token = ctx.token_ids.get("down", "")
-                    if up_token:
-                        self.price_stream.add_asset(up_token, ctx.slug, "Up")
-                    if down_token:
-                        self.price_stream.add_asset(down_token, ctx.slug, "Down")
+                    # Only subscribe to prices for ACTIVE (non-resolved) markets
+                    if not ctx.resolved:
+                        up_token = ctx.token_ids.get("up", "")
+                        down_token = ctx.token_ids.get("down", "")
+                        if up_token:
+                            self.price_stream.add_asset(up_token, ctx.slug, "Up")
+                        if down_token:
+                            self.price_stream.add_asset(down_token, ctx.slug, "Down")
 
             except Exception as e:
                 print(f"Discovery error: {e}")
