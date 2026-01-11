@@ -2,4 +2,4 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "python -m bot_tracker.main"
+startCommand = "python run.py"
