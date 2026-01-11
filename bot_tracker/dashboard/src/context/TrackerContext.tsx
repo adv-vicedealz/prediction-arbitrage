@@ -3,9 +3,9 @@ import { TradeEvent, WalletPosition, MarketContext, TrackerStats, Wallet, Tracke
 import { useWebSocket } from '../hooks/useWebSocket';
 
 // Use relative URL when served from same origin, or fallback to localhost for dev
-const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
+const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8080' : '');
 const WS_URL = import.meta.env.VITE_WS_URL || (window.location.hostname === 'localhost'
-  ? 'ws://localhost:8765'
+  ? 'ws://localhost:8080/ws'
   : `wss://${window.location.host}/ws`);
 
 interface State {

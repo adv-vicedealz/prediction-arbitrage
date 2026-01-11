@@ -5,11 +5,15 @@ All endpoints the React dashboard needs.
 
 import asyncio
 import json
+import os
 from datetime import datetime
+from pathlib import Path
 from typing import List, Optional, Set
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from .config import TARGET_WALLETS
@@ -394,3 +398,33 @@ async def broadcast_stats():
     }
 
     await ws_manager.broadcast("stats", stats)
+
+
+# =============================================================================
+# STATIC FILE SERVING (for production)
+# =============================================================================
+
+STATIC_DIR = Path(__file__).parent.parent / "static"
+
+
+def setup_static_files():
+    """Mount static files if they exist (production mode)."""
+    if STATIC_DIR.exists():
+        log.info(f"Serving static files from {STATIC_DIR}")
+        app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
+
+        @app.get("/")
+        async def serve_index():
+            return FileResponse(STATIC_DIR / "index.html")
+
+        @app.get("/{full_path:path}")
+        async def serve_spa(full_path: str):
+            # Serve static file if exists, otherwise serve index.html (SPA)
+            file_path = STATIC_DIR / full_path
+            if file_path.exists() and file_path.is_file():
+                return FileResponse(file_path)
+            return FileResponse(STATIC_DIR / "index.html")
+
+
+# Setup static files on module load
+setup_static_files()
