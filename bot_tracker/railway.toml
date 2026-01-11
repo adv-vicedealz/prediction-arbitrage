@@ -3,7 +3,7 @@ builder = "nixpacks"
 
 [deploy]
 startCommand = "python -m bot_tracker.main"
-healthcheckPath = "/api/config"
-healthcheckTimeout = 30
+healthcheckPath = "/api/status"
+healthcheckTimeout = 120
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
