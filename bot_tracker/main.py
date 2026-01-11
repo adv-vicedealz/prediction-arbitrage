@@ -23,7 +23,7 @@ from .trade_poller import TradePoller
 from .market_context import MarketContextFetcher
 from .position_tracker import PositionTracker
 from .pattern_detector import PatternDetector
-from .storage import JSONStorage
+from .sqlite_storage import SQLiteStorage
 from .price_stream import PriceStream, PriceUpdate
 from . import api
 
@@ -39,7 +39,7 @@ class BotTracker:
         self.pattern_detector = PatternDetector()
         self.market_fetcher = MarketContextFetcher()
         self.trade_poller = TradePoller(self.on_new_trades)
-        self.storage = JSONStorage()  # JSON file storage
+        self.storage = SQLiteStorage()  # SQLite database storage
         self.price_stream = PriceStream(
             on_price_update=self.on_price_update
         )

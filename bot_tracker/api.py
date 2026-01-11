@@ -337,6 +337,38 @@ def get_recent_prices(limit: int = 50):
     return all_prices[-limit:][::-1]
 
 
+@app.post("/api/backup")
+def create_backup():
+    """Create a manual database backup."""
+    if not storage:
+        raise HTTPException(status_code=503, detail="Storage not initialized")
+
+    # Check if storage supports backups (SQLiteStorage)
+    if hasattr(storage, 'create_manual_backup'):
+        backup_path = storage.create_manual_backup()
+        if backup_path:
+            return {"status": "success", "backup_path": backup_path}
+        else:
+            raise HTTPException(status_code=500, detail="Backup failed")
+    else:
+        raise HTTPException(status_code=501, detail="Backup not supported with current storage")
+
+
+@app.get("/api/storage/info")
+def get_storage_info():
+    """Get storage information and summary."""
+    if not storage:
+        raise HTTPException(status_code=503, detail="Storage not initialized")
+
+    summary = storage.get_session_summary()
+    storage_type = type(storage).__name__
+
+    return {
+        "storage_type": storage_type,
+        **summary
+    }
+
+
 # ===== Wallet Endpoints =====
 
 @app.get("/api/wallets")
