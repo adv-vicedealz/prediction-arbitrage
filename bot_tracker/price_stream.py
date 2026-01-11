@@ -85,7 +85,7 @@ class PriceStream:
 
         message = {
             "type": "market",
-            "asset_ids": asset_ids
+            "assets_ids": asset_ids  # Note: Polymarket API uses "assets_ids" (plural)
         }
 
         await self.ws.send(json.dumps(message))
@@ -232,7 +232,13 @@ class PriceStream:
                     async for message in ws:
                         try:
                             data = json.loads(message)
-                            await self.handle_message(data)
+                            # First message after subscribe is a list (orderbook snapshot)
+                            if isinstance(data, list):
+                                for item in data:
+                                    if isinstance(item, dict):
+                                        await self.handle_message(item)
+                            else:
+                                await self.handle_message(data)
                         except json.JSONDecodeError:
                             print(f"Invalid JSON: {message[:100]}")
                         except Exception as e:
