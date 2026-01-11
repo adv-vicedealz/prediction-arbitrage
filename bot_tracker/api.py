@@ -161,14 +161,11 @@ def root(auth: bool = Depends(optional_auth)):
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time updates."""
-    # Check auth via query param if password is set
-    if AUTH_PASSWORD:
-        token = websocket.query_params.get("token", "")
-        if token != AUTH_PASSWORD:
-            await websocket.close(code=4001)
-            return
+    """WebSocket endpoint for real-time updates.
 
+    Note: No auth required here since the dashboard page itself
+    is protected by HTTP Basic Auth.
+    """
     await ws_manager.connect(websocket)
     try:
         while True:
