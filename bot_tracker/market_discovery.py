@@ -5,6 +5,7 @@ Market discovery - finds active/upcoming 15-minute BTC/ETH markets.
 import asyncio
 import aiohttp
 import re
+import time
 from typing import List, Set, Optional
 from datetime import datetime, timezone
 
@@ -17,8 +18,8 @@ class MarketDiscovery:
     """
     Discovers new 15-minute BTC/ETH markets from Gamma API.
 
-    Polls for markets matching the pattern (btc|eth)-updown-15m-*
-    and tracks them for the resolver to process after they end.
+    Since the Gamma API doesn't support slug_contains for these markets,
+    we calculate expected timestamps and query by specific slug.
     """
 
     def __init__(self, market_fetcher: MarketContextFetcher):
@@ -26,58 +27,72 @@ class MarketDiscovery:
         self.discovered_slugs: Set[str] = set()
         self.running = False
 
+    def _generate_market_slugs(self, lookback_periods: int = 4, lookahead_periods: int = 2) -> List[str]:
+        """Generate expected market slugs based on current time.
+
+        15-min markets have timestamps rounded to 15-min intervals (900 seconds).
+        """
+        now = int(time.time())
+        interval = 900  # 15 minutes in seconds
+        base_ts = (now // interval) * interval
+
+        slugs = []
+        for asset in ["btc", "eth"]:
+            # Look back and ahead
+            for offset in range(-lookback_periods, lookahead_periods + 1):
+                ts = base_ts + (offset * interval)
+                slugs.append(f"{asset}-updown-15m-{ts}")
+
+        return slugs
+
     async def discover_markets(self) -> List[MarketContext]:
         """Find all active/upcoming 15-min BTC/ETH markets."""
         new_markets = []
 
+        # Generate expected slugs based on current time
+        expected_slugs = self._generate_market_slugs()
+
         async with aiohttp.ClientSession() as session:
-            # Search for BTC and ETH 15-min markets
-            for asset in ["btc", "eth"]:
-                markets = await self._fetch_markets_for_asset(session, asset)
-                for market in markets:
-                    slug = market.get("slug", "")
+            for slug in expected_slugs:
+                # Skip if already discovered
+                if slug in self.discovered_slugs:
+                    continue
 
-                    # Skip if already discovered
-                    if slug in self.discovered_slugs:
-                        continue
+                # Try to fetch this specific market
+                market = await self._fetch_market_by_slug(session, slug)
+                if not market:
+                    continue
 
-                    # Check if matches our pattern
-                    if not re.match(MARKET_SLUGS_PATTERN, slug):
-                        continue
-
-                    # Build full context
-                    try:
-                        context = await self.market_fetcher.build_context(session, market)
-                        self.discovered_slugs.add(slug)
-                        new_markets.append(context)
-                        print(f"[Discovery] New market: {slug}")
-                    except Exception as e:
-                        print(f"[Discovery] Error building context for {slug}: {e}")
+                # Build full context
+                try:
+                    context = await self.market_fetcher.build_context(session, market)
+                    self.discovered_slugs.add(slug)
+                    new_markets.append(context)
+                    print(f"[Discovery] New market: {slug} (closed: {market.get('closed', False)})")
+                except Exception as e:
+                    print(f"[Discovery] Error building context for {slug}: {e}")
 
         return new_markets
 
-    async def _fetch_markets_for_asset(
+    async def _fetch_market_by_slug(
         self,
         session: aiohttp.ClientSession,
-        asset: str
-    ) -> List[dict]:
-        """Fetch markets for a specific asset (btc/eth)."""
+        slug: str
+    ) -> Optional[dict]:
+        """Fetch a specific market by slug."""
         try:
-            # Search for updown 15m markets
             async with session.get(
                 f"{GAMMA_API}/markets",
-                params={
-                    "slug_contains": f"{asset}-updown-15m",
-                    "closed": "false",  # Only open markets
-                    "limit": 50
-                },
+                params={"slug": slug},
                 timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT)
             ) as resp:
                 if resp.status == 200:
-                    return await resp.json()
+                    markets = await resp.json()
+                    if markets:
+                        return markets[0] if isinstance(markets, list) else markets
         except Exception as e:
-            print(f"[Discovery] Error fetching {asset} markets: {e}")
-        return []
+            pass  # Silently ignore - market might not exist yet
+        return None
 
     async def discover_recent_resolved(self, hours_back: int = 24) -> List[MarketContext]:
         """
@@ -86,49 +101,42 @@ class MarketDiscovery:
         """
         resolved_markets = []
 
+        # Calculate how many 15-min periods to look back
+        periods_back = int((hours_back * 60) / 15)  # e.g., 24h = 96 periods
+
+        # Generate slugs for past periods
+        now = int(time.time())
+        interval = 900  # 15 minutes
+        base_ts = (now // interval) * interval
+
         async with aiohttp.ClientSession() as session:
             for asset in ["btc", "eth"]:
-                try:
-                    async with session.get(
-                        f"{GAMMA_API}/markets",
-                        params={
-                            "slug_contains": f"{asset}-updown-15m",
-                            "closed": "true",
-                            "limit": 100  # Get recent resolved
-                        },
-                        timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT)
-                    ) as resp:
-                        if resp.status != 200:
-                            continue
-                        markets = await resp.json()
+                for i in range(1, periods_back + 1):
+                    ts = base_ts - (i * interval)
+                    slug = f"{asset}-updown-15m-{ts}"
 
-                        for market in markets:
-                            slug = market.get("slug", "")
+                    # Skip if already discovered
+                    if slug in self.discovered_slugs:
+                        continue
 
-                            # Skip if already discovered
-                            if slug in self.discovered_slugs:
-                                continue
+                    # Try to fetch this market
+                    market = await self._fetch_market_by_slug(session, slug)
+                    if not market:
+                        continue
 
-                            # Check pattern
-                            if not re.match(MARKET_SLUGS_PATTERN, slug):
-                                continue
+                    # Only include closed markets
+                    if not market.get("closed", False):
+                        continue
 
-                            # Check if resolved within time window
-                            end_date = parse_iso_datetime(market.get("endDate", ""))
-                            if end_date:
-                                now = datetime.now(timezone.utc)
-                                if end_date.tzinfo is None:
-                                    end_date = end_date.replace(tzinfo=timezone.utc)
-                                hours_since = (now - end_date).total_seconds() / 3600
+                    try:
+                        context = await self.market_fetcher.build_context(session, market)
+                        self.discovered_slugs.add(slug)
+                        resolved_markets.append(context)
 
-                                if hours_since <= hours_back:
-                                    context = await self.market_fetcher.build_context(session, market)
-                                    self.discovered_slugs.add(slug)
-                                    resolved_markets.append(context)
-                                    print(f"[Discovery] Recent resolved: {slug} ({hours_since:.1f}h ago)")
-
-                except Exception as e:
-                    print(f"[Discovery] Error fetching resolved {asset} markets: {e}")
+                        hours_ago = i * 0.25  # Each period is 15 min = 0.25 hours
+                        print(f"[Discovery] Recent resolved: {slug} ({hours_ago:.1f}h ago)")
+                    except Exception as e:
+                        print(f"[Discovery] Error building context for {slug}: {e}")
 
         return resolved_markets
 
