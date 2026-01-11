@@ -178,6 +178,12 @@ def set_storage(store):
                             position_tracker.update_position(trade)
                     positions_count = len(position_tracker.get_all_positions())
                     print(f"Rebuilt {positions_count} positions from historical trades")
+
+                # Populate trade_poller's seen_trade_ids to prevent duplicate processing
+                if trade_poller and loaded_trades:
+                    for trade in loaded_trades:
+                        trade_poller.seen_trade_ids.add(trade.id)
+                    print(f"Added {len(loaded_trades)} trade IDs to seen_trade_ids")
         except Exception as e:
             print(f"Error loading trades from storage: {e}")
 
