@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTracker } from '../context/TrackerContext';
-import { WalletPosition } from '../types';
+import { WalletPosition, MarketContext } from '../types';
 
 function TimeRemaining({ endTime }: { endTime: Date }) {
   const [timeLeft, setTimeLeft] = useState('');
@@ -28,7 +28,7 @@ function TimeRemaining({ endTime }: { endTime: Date }) {
   return <span className="font-mono text-gray-300">{timeLeft}</span>;
 }
 
-function PositionCard({ position }: { position: WalletPosition }) {
+function PositionCard({ position, market }: { position: WalletPosition; market?: MarketContext }) {
   const formatPercent = (value: number) => `${(value * 100).toFixed(1)}%`;
   const formatShares = (value: number) => value.toFixed(2);
   const formatPrice = (value: number) => `$${value.toFixed(3)}`;
@@ -54,6 +54,29 @@ function PositionCard({ position }: { position: WalletPosition }) {
   const marketType = position.market_slug.includes('btc') ? 'BTC' :
                      position.market_slug.includes('eth') ? 'ETH' : '???';
 
+  // Determine win/loss for ended markets
+  const isResolved = market?.resolved && market?.winning_outcome;
+  const winningOutcome = market?.winning_outcome?.toLowerCase();
+
+  // For hedged positions (complete_sets), we always profit from the edge
+  // For unhedged positions, check if the dominant side won
+  let resultStatus: 'won' | 'lost' | 'partial' | null = null;
+  if (!isLive && isResolved) {
+    const dominantSide = position.up_shares > position.down_shares ? 'up' : 'down';
+    const unhedgedShares = Math.abs(position.up_shares - position.down_shares);
+
+    if (unhedgedShares < 0.01) {
+      // Fully hedged - won the edge
+      resultStatus = 'won';
+    } else if (dominantSide === winningOutcome) {
+      // Unhedged side won
+      resultStatus = 'won';
+    } else {
+      // Unhedged side lost
+      resultStatus = completeSets > 0 ? 'partial' : 'lost';
+    }
+  }
+
   return (
     <div className="rounded-lg border border-gray-700">
       {/* Header Row */}
@@ -75,7 +98,28 @@ function PositionCard({ position }: { position: WalletPosition }) {
               <TimeRemaining endTime={marketEndTime} />
             </span>
           ) : (
-            <span className="text-gray-500">Ended</span>
+            <div className="flex items-center gap-2">
+              {isResolved ? (
+                <>
+                  <span className="text-gray-400">
+                    Won: <span className={winningOutcome === 'up' ? 'text-blue-400' : 'text-orange-400'}>
+                      {winningOutcome?.toUpperCase()}
+                    </span>
+                  </span>
+                  {resultStatus === 'won' && (
+                    <span className="px-1.5 py-0.5 rounded bg-green-500/20 text-green-400">WIN</span>
+                  )}
+                  {resultStatus === 'lost' && (
+                    <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">LOSS</span>
+                  )}
+                  {resultStatus === 'partial' && (
+                    <span className="px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400">PARTIAL</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-gray-500">Ended</span>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -157,7 +201,7 @@ export function PositionsPanel() {
     ? positions.filter((p) => p.wallet.toLowerCase() === state.selectedWallet?.toLowerCase())
     : positions;
 
-  // Sort: live markets first, then by trades count
+  // Sort: live markets first, then by timestamp (most recent to oldest)
   const sortedPositions = [...filteredPositions].sort((a, b) => {
     const aTimestamp = parseInt(a.market_slug.split('-').pop() || '0');
     const bTimestamp = parseInt(b.market_slug.split('-').pop() || '0');
@@ -166,9 +210,11 @@ export function PositionsPanel() {
     const aIsLive = now < aEndTime;
     const bIsLive = now < bEndTime;
 
+    // Live markets first
     if (aIsLive && !bIsLive) return -1;
     if (!aIsLive && bIsLive) return 1;
-    return b.total_trades - a.total_trades;
+    // Then by timestamp descending (most recent first)
+    return bTimestamp - aTimestamp;
   });
 
   // Apply limit unless expanded
@@ -239,6 +285,7 @@ export function PositionsPanel() {
               <PositionCard
                 key={`${position.wallet}:${position.market_slug}`}
                 position={position}
+                market={state.markets[position.market_slug]}
               />
             ))}
           </div>
