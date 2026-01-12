@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 import type { ExecutionQualityData, ExecutionQualityTrade } from '../../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
 
 interface Props {
   selectedMarket: string | null;

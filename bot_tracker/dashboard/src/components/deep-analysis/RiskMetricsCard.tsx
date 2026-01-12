@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { RiskMetrics } from '../../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
 
 export function RiskMetricsCard() {
   const [data, setData] = useState<RiskMetrics | null>(null);

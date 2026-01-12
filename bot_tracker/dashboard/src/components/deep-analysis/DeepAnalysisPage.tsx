@@ -9,7 +9,7 @@ import type { DeepAnalysisMarket } from '../../types';
 
 type SubTab = 'execution' | 'price-trades' | 'position' | 'intensity' | 'losses' | 'risk';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
 
 export function DeepAnalysisPage() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('execution');

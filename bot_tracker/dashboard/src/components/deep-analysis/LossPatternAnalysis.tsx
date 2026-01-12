@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import type { LossPatternData, BoxPlotData } from '../../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
 
 export function LossPatternAnalysis() {
   const [data, setData] = useState<LossPatternData | null>(null);
