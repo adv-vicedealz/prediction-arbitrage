@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import {
   ComposedChart,
   Line,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Bar,
   ReferenceLine,
 } from 'recharts';
 import type { MarketOverlayData } from '../../types';
@@ -77,58 +77,67 @@ export function MarketOverlayChart({ marketSlug }: Props) {
   const totalUpSells = sellUpTrades.reduce((sum, t) => sum + t.shares, 0);
   const totalDownSells = sellDownTrades.reduce((sum, t) => sum + t.shares, 0);
 
-  // Format volume bars from 10-second buckets (sparse - only buckets with trades)
-  const volumeBuckets = (data.trade_volume_by_bucket || [])
-    .filter((v) => v.time_seconds >= 0 && v.time_seconds < 900) // 0-15 minutes
-    .map((v) => ({
-      ...v,
-      minuteIntoMarket: v.time_seconds / 60,
-      up_net: v.buy_up_usdc - v.sell_up_usdc,
-      down_net: v.buy_down_usdc - v.sell_down_usdc,
-    }));
+  // Build volume lookup by bucket index
+  const volumeByBucket: Record<number, { buy_up: number; buy_down: number; sell_up: number; sell_down: number }> = {};
+  (data.trade_volume_by_bucket || []).forEach((v) => {
+    if (v.time_seconds >= 0 && v.time_seconds < 900) {
+      volumeByBucket[v.bucket] = {
+        buy_up: v.buy_up_usdc,
+        buy_down: v.buy_down_usdc,
+        sell_up: v.sell_up_usdc,
+        sell_down: v.sell_down_usdc,
+      };
+    }
+  });
 
-  // Merge price data with volume data for combined charts
-  // Group prices by 10-second bucket for alignment with volume
-  const priceByBucket: Record<number, { up_price: number | null; down_price: number | null; up_bid: number | null; up_ask: number | null; down_bid: number | null; down_ask: number | null }> = {};
+  // Group prices by 10-second bucket for alignment
+  const priceByBucket: Record<number, { up_price: number | null; down_price: number | null }> = {};
   priceData.forEach((p) => {
     const bucket = Math.floor(p.minuteIntoMarket * 6); // 6 buckets per minute (10s each)
     if (bucket >= 0 && bucket < 90) {
       if (!priceByBucket[bucket]) {
-        priceByBucket[bucket] = { up_price: null, down_price: null, up_bid: null, up_ask: null, down_bid: null, down_ask: null };
+        priceByBucket[bucket] = { up_price: null, down_price: null };
       }
-      // Use last price in each bucket
       if (p.up_price !== null) priceByBucket[bucket].up_price = p.up_price;
       if (p.down_price !== null) priceByBucket[bucket].down_price = p.down_price;
-      if (p.up_bid !== null) priceByBucket[bucket].up_bid = p.up_bid;
-      if (p.up_ask !== null) priceByBucket[bucket].up_ask = p.up_ask;
-      if (p.down_bid !== null) priceByBucket[bucket].down_bid = p.down_bid;
-      if (p.down_ask !== null) priceByBucket[bucket].down_ask = p.down_ask;
     }
   });
 
-  // Create combined data for UP price + UP volume chart
-  const upPriceVolumeData = volumeBuckets.map((v) => ({
-    bucket: v.bucket,
-    minuteIntoMarket: v.minuteIntoMarket,
-    up_price: priceByBucket[v.bucket]?.up_price,
-    up_bid: priceByBucket[v.bucket]?.up_bid,
-    up_ask: priceByBucket[v.bucket]?.up_ask,
-    buy_volume: v.buy_up_usdc,
-    sell_volume: v.sell_up_usdc, // Keep positive for visual clarity
-    net_volume: v.up_net,
-  }));
+  // Create FULL timeline with all 90 buckets (10s each for 15 min) - no gaps
+  const fullTimeline = Array.from({ length: 90 }, (_, bucket) => {
+    const vol = volumeByBucket[bucket] || { buy_up: 0, buy_down: 0, sell_up: 0, sell_down: 0 };
+    const price = priceByBucket[bucket] || { up_price: null, down_price: null };
+    return {
+      bucket,
+      minuteIntoMarket: bucket / 6, // 6 buckets per minute
+      up_price: price.up_price,
+      down_price: price.down_price,
+      buy_up_volume: vol.buy_up,
+      buy_down_volume: vol.buy_down,
+    };
+  });
 
-  // Create combined data for DOWN price + DOWN volume chart
-  const downPriceVolumeData = volumeBuckets.map((v) => ({
-    bucket: v.bucket,
-    minuteIntoMarket: v.minuteIntoMarket,
-    down_price: priceByBucket[v.bucket]?.down_price,
-    down_bid: priceByBucket[v.bucket]?.down_bid,
-    down_ask: priceByBucket[v.bucket]?.down_ask,
-    buy_volume: v.buy_down_usdc,
-    sell_volume: v.sell_down_usdc, // Keep positive for visual clarity
-    net_volume: v.down_net,
-  }));
+  // Calculate cumulative buy volume for trendlines
+  let cumBuyUp = 0;
+  let cumBuyDown = 0;
+  const upPriceVolumeData = fullTimeline.map((d) => {
+    cumBuyUp += d.buy_up_volume;
+    return {
+      ...d,
+      buy_volume: d.buy_up_volume,
+      cumulative_buy_volume: cumBuyUp,
+    };
+  });
+
+  cumBuyDown = 0;
+  const downPriceVolumeData = fullTimeline.map((d) => {
+    cumBuyDown += d.buy_down_volume;
+    return {
+      ...d,
+      buy_volume: d.buy_down_volume,
+      cumulative_buy_volume: cumBuyDown,
+    };
+  });
 
   return (
     <div className="space-y-4">
@@ -147,7 +156,7 @@ export function MarketOverlayChart({ marketSlug }: Props) {
           </div>
           <div className="text-right text-xs text-gray-400">
             <p>{priceData.length} price points</p>
-            <p>{data.trades.length} trades in {volumeBuckets.length} buckets</p>
+            <p>{data.trades.length} trades across 90 buckets</p>
           </div>
         </div>
       </div>
@@ -240,11 +249,11 @@ export function MarketOverlayChart({ marketSlug }: Props) {
         </div>
       </div>
 
-      {/* UP Price + BUY Volume */}
+      {/* UP Price + Cumulative BUY Volume (both as trendlines) */}
       <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-2">UP Price with BUY Volume</h3>
+        <h3 className="text-sm font-medium text-gray-300 mb-2">UP Price vs Cumulative Buy Volume</h3>
         <ResponsiveContainer width="100%" height={280}>
-          <ComposedChart data={upPriceVolumeData} margin={{ top: 10, right: 50, left: 0, bottom: 20 }}>
+          <ComposedChart data={upPriceVolumeData} margin={{ top: 10, right: 60, left: 10, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis
               dataKey="minuteIntoMarket"
@@ -257,14 +266,14 @@ export function MarketOverlayChart({ marketSlug }: Props) {
             <YAxis
               yAxisId="price"
               domain={['auto', 'auto']}
-              tickFormatter={(v) => v.toFixed(2)}
+              tickFormatter={(v) => `$${v.toFixed(2)}`}
               stroke="#10B981"
               fontSize={10}
             />
             <YAxis
               yAxisId="volume"
               orientation="right"
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => v >= 1000 ? `$${(v/1000).toFixed(1)}k` : `$${v.toFixed(0)}`}
               stroke="#3B82F6"
               fontSize={10}
             />
@@ -275,27 +284,38 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 return (
                   <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
                     <p className="font-medium">{d.minuteIntoMarket?.toFixed(1)}m</p>
-                    <p className="text-green-400">UP Price: {d.up_price?.toFixed(4)}</p>
-                    <p className="text-blue-400">Buy Volume: ${d.buy_volume?.toFixed(0)}</p>
+                    <p className="text-green-400">UP Price: ${d.up_price?.toFixed(4)}</p>
+                    <p className="text-blue-400">Cumulative Buy: ${d.cumulative_buy_volume?.toFixed(0)}</p>
+                    <p className="text-blue-300">This bucket: ${d.buy_volume?.toFixed(0)}</p>
                   </div>
                 );
               }}
             />
-            <Bar yAxisId="volume" dataKey="buy_volume" fill="#3B82F6" fillOpacity={0.6} barSize={6} />
+            {/* Cumulative buy volume as area */}
+            <Area
+              yAxisId="volume"
+              type="monotone"
+              dataKey="cumulative_buy_volume"
+              stroke="#3B82F6"
+              strokeWidth={2}
+              fill="#3B82F6"
+              fillOpacity={0.2}
+            />
+            {/* Price line */}
             <Line yAxisId="price" type="monotone" dataKey="up_price" stroke="#10B981" strokeWidth={2} dot={false} connectNulls />
           </ComposedChart>
         </ResponsiveContainer>
         <div className="flex justify-center gap-6 text-xs text-gray-400">
           <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-green-500"></span> UP Price</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-500"></span> Buy Volume</span>
+          <span className="flex items-center gap-1"><span className="w-4 h-3 rounded bg-blue-500/30 border border-blue-500"></span> Cumulative Buy $</span>
         </div>
       </div>
 
-      {/* DOWN Price + BUY Volume */}
+      {/* DOWN Price + Cumulative BUY Volume (both as trendlines) */}
       <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-2">DOWN Price with BUY Volume</h3>
+        <h3 className="text-sm font-medium text-gray-300 mb-2">DOWN Price vs Cumulative Buy Volume</h3>
         <ResponsiveContainer width="100%" height={280}>
-          <ComposedChart data={downPriceVolumeData} margin={{ top: 10, right: 50, left: 0, bottom: 20 }}>
+          <ComposedChart data={downPriceVolumeData} margin={{ top: 10, right: 60, left: 10, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis
               dataKey="minuteIntoMarket"
@@ -308,14 +328,14 @@ export function MarketOverlayChart({ marketSlug }: Props) {
             <YAxis
               yAxisId="price"
               domain={['auto', 'auto']}
-              tickFormatter={(v) => v.toFixed(2)}
+              tickFormatter={(v) => `$${v.toFixed(2)}`}
               stroke="#EF4444"
               fontSize={10}
             />
             <YAxis
               yAxisId="volume"
               orientation="right"
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => v >= 1000 ? `$${(v/1000).toFixed(1)}k` : `$${v.toFixed(0)}`}
               stroke="#3B82F6"
               fontSize={10}
             />
@@ -326,19 +346,30 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 return (
                   <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
                     <p className="font-medium">{d.minuteIntoMarket?.toFixed(1)}m</p>
-                    <p className="text-red-400">DOWN Price: {d.down_price?.toFixed(4)}</p>
-                    <p className="text-blue-400">Buy Volume: ${d.buy_volume?.toFixed(0)}</p>
+                    <p className="text-red-400">DOWN Price: ${d.down_price?.toFixed(4)}</p>
+                    <p className="text-blue-400">Cumulative Buy: ${d.cumulative_buy_volume?.toFixed(0)}</p>
+                    <p className="text-blue-300">This bucket: ${d.buy_volume?.toFixed(0)}</p>
                   </div>
                 );
               }}
             />
-            <Bar yAxisId="volume" dataKey="buy_volume" fill="#3B82F6" fillOpacity={0.6} barSize={6} />
+            {/* Cumulative buy volume as area */}
+            <Area
+              yAxisId="volume"
+              type="monotone"
+              dataKey="cumulative_buy_volume"
+              stroke="#3B82F6"
+              strokeWidth={2}
+              fill="#3B82F6"
+              fillOpacity={0.2}
+            />
+            {/* Price line */}
             <Line yAxisId="price" type="monotone" dataKey="down_price" stroke="#EF4444" strokeWidth={2} dot={false} connectNulls />
           </ComposedChart>
         </ResponsiveContainer>
         <div className="flex justify-center gap-6 text-xs text-gray-400">
           <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-red-500"></span> DOWN Price</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-500"></span> Buy Volume</span>
+          <span className="flex items-center gap-1"><span className="w-4 h-3 rounded bg-blue-500/30 border border-blue-500"></span> Cumulative Buy $</span>
         </div>
       </div>
 
