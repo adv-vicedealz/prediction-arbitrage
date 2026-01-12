@@ -265,10 +265,49 @@ export interface ExecutionDistributionBucket {
   count: number;
 }
 
+export interface ExecutionTimePoint {
+  minute: number;
+  avg_score: number;
+  maker_avg: number;
+  taker_avg: number;
+  trade_count: number;
+}
+
+export interface ExecutionTimeAnalysis {
+  by_minute: ExecutionTimePoint[];
+  early_avg: number;
+  late_avg: number;
+  degradation_pct: number;
+}
+
+export interface ExecutionSlippage {
+  total_usd: number;
+  by_role: { maker: number; taker: number };
+  by_outcome: { up: number; down: number };
+  by_side: { buy: number; sell: number };
+  avg_per_trade: number;
+}
+
+export interface ExecutionSizeAnalysis {
+  correlation: number;
+  by_bucket: { small: number; medium: number; large: number };
+}
+
+export interface ExecutionBreakdown {
+  buy_up: number;
+  buy_down: number;
+  sell_up: number;
+  sell_down: number;
+}
+
 export interface ExecutionQualityData {
   trades: ExecutionQualityTrade[];
   summary: ExecutionQualitySummary;
   distribution: ExecutionDistributionBucket[];
+  time_analysis: ExecutionTimeAnalysis;
+  slippage: ExecutionSlippage;
+  size_analysis: ExecutionSizeAnalysis;
+  breakdown: ExecutionBreakdown;
 }
 
 export interface PriceTimelinePoint {
@@ -294,6 +333,48 @@ export interface OverlayTrade {
   usdc: number;
 }
 
+export interface SpreadPoint {
+  timestamp: number;
+  up_spread: number;
+  down_spread: number;
+}
+
+export interface SpreadAnalysis {
+  by_timestamp: SpreadPoint[];
+  avg_spread: number;
+  min_spread: number;
+  max_spread: number;
+}
+
+export interface EfficiencyPoint {
+  timestamp: number;
+  combined: number;
+}
+
+export interface MarketEfficiency {
+  by_timestamp: EfficiencyPoint[];
+  avg_combined: number;
+  arbitrage_seconds: number;
+}
+
+export interface VolatilityMinute {
+  minute: number;
+  volatility: number;
+  trade_count: number;
+}
+
+export interface MarketVolatility {
+  by_minute: VolatilityMinute[];
+  vol_trade_correlation: number;
+}
+
+export interface TradeImpact {
+  buy_up_impact: number;
+  sell_up_impact: number;
+  buy_down_impact: number;
+  sell_down_impact: number;
+}
+
 export interface MarketOverlayData {
   prices: PriceTimelinePoint[];
   trades: OverlayTrade[];
@@ -304,6 +385,10 @@ export interface MarketOverlayData {
     end_time: number;
     winning_outcome: string | null;
   } | null;
+  spread_analysis: SpreadAnalysis;
+  efficiency: MarketEfficiency;
+  volatility: MarketVolatility;
+  trade_impact: TradeImpact;
 }
 
 export interface PositionEvolutionPoint {
@@ -315,6 +400,53 @@ export interface PositionEvolutionPoint {
   hedge_ratio: number;
   total_cost: number;
   total_revenue: number;
+  // NEW: Cost basis fields
+  up_avg_cost: number;
+  down_avg_cost: number;
+  combined_cost: number;
+  // NEW: P&L fields
+  realized_pnl: number;
+  unrealized_pnl: number;
+  total_pnl: number;
+  // NEW: Entry quality for this trade
+  entry_edge: number;
+}
+
+export interface PositionSummary {
+  final_up_shares: number;
+  final_down_shares: number;
+  final_up_vwap: number;
+  final_down_vwap: number;
+  final_combined_cost: number;
+  total_cost: number;
+  total_revenue: number;
+  total_realized_pnl: number;
+  final_pnl: number | null;
+  winning_outcome: string | null;
+}
+
+export interface EntryQuality {
+  avg_entry_edge: number;
+  pct_positive_edge: number;
+  total_edge_value: number;
+  trade_count: number;
+}
+
+export interface PositionSizing {
+  buy_sizes: number[];
+  buy_count: number;
+  avg_size: number;
+  stddev: number;
+  coefficient_variation: number;
+  largest_pct: number;
+  pattern: 'DCA' | 'Variable' | 'Concentrated';
+}
+
+export interface PositionEvolutionData {
+  points: PositionEvolutionPoint[];
+  summary: PositionSummary;
+  entry_quality: EntryQuality;
+  sizing: PositionSizing;
 }
 
 export interface TradingIntensityMinute {

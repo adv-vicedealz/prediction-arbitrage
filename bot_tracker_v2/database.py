@@ -1081,7 +1081,7 @@ class Database:
         params = (market_slug,) if market_slug else ()
 
         with self._get_conn() as conn:
-            # Get all trades
+            # Get all trades with market timing info
             trades_rows = conn.execute(f"""
                 SELECT
                     t.id,
@@ -1092,7 +1092,9 @@ class Database:
                     t.role,
                     t.price as trade_price,
                     t.shares,
-                    t.usdc
+                    t.usdc,
+                    m.start_time,
+                    m.end_time
                 FROM trades t
                 JOIN markets m ON t.market_slug = m.slug
                 WHERE m.resolved = 1
@@ -1107,21 +1109,44 @@ class Database:
                 ORDER BY timestamp
             """).fetchall()
 
-        if not trades_rows:
-            return {
-                "trades": [],
-                "summary": {
-                    "total_trades": 0,
-                    "matched_trades": 0,
-                    "avg_execution_score": 0,
-                    "pct_at_bid": 0,
-                    "pct_at_ask": 0,
-                    "pct_mid": 0,
-                    "maker_avg_score": 0,
-                    "taker_avg_score": 0
-                },
-                "distribution": []
+        empty_result = {
+            "trades": [],
+            "summary": {
+                "total_trades": 0,
+                "matched_trades": 0,
+                "avg_execution_score": 0,
+                "pct_at_bid": 0,
+                "pct_at_ask": 0,
+                "pct_mid": 0,
+                "maker_avg_score": 0,
+                "taker_avg_score": 0
+            },
+            "distribution": [],
+            "time_analysis": {
+                "by_minute": [],
+                "early_avg": 0,
+                "late_avg": 0,
+                "degradation_pct": 0
+            },
+            "slippage": {
+                "total_usd": 0,
+                "by_role": {"maker": 0, "taker": 0},
+                "by_outcome": {"up": 0, "down": 0},
+                "by_side": {"buy": 0, "sell": 0},
+                "avg_per_trade": 0
+            },
+            "size_analysis": {
+                "correlation": 0,
+                "by_bucket": {"small": 0, "medium": 0, "large": 0}
+            },
+            "breakdown": {
+                "buy_up": 0, "buy_down": 0,
+                "sell_up": 0, "sell_down": 0
             }
+        }
+
+        if not trades_rows:
+            return empty_result
 
         # Build price index
         price_index = {}
@@ -1146,6 +1171,30 @@ class Database:
         at_ask = 0
         mid_range = 0
 
+        # NEW: Time analysis data
+        minute_scores = {}  # {minute: {"all": [], "maker": [], "taker": []}}
+
+        # NEW: Slippage data
+        slippage_total = 0
+        slippage_maker = 0
+        slippage_taker = 0
+        slippage_up = 0
+        slippage_down = 0
+        slippage_buy = 0
+        slippage_sell = 0
+
+        # NEW: Size analysis data
+        size_score_pairs = []  # [(shares, score), ...]
+        small_scores = []  # shares < 50
+        medium_scores = []  # 50 <= shares < 200
+        large_scores = []  # shares >= 200
+
+        # NEW: Breakdown data
+        breakdown_scores = {
+            "buy_up": [], "buy_down": [],
+            "sell_up": [], "sell_down": []
+        }
+
         for trade_row in trades_rows:
             t = dict(trade_row)
             key = (t["market_slug"], t["outcome"])
@@ -1165,6 +1214,13 @@ class Database:
                 "execution_score": None
             }
 
+            # Calculate minute into market for time analysis
+            if "15m" in t["market_slug"]:
+                actual_start = t["end_time"] - 900
+            else:
+                actual_start = t["start_time"]
+            minute_into_market = max(0, min(14, int((t["timestamp"] - actual_start) / 60)))
+
             if key in price_index:
                 price_snapshots = price_index[key]
                 closest = min(price_snapshots, key=lambda p: abs(p["timestamp"] - t["timestamp"]))
@@ -1173,10 +1229,11 @@ class Database:
                     best_bid = closest["best_bid"]
                     best_ask = closest["best_ask"]
                     spread = best_ask - best_bid
+                    mid_price = (best_bid + best_ask) / 2
 
                     trade_data["market_bid"] = best_bid
                     trade_data["market_ask"] = best_ask
-                    trade_data["market_mid"] = (best_bid + best_ask) / 2
+                    trade_data["market_mid"] = mid_price
 
                     # Execution score: 0 = at bid, 1 = at ask
                     if spread > 0:
@@ -1201,6 +1258,50 @@ class Database:
                     else:
                         mid_range += 1
 
+                    # NEW: Time analysis - group scores by minute
+                    if minute_into_market not in minute_scores:
+                        minute_scores[minute_into_market] = {"all": [], "maker": [], "taker": []}
+                    minute_scores[minute_into_market]["all"].append(score)
+                    if t["role"] == "maker":
+                        minute_scores[minute_into_market]["maker"].append(score)
+                    else:
+                        minute_scores[minute_into_market]["taker"].append(score)
+
+                    # NEW: Slippage calculation
+                    # For BUY: slippage = (trade_price - mid) * shares (positive = overpaid)
+                    # For SELL: slippage = (mid - trade_price) * shares (positive = undersold)
+                    if t["side"] == "BUY":
+                        slip = (t["trade_price"] - mid_price) * t["shares"]
+                    else:
+                        slip = (mid_price - t["trade_price"]) * t["shares"]
+
+                    slippage_total += slip
+                    if t["role"] == "maker":
+                        slippage_maker += slip
+                    else:
+                        slippage_taker += slip
+                    if t["outcome"] == "Up":
+                        slippage_up += slip
+                    else:
+                        slippage_down += slip
+                    if t["side"] == "BUY":
+                        slippage_buy += slip
+                    else:
+                        slippage_sell += slip
+
+                    # NEW: Size analysis
+                    size_score_pairs.append((t["shares"], score))
+                    if t["shares"] < 50:
+                        small_scores.append(score)
+                    elif t["shares"] < 200:
+                        medium_scores.append(score)
+                    else:
+                        large_scores.append(score)
+
+                    # NEW: Breakdown by side+outcome
+                    breakdown_key = f"{t['side'].lower()}_{t['outcome'].lower()}"
+                    breakdown_scores[breakdown_key].append(score)
+
             matched_trades.append(trade_data)
 
         # Create distribution histogram (10 buckets from 0 to 1)
@@ -1217,6 +1318,56 @@ class Database:
             })
 
         matched_count = len(scores)
+
+        # NEW: Build time analysis
+        by_minute = []
+        early_scores = []
+        late_scores = []
+        for minute in range(15):
+            if minute in minute_scores:
+                data = minute_scores[minute]
+                avg_all = sum(data["all"]) / len(data["all"]) if data["all"] else 0
+                avg_maker = sum(data["maker"]) / len(data["maker"]) if data["maker"] else 0
+                avg_taker = sum(data["taker"]) / len(data["taker"]) if data["taker"] else 0
+                by_minute.append({
+                    "minute": minute,
+                    "avg_score": round(avg_all, 4),
+                    "maker_avg": round(avg_maker, 4),
+                    "taker_avg": round(avg_taker, 4),
+                    "trade_count": len(data["all"])
+                })
+                # Collect early (0-4) and late (10-14) scores
+                if minute < 5:
+                    early_scores.extend(data["all"])
+                elif minute >= 10:
+                    late_scores.extend(data["all"])
+            else:
+                by_minute.append({
+                    "minute": minute,
+                    "avg_score": 0,
+                    "maker_avg": 0,
+                    "taker_avg": 0,
+                    "trade_count": 0
+                })
+
+        early_avg = sum(early_scores) / len(early_scores) if early_scores else 0
+        late_avg = sum(late_scores) / len(late_scores) if late_scores else 0
+        degradation_pct = ((late_avg - early_avg) / early_avg * 100) if early_avg > 0 else 0
+
+        # NEW: Calculate size-execution correlation (Pearson)
+        correlation = 0
+        if len(size_score_pairs) > 1:
+            sizes = [p[0] for p in size_score_pairs]
+            exec_scores = [p[1] for p in size_score_pairs]
+            n = len(sizes)
+            mean_size = sum(sizes) / n
+            mean_score = sum(exec_scores) / n
+            numerator = sum((s - mean_size) * (e - mean_score) for s, e in zip(sizes, exec_scores))
+            denom_size = sum((s - mean_size) ** 2 for s in sizes) ** 0.5
+            denom_score = sum((e - mean_score) ** 2 for e in exec_scores) ** 0.5
+            if denom_size > 0 and denom_score > 0:
+                correlation = numerator / (denom_size * denom_score)
+
         return {
             "trades": matched_trades,
             "summary": {
@@ -1229,7 +1380,43 @@ class Database:
                 "maker_avg_score": round(sum(maker_scores) / len(maker_scores), 4) if maker_scores else 0,
                 "taker_avg_score": round(sum(taker_scores) / len(taker_scores), 4) if taker_scores else 0
             },
-            "distribution": distribution
+            "distribution": distribution,
+            "time_analysis": {
+                "by_minute": by_minute,
+                "early_avg": round(early_avg, 4),
+                "late_avg": round(late_avg, 4),
+                "degradation_pct": round(degradation_pct, 1)
+            },
+            "slippage": {
+                "total_usd": round(slippage_total, 2),
+                "by_role": {
+                    "maker": round(slippage_maker, 2),
+                    "taker": round(slippage_taker, 2)
+                },
+                "by_outcome": {
+                    "up": round(slippage_up, 2),
+                    "down": round(slippage_down, 2)
+                },
+                "by_side": {
+                    "buy": round(slippage_buy, 2),
+                    "sell": round(slippage_sell, 2)
+                },
+                "avg_per_trade": round(slippage_total / matched_count, 2) if matched_count else 0
+            },
+            "size_analysis": {
+                "correlation": round(correlation, 4),
+                "by_bucket": {
+                    "small": round(sum(small_scores) / len(small_scores), 4) if small_scores else 0,
+                    "medium": round(sum(medium_scores) / len(medium_scores), 4) if medium_scores else 0,
+                    "large": round(sum(large_scores) / len(large_scores), 4) if large_scores else 0
+                }
+            },
+            "breakdown": {
+                "buy_up": round(sum(breakdown_scores["buy_up"]) / len(breakdown_scores["buy_up"]), 4) if breakdown_scores["buy_up"] else 0,
+                "buy_down": round(sum(breakdown_scores["buy_down"]) / len(breakdown_scores["buy_down"]), 4) if breakdown_scores["buy_down"] else 0,
+                "sell_up": round(sum(breakdown_scores["sell_up"]) / len(breakdown_scores["sell_up"]), 4) if breakdown_scores["sell_up"] else 0,
+                "sell_down": round(sum(breakdown_scores["sell_down"]) / len(breakdown_scores["sell_down"]), 4) if breakdown_scores["sell_down"] else 0
+            }
         }
 
     def get_market_price_trade_overlay(self, market_slug: str) -> Dict:
@@ -1241,7 +1428,13 @@ class Database:
             ).fetchone()
 
             if not market:
-                return {"prices": [], "trades": [], "market": None}
+                return {
+                    "prices": [], "trades": [], "market": None,
+                    "spread_analysis": {"by_timestamp": [], "avg_spread": 0, "min_spread": 0, "max_spread": 0},
+                    "efficiency": {"by_timestamp": [], "avg_combined": 0, "arbitrage_seconds": 0},
+                    "volatility": {"by_minute": [], "vol_trade_correlation": 0},
+                    "trade_impact": {"buy_up_impact": 0, "sell_up_impact": 0, "buy_down_impact": 0, "sell_down_impact": 0}
+                }
 
             market_dict = dict(market)
 
@@ -1305,6 +1498,137 @@ class Database:
         else:
             calculated_start = market_dict["start_time"]
 
+        # NEW: Calculate spread analysis
+        spread_data = []
+        spreads = []
+        for p in prices:
+            up_spread = (p["up_ask"] - p["up_bid"]) if p["up_ask"] and p["up_bid"] else None
+            down_spread = (p["down_ask"] - p["down_bid"]) if p["down_ask"] and p["down_bid"] else None
+            spread_data.append({
+                "timestamp": p["timestamp"],
+                "up_spread": round(up_spread, 4) if up_spread else None,
+                "down_spread": round(down_spread, 4) if down_spread else None
+            })
+            if up_spread is not None:
+                spreads.append(up_spread)
+            if down_spread is not None:
+                spreads.append(down_spread)
+
+        # NEW: Calculate market efficiency (combined price = up + down should equal 1.0)
+        efficiency_data = []
+        combined_prices = []
+        arbitrage_seconds = 0
+        for p in prices:
+            if p["up_price"] is not None and p["down_price"] is not None:
+                combined = p["up_price"] + p["down_price"]
+                efficiency_data.append({
+                    "timestamp": p["timestamp"],
+                    "combined": round(combined, 4)
+                })
+                combined_prices.append(combined)
+                if combined < 0.98:
+                    arbitrage_seconds += 1  # Each price point is ~1 second
+
+        # NEW: Calculate volatility by minute
+        if calculated_start:
+            minute_prices = {}  # {minute: [prices]}
+            minute_trade_counts = {}  # {minute: count}
+
+            for p in prices:
+                minute = int((p["timestamp"] - calculated_start) / 60)
+                minute = max(0, min(14, minute))
+                if minute not in minute_prices:
+                    minute_prices[minute] = []
+                if p["up_price"] is not None:
+                    minute_prices[minute].append(p["up_price"])
+                if p["down_price"] is not None:
+                    minute_prices[minute].append(p["down_price"])
+
+            for t in trades:
+                minute = int((t["timestamp"] - calculated_start) / 60)
+                minute = max(0, min(14, minute))
+                minute_trade_counts[minute] = minute_trade_counts.get(minute, 0) + 1
+
+            volatility_data = []
+            vol_values = []
+            trade_counts = []
+            for minute in range(15):
+                prices_in_minute = minute_prices.get(minute, [])
+                trade_count = minute_trade_counts.get(minute, 0)
+
+                # Calculate volatility as standard deviation
+                if len(prices_in_minute) > 1:
+                    mean_price = sum(prices_in_minute) / len(prices_in_minute)
+                    variance = sum((p - mean_price) ** 2 for p in prices_in_minute) / len(prices_in_minute)
+                    volatility = variance ** 0.5
+                else:
+                    volatility = 0
+
+                volatility_data.append({
+                    "minute": minute,
+                    "volatility": round(volatility, 6),
+                    "trade_count": trade_count
+                })
+                vol_values.append(volatility)
+                trade_counts.append(trade_count)
+
+            # Calculate correlation between volatility and trade count
+            vol_trade_correlation = 0
+            if len(vol_values) > 1 and sum(vol_values) > 0 and sum(trade_counts) > 0:
+                n = len(vol_values)
+                mean_vol = sum(vol_values) / n
+                mean_tc = sum(trade_counts) / n
+                numerator = sum((v - mean_vol) * (tc - mean_tc) for v, tc in zip(vol_values, trade_counts))
+                denom_vol = sum((v - mean_vol) ** 2 for v in vol_values) ** 0.5
+                denom_tc = sum((tc - mean_tc) ** 2 for tc in trade_counts) ** 0.5
+                if denom_vol > 0 and denom_tc > 0:
+                    vol_trade_correlation = numerator / (denom_vol * denom_tc)
+        else:
+            volatility_data = []
+            vol_trade_correlation = 0
+
+        # NEW: Calculate trade impact (price change after trade)
+        # Build price lookup by timestamp for quick access
+        price_lookup = {p["timestamp"]: p for p in prices}
+
+        trade_impacts = {"buy_up": [], "sell_up": [], "buy_down": [], "sell_down": []}
+        for t in trades:
+            trade_ts = t["timestamp"]
+            outcome = t["outcome"]
+            side = t["side"]
+
+            # Find price 30 seconds after trade
+            future_ts = trade_ts + 30
+            closest_future = None
+            min_diff = float('inf')
+            for ts, p in price_lookup.items():
+                if ts >= future_ts and ts - future_ts < min_diff:
+                    min_diff = ts - future_ts
+                    closest_future = p
+
+            if closest_future and min_diff <= 60:  # Within 60 seconds after target
+                # Get price at trade time (closest)
+                closest_current = None
+                min_current_diff = float('inf')
+                for ts, p in price_lookup.items():
+                    diff = abs(ts - trade_ts)
+                    if diff < min_current_diff:
+                        min_current_diff = diff
+                        closest_current = p
+
+                if closest_current and min_current_diff <= 30:
+                    if outcome == "Up":
+                        price_at_trade = closest_current.get("up_price")
+                        price_after = closest_future.get("up_price")
+                    else:
+                        price_at_trade = closest_current.get("down_price")
+                        price_after = closest_future.get("down_price")
+
+                    if price_at_trade and price_after:
+                        impact = price_after - price_at_trade
+                        key = f"{side.lower()}_{outcome.lower()}"
+                        trade_impacts[key].append(impact)
+
         return {
             "prices": prices,
             "trades": trades,
@@ -1314,18 +1638,57 @@ class Database:
                 "start_time": calculated_start,
                 "end_time": end_time,
                 "winning_outcome": market_dict["winning_outcome"]
+            },
+            "spread_analysis": {
+                "by_timestamp": spread_data,
+                "avg_spread": round(sum(spreads) / len(spreads), 4) if spreads else 0,
+                "min_spread": round(min(spreads), 4) if spreads else 0,
+                "max_spread": round(max(spreads), 4) if spreads else 0
+            },
+            "efficiency": {
+                "by_timestamp": efficiency_data,
+                "avg_combined": round(sum(combined_prices) / len(combined_prices), 4) if combined_prices else 0,
+                "arbitrage_seconds": arbitrage_seconds
+            },
+            "volatility": {
+                "by_minute": volatility_data,
+                "vol_trade_correlation": round(vol_trade_correlation, 4)
+            },
+            "trade_impact": {
+                "buy_up_impact": round(sum(trade_impacts["buy_up"]) / len(trade_impacts["buy_up"]) * 100, 2) if trade_impacts["buy_up"] else 0,
+                "sell_up_impact": round(sum(trade_impacts["sell_up"]) / len(trade_impacts["sell_up"]) * 100, 2) if trade_impacts["sell_up"] else 0,
+                "buy_down_impact": round(sum(trade_impacts["buy_down"]) / len(trade_impacts["buy_down"]) * 100, 2) if trade_impacts["buy_down"] else 0,
+                "sell_down_impact": round(sum(trade_impacts["sell_down"]) / len(trade_impacts["sell_down"]) * 100, 2) if trade_impacts["sell_down"] else 0
             }
         }
 
-    def get_position_evolution(self, market_slug: str) -> List[Dict]:
-        """Get position building over time for a market."""
+    def get_position_evolution(self, market_slug: str) -> Dict:
+        """Get position building over time for a market with enhanced metrics."""
         with self._get_conn() as conn:
+            # Get trades with price data for entry quality analysis
             rows = conn.execute("""
-                SELECT id, timestamp, side, outcome, shares, price, usdc
-                FROM trades
-                WHERE market_slug = ?
-                ORDER BY timestamp ASC
+                SELECT t.id, t.timestamp, t.side, t.outcome, t.shares, t.price, t.usdc,
+                       p.price as mid_price, p.best_bid, p.best_ask
+                FROM trades t
+                LEFT JOIN prices p ON t.market_slug = p.market_slug
+                    AND t.outcome = p.outcome
+                    AND p.timestamp = (
+                        SELECT MAX(p2.timestamp) FROM prices p2
+                        WHERE p2.market_slug = t.market_slug
+                        AND p2.outcome = t.outcome
+                        AND p2.timestamp <= t.timestamp
+                    )
+                WHERE t.market_slug = ?
+                ORDER BY t.timestamp ASC
             """, (market_slug,)).fetchall()
+
+            # Get market info for final P&L calculation
+            market_info = conn.execute("""
+                SELECT winning_outcome, resolved FROM markets WHERE slug = ?
+            """, (market_slug,)).fetchone()
+
+        winning_outcome = market_info["winning_outcome"] if market_info else None
+        is_resolved = market_info["resolved"] if market_info else False
 
         evolution = []
         up_shares = 0
@@ -1333,21 +1696,75 @@ class Database:
         total_cost = 0
         total_revenue = 0
 
+        # Cost basis tracking (VWAP)
+        up_total_cost = 0  # Total $ spent on UP
+        down_total_cost = 0  # Total $ spent on DOWN
+        up_shares_bought = 0  # Total UP shares bought (for VWAP)
+        down_shares_bought = 0  # Total DOWN shares bought (for VWAP)
+
+        # P&L tracking
+        realized_pnl = 0
+
+        # Entry quality tracking
+        entry_edges = []  # List of (edge_cents, shares) for each buy
+
+        # Position sizing tracking
+        buy_sizes = []  # List of share sizes for each buy
+
         for row in rows:
             r = dict(row)
+            trade_price = r["price"]
+            mid_price = r["mid_price"] if r["mid_price"] else trade_price
+            shares = r["shares"]
+            usdc = r["usdc"]
 
+            # Calculate entry edge (how much better than mid)
+            # For BUY: lower is better, so edge = mid - trade_price
+            # For SELL: higher is better, so edge = trade_price - mid
             if r["side"] == "BUY":
+                entry_edge = (mid_price - trade_price) * 100  # In cents
+                entry_edges.append((entry_edge, shares))
+                buy_sizes.append(shares)
+
                 if r["outcome"] == "Up":
-                    up_shares += r["shares"]
+                    up_shares += shares
+                    up_total_cost += usdc
+                    up_shares_bought += shares
                 else:
-                    down_shares += r["shares"]
-                total_cost += r["usdc"]
-            else:
-                if r["outcome"] == "Up":
-                    up_shares -= r["shares"]
-                else:
-                    down_shares -= r["shares"]
-                total_revenue += r["usdc"]
+                    down_shares += shares
+                    down_total_cost += usdc
+                    down_shares_bought += shares
+                total_cost += usdc
+            else:  # SELL
+                entry_edge = (trade_price - mid_price) * 100  # In cents
+                entry_edges.append((entry_edge, shares))
+
+                # Calculate realized P&L on sell
+                if r["outcome"] == "Up" and up_shares_bought > 0:
+                    avg_cost = up_total_cost / up_shares_bought
+                    realized_pnl += (trade_price - avg_cost) * shares
+                    up_shares -= shares
+                elif r["outcome"] == "Down" and down_shares_bought > 0:
+                    avg_cost = down_total_cost / down_shares_bought
+                    realized_pnl += (trade_price - avg_cost) * shares
+                    down_shares -= shares
+                total_revenue += usdc
+
+            # Calculate current VWAP for each side
+            up_avg_cost = up_total_cost / up_shares_bought if up_shares_bought > 0 else 0
+            down_avg_cost = down_total_cost / down_shares_bought if down_shares_bought > 0 else 0
+            combined_cost = up_avg_cost + down_avg_cost
+
+            # Calculate unrealized P&L (mark-to-market using current mid)
+            unrealized_pnl = 0
+            if up_shares > 0 and up_avg_cost > 0:
+                # UP position value at current mid
+                current_up_mid = mid_price if r["outcome"] == "Up" else (1 - mid_price)
+                unrealized_pnl += (current_up_mid - up_avg_cost) * up_shares
+            if down_shares > 0 and down_avg_cost > 0:
+                # DOWN position value at current mid
+                current_down_mid = mid_price if r["outcome"] == "Down" else (1 - mid_price)
+                unrealized_pnl += (current_down_mid - down_avg_cost) * down_shares
 
             # Calculate hedge ratio
             if up_shares > 0 and down_shares > 0:
@@ -1365,10 +1782,82 @@ class Database:
                 "net_position": round(up_shares - down_shares, 2),
                 "hedge_ratio": round(hedge_ratio * 100, 1),
                 "total_cost": round(total_cost, 2),
-                "total_revenue": round(total_revenue, 2)
+                "total_revenue": round(total_revenue, 2),
+                # NEW: Cost basis fields
+                "up_avg_cost": round(up_avg_cost, 4),
+                "down_avg_cost": round(down_avg_cost, 4),
+                "combined_cost": round(combined_cost, 4),
+                # NEW: P&L fields
+                "realized_pnl": round(realized_pnl, 2),
+                "unrealized_pnl": round(unrealized_pnl, 2),
+                "total_pnl": round(realized_pnl + unrealized_pnl, 2),
+                # NEW: Entry quality for this trade
+                "entry_edge": round(entry_edge, 2)
             })
 
-        return evolution
+        # Calculate summary statistics
+        total_edge_value = sum(edge * shares for edge, shares in entry_edges) / 100 if entry_edges else 0
+        avg_entry_edge = sum(edge for edge, _ in entry_edges) / len(entry_edges) if entry_edges else 0
+        pct_positive_edge = len([e for e, _ in entry_edges if e > 0]) / len(entry_edges) * 100 if entry_edges else 0
+
+        # Position sizing stats
+        if buy_sizes:
+            avg_size = sum(buy_sizes) / len(buy_sizes)
+            if len(buy_sizes) > 1:
+                variance = sum((s - avg_size) ** 2 for s in buy_sizes) / (len(buy_sizes) - 1)
+                stddev = variance ** 0.5
+            else:
+                stddev = 0
+            coefficient_variation = stddev / avg_size if avg_size > 0 else 0
+            largest_pct = max(buy_sizes) / sum(buy_sizes) * 100 if sum(buy_sizes) > 0 else 0
+        else:
+            avg_size = 0
+            stddev = 0
+            coefficient_variation = 0
+            largest_pct = 0
+
+        # Final P&L calculation if market resolved
+        final_pnl = None
+        if is_resolved and winning_outcome:
+            # Winning side pays $1, losing side pays $0
+            if winning_outcome == "Up":
+                final_pnl = up_shares * 1.0 + down_shares * 0.0 - total_cost + total_revenue
+            else:
+                final_pnl = up_shares * 0.0 + down_shares * 1.0 - total_cost + total_revenue
+
+        return {
+            "points": evolution,
+            "summary": {
+                "final_up_shares": round(max(0, up_shares), 2),
+                "final_down_shares": round(max(0, down_shares), 2),
+                "final_up_vwap": round(up_total_cost / up_shares_bought, 4) if up_shares_bought > 0 else 0,
+                "final_down_vwap": round(down_total_cost / down_shares_bought, 4) if down_shares_bought > 0 else 0,
+                "final_combined_cost": round(
+                    (up_total_cost / up_shares_bought if up_shares_bought > 0 else 0) +
+                    (down_total_cost / down_shares_bought if down_shares_bought > 0 else 0), 4
+                ),
+                "total_cost": round(total_cost, 2),
+                "total_revenue": round(total_revenue, 2),
+                "total_realized_pnl": round(realized_pnl, 2),
+                "final_pnl": round(final_pnl, 2) if final_pnl is not None else None,
+                "winning_outcome": winning_outcome
+            },
+            "entry_quality": {
+                "avg_entry_edge": round(avg_entry_edge, 2),  # Cents better than mid
+                "pct_positive_edge": round(pct_positive_edge, 1),  # % of trades with positive edge
+                "total_edge_value": round(total_edge_value, 2),  # Total $ saved from good entries
+                "trade_count": len(entry_edges)
+            },
+            "sizing": {
+                "buy_sizes": [round(s, 2) for s in buy_sizes],
+                "buy_count": len(buy_sizes),
+                "avg_size": round(avg_size, 2),
+                "stddev": round(stddev, 2),
+                "coefficient_variation": round(coefficient_variation, 3),  # Low = DCA, High = variable
+                "largest_pct": round(largest_pct, 1),
+                "pattern": "DCA" if coefficient_variation < 0.3 else ("Variable" if coefficient_variation < 0.7 else "Concentrated")
+            }
+        }
 
     def get_trading_intensity_patterns(self) -> Dict:
         """Analyze when trades occur within markets (relative timing)."""
