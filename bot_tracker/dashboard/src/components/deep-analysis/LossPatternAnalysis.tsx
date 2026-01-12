@@ -205,7 +205,7 @@ export function LossPatternAnalysis() {
       </div>
 
       {/* Interpretation */}
-      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-400">
+      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-300">
         <p className="font-medium text-gray-300 mb-2">How to Use This Analysis:</p>
         <ul className="list-disc list-inside space-y-1">
           <li><strong>Hedge Ratio</strong>: Higher = more balanced positions, lower loss risk</li>

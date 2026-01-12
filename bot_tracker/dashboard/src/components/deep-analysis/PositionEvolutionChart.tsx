@@ -164,7 +164,7 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
             />
           </ComposedChart>
         </ResponsiveContainer>
-        <div className="flex justify-center gap-6 mt-2 text-xs">
+        <div className="flex justify-center gap-6 mt-2 text-xs text-gray-200">
           <span className="flex items-center gap-1">
             <span className="w-3 h-3 rounded bg-green-500 opacity-60"></span>
             UP Shares
@@ -219,13 +219,13 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
             />
           </ComposedChart>
         </ResponsiveContainer>
-        <div className="text-center text-xs text-gray-500 mt-2">
+        <div className="text-center text-xs text-gray-300 mt-2">
           Min: {minHedge.toFixed(1)}% | Max: {maxHedge.toFixed(1)}%
         </div>
       </div>
 
       {/* Interpretation */}
-      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-400">
+      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-300">
         <p className="font-medium text-gray-300 mb-2">How to Read This:</p>
         <ul className="list-disc list-inside space-y-1">
           <li><strong>UP Shares (green)</strong>: Net long position in UP outcome</li>

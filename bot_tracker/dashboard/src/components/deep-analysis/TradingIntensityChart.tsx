@@ -139,7 +139,7 @@ export function TradingIntensityChart() {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <div className="flex justify-center gap-4 mt-2 text-xs">
+          <div className="flex justify-center gap-4 mt-2 text-xs text-gray-200">
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded bg-green-500"></span>
               Early (0-4)
@@ -222,7 +222,7 @@ export function TradingIntensityChart() {
       </div>
 
       {/* Interpretation */}
-      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-400">
+      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-300">
         <p className="font-medium text-gray-300 mb-2">What This Tells Us:</p>
         <ul className="list-disc list-inside space-y-1">
           <li><strong>Peak minute</strong>: Most active trading period - may indicate optimal entry timing</li>

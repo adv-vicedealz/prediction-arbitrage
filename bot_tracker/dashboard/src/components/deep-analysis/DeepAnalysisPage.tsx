@@ -129,7 +129,7 @@ export function DeepAnalysisPage() {
       </div>
 
       {/* Legend */}
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-gray-400">
         * These tabs require selecting a specific market from the dropdown
       </div>
     </div>

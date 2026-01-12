@@ -175,7 +175,7 @@ export function ExecutionQualityChart({ selectedMarket }: Props) {
               <Scatter name="Taker" data={takerTrades} fill="#EF4444" opacity={0.6} />
             </ScatterChart>
           </ResponsiveContainer>
-          <div className="flex justify-center gap-4 mt-2 text-xs">
+          <div className="flex justify-center gap-4 mt-2 text-xs text-gray-200">
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded-full bg-green-500"></span>
               Maker
@@ -184,7 +184,7 @@ export function ExecutionQualityChart({ selectedMarket }: Props) {
               <span className="w-3 h-3 rounded-full bg-red-500"></span>
               Taker
             </span>
-            <span className="text-gray-500">Below diagonal = better execution</span>
+            <span className="text-gray-300">Below diagonal = better execution</span>
           </div>
         </div>
 
@@ -233,7 +233,7 @@ export function ExecutionQualityChart({ selectedMarket }: Props) {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <div className="flex justify-center gap-4 mt-2 text-xs">
+          <div className="flex justify-center gap-4 mt-2 text-xs text-gray-200">
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded bg-green-500"></span>
               Near Bid (Good)
@@ -251,7 +251,7 @@ export function ExecutionQualityChart({ selectedMarket }: Props) {
       </div>
 
       {/* Interpretation */}
-      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-400">
+      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-300">
         <p className="font-medium text-gray-300 mb-2">How to Read This:</p>
         <ul className="list-disc list-inside space-y-1">
           <li><strong>Execution Score 0.0</strong> = Trade executed at the bid (best price for buyers)</li>

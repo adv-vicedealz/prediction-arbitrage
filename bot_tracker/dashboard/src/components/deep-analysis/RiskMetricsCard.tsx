@@ -194,7 +194,7 @@ export function RiskMetricsCard() {
       </div>
 
       {/* Interpretation */}
-      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-400">
+      <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-300">
         <p className="font-medium text-gray-300 mb-2">Understanding These Metrics:</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
