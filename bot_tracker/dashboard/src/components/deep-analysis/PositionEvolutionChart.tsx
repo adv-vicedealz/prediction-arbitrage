@@ -73,6 +73,23 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
   const minHedge = Math.min(...points.map((d: PositionEvolutionPoint) => d.hedge_ratio));
   const maxHedge = Math.max(...points.map((d: PositionEvolutionPoint) => d.hedge_ratio));
 
+  // Filter price correlation timeline to 0-15 minutes only
+  const filteredTimeline = data.price_correlation?.timeline
+    ? (() => {
+        const timeline = data.price_correlation.timeline;
+        if (timeline.length === 0) return [];
+        const startTs = timeline[0]?.timestamp || 0;
+        const endTs = startTs + 15 * 60; // 15 minutes
+        return timeline
+          .filter((p) => p.timestamp >= startTs && p.timestamp <= endTs)
+          .map((p, i) => ({
+            ...p,
+            minuteIntoMarket: (p.timestamp - startTs) / 60,
+            index: i,
+          }));
+      })()
+    : [];
+
   return (
     <div className="space-y-4">
       {/* Summary Stats */}
@@ -138,7 +155,6 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
                 );
               }}
             />
-            {/* Stacked areas for UP and DOWN */}
             <Area
               yAxisId="shares"
               type="stepAfter"
@@ -159,7 +175,6 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
               fillOpacity={0.4}
               name="DOWN Shares"
             />
-            {/* Net position line */}
             <Line
               yAxisId="shares"
               type="stepAfter"
@@ -187,8 +202,8 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
         </div>
       </div>
 
-      {/* NEW: Position vs Price Correlation */}
-      {data.price_correlation && data.price_correlation.timeline.length > 0 && (
+      {/* Position vs Price Correlation */}
+      {data.price_correlation && filteredTimeline.length > 0 && (
         <>
           {/* Correlation Stats Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -228,21 +243,28 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
             </div>
           </div>
 
-          {/* UP Position vs UP Price Chart (Dual Y-Axis) */}
+          {/* UP Position vs UP Price Chart (0-15 minutes) */}
           <div className="bg-gray-900 rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-300 mb-4">
-              UP Position vs UP Price
+              UP Position vs UP Price (0-15 min)
               <span className="ml-2 text-xs text-gray-400">
-                Correlation: r = {data.price_correlation.up_shares_vs_up_price.toFixed(3)}
+                r = {data.price_correlation.up_shares_vs_up_price.toFixed(3)}
               </span>
             </h3>
             <ResponsiveContainer width="100%" height={250}>
               <ComposedChart
-                data={data.price_correlation.timeline.map((p, i) => ({ ...p, index: i }))}
+                data={filteredTimeline}
                 margin={{ top: 10, right: 50, left: 0, bottom: 10 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="index" stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${Math.floor(v / 12)}m`} />
+                <XAxis
+                  dataKey="minuteIntoMarket"
+                  type="number"
+                  domain={[0, 15]}
+                  stroke="#9CA3AF"
+                  fontSize={10}
+                  tickFormatter={(v) => `${Math.floor(v)}m`}
+                />
                 <YAxis
                   yAxisId="shares"
                   stroke="#10B981"
@@ -264,6 +286,7 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
                     const d = payload[0].payload;
                     return (
                       <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                        <p className="font-medium">{d.minuteIntoMarket?.toFixed(1)}m</p>
                         <p className="text-green-400">UP Shares: {d.up_shares?.toFixed(0)}</p>
                         <p className="text-yellow-400">UP Price: ${d.up_price?.toFixed(4)}</p>
                       </div>
@@ -295,21 +318,28 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
             </div>
           </div>
 
-          {/* DOWN Position vs DOWN Price Chart (Dual Y-Axis) */}
+          {/* DOWN Position vs DOWN Price Chart (0-15 minutes) */}
           <div className="bg-gray-900 rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-300 mb-4">
-              DOWN Position vs DOWN Price
+              DOWN Position vs DOWN Price (0-15 min)
               <span className="ml-2 text-xs text-gray-400">
-                Correlation: r = {data.price_correlation.down_shares_vs_down_price.toFixed(3)}
+                r = {data.price_correlation.down_shares_vs_down_price.toFixed(3)}
               </span>
             </h3>
             <ResponsiveContainer width="100%" height={250}>
               <ComposedChart
-                data={data.price_correlation.timeline.map((p, i) => ({ ...p, index: i }))}
+                data={filteredTimeline}
                 margin={{ top: 10, right: 50, left: 0, bottom: 10 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="index" stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${Math.floor(v / 12)}m`} />
+                <XAxis
+                  dataKey="minuteIntoMarket"
+                  type="number"
+                  domain={[0, 15]}
+                  stroke="#9CA3AF"
+                  fontSize={10}
+                  tickFormatter={(v) => `${Math.floor(v)}m`}
+                />
                 <YAxis
                   yAxisId="shares"
                   stroke="#EF4444"
@@ -331,6 +361,7 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
                     const d = payload[0].payload;
                     return (
                       <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                        <p className="font-medium">{d.minuteIntoMarket?.toFixed(1)}m</p>
                         <p className="text-red-400">DOWN Shares: {d.down_shares?.toFixed(0)}</p>
                         <p className="text-yellow-400">DOWN Price: ${d.down_price?.toFixed(4)}</p>
                       </div>
@@ -392,101 +423,83 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
         </>
       )}
 
-      {/* Hedge Ratio Evolution */}
-      <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">Hedge Ratio Evolution</h3>
-        <ResponsiveContainer width="100%" height={200}>
-          <ComposedChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis
-              dataKey="tradeNum"
-              stroke="#9CA3AF"
-              fontSize={11}
-            />
-            <YAxis
-              domain={[0, 100]}
-              tickFormatter={(v) => `${v}%`}
-              stroke="#9CA3AF"
-              fontSize={11}
-            />
-            <Tooltip
-              content={({ payload }) => {
-                if (!payload || !payload[0]) return null;
-                const d = payload[0].payload;
-                return (
-                  <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p>Trade #{d.tradeNum}</p>
-                    <p className="text-cyan-400">Hedge: {d.hedge_ratio?.toFixed(1)}%</p>
-                  </div>
-                );
-              }}
-            />
-            {/* Reference line at 100% */}
-            <Line
-              type="stepAfter"
-              dataKey="hedge_ratio"
-              stroke="#06B6D4"
-              strokeWidth={2}
-              dot={false}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
-        <div className="text-center text-xs text-gray-300 mt-2">
-          Min: {minHedge.toFixed(1)}% | Max: {maxHedge.toFixed(1)}%
-        </div>
-      </div>
-
-      {/* NEW: Cost Basis Evolution */}
-      <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">
-          Cost Basis Evolution (VWAP)
-          {data.summary && (
+      {/* Hedge Ratio + Cost Basis in ONE ROW */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Hedge Ratio Evolution */}
+        <div className="bg-gray-900 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-300 mb-2">
+            Hedge Ratio Evolution
             <span className="ml-2 text-xs text-gray-400">
-              Final Combined: ${data.summary.final_combined_cost.toFixed(4)}
+              Min: {minHedge.toFixed(1)}% | Max: {maxHedge.toFixed(1)}%
             </span>
-          )}
-        </h3>
-        <ResponsiveContainer width="100%" height={250}>
-          <ComposedChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="tradeNum" stroke="#9CA3AF" fontSize={11} />
-            <YAxis
-              domain={[0, 1]}
-              tickFormatter={(v) => `$${v.toFixed(2)}`}
-              stroke="#9CA3AF"
-              fontSize={11}
-            />
-            <Tooltip
-              content={({ payload }) => {
-                if (!payload || !payload[0]) return null;
-                const d = payload[0].payload;
-                return (
-                  <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p className="font-medium">Trade #{d.tradeNum}</p>
-                    <p className="text-green-400">UP VWAP: ${d.up_avg_cost?.toFixed(4)}</p>
-                    <p className="text-red-400">DOWN VWAP: ${d.down_avg_cost?.toFixed(4)}</p>
-                    <p className="text-cyan-400">Combined: ${d.combined_cost?.toFixed(4)}</p>
-                    {d.combined_cost < 1.0 && (
-                      <p className="text-yellow-400">Edge: ${(1.0 - d.combined_cost).toFixed(4)}</p>
-                    )}
-                  </div>
-                );
-              }}
-            />
-            <ReferenceLine y={1.0} stroke="#6B7280" strokeDasharray="3 3" label={{ value: 'Breakeven', fill: '#6B7280', fontSize: 9 }} />
-            <Line type="monotone" dataKey="up_avg_cost" stroke="#10B981" strokeWidth={2} dot={false} name="UP VWAP" />
-            <Line type="monotone" dataKey="down_avg_cost" stroke="#EF4444" strokeWidth={2} dot={false} name="DOWN VWAP" />
-            <Line type="monotone" dataKey="combined_cost" stroke="#06B6D4" strokeWidth={2} dot={{ r: 2 }} name="Combined" />
-          </ComposedChart>
-        </ResponsiveContainer>
-        <div className="flex justify-center gap-6 mt-2 text-xs text-gray-200">
-          <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-green-500"></span> UP VWAP</span>
-          <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-red-500"></span> DOWN VWAP</span>
-          <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-cyan-500"></span> Combined</span>
+          </h3>
+          <ResponsiveContainer width="100%" height={180}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="tradeNum" stroke="#9CA3AF" fontSize={10} />
+              <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} stroke="#9CA3AF" fontSize={10} />
+              <Tooltip
+                content={({ payload }) => {
+                  if (!payload || !payload[0]) return null;
+                  const d = payload[0].payload;
+                  return (
+                    <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                      <p>Trade #{d.tradeNum}</p>
+                      <p className="text-cyan-400">Hedge: {d.hedge_ratio?.toFixed(1)}%</p>
+                    </div>
+                  );
+                }}
+              />
+              <ReferenceLine y={100} stroke="#6B7280" strokeDasharray="3 3" />
+              <Line type="stepAfter" dataKey="hedge_ratio" stroke="#06B6D4" strokeWidth={2} dot={false} />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Cost Basis Evolution */}
+        <div className="bg-gray-900 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-300 mb-2">
+            Cost Basis (VWAP)
+            {data.summary && (
+              <span className="ml-2 text-xs text-gray-400">
+                Final: ${data.summary.final_combined_cost.toFixed(4)}
+              </span>
+            )}
+          </h3>
+          <ResponsiveContainer width="100%" height={180}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="tradeNum" stroke="#9CA3AF" fontSize={10} />
+              <YAxis domain={[0, 1]} tickFormatter={(v) => `$${v.toFixed(2)}`} stroke="#9CA3AF" fontSize={10} />
+              <Tooltip
+                content={({ payload }) => {
+                  if (!payload || !payload[0]) return null;
+                  const d = payload[0].payload;
+                  return (
+                    <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                      <p className="font-medium">Trade #{d.tradeNum}</p>
+                      <p className="text-green-400">UP: ${d.up_avg_cost?.toFixed(4)}</p>
+                      <p className="text-red-400">DOWN: ${d.down_avg_cost?.toFixed(4)}</p>
+                      <p className="text-cyan-400">Combined: ${d.combined_cost?.toFixed(4)}</p>
+                    </div>
+                  );
+                }}
+              />
+              <ReferenceLine y={1.0} stroke="#6B7280" strokeDasharray="3 3" />
+              <Line type="monotone" dataKey="up_avg_cost" stroke="#10B981" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="down_avg_cost" stroke="#EF4444" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="combined_cost" stroke="#06B6D4" strokeWidth={2} dot={false} />
+            </ComposedChart>
+          </ResponsiveContainer>
+          <div className="flex justify-center gap-4 mt-1 text-xs text-gray-400">
+            <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-green-500"></span> UP</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-red-500"></span> DOWN</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-cyan-500"></span> Combined</span>
+          </div>
         </div>
       </div>
 
-      {/* NEW: P&L Evolution */}
+      {/* P&L Evolution */}
       <div className="bg-gray-900 rounded-lg p-4">
         <h3 className="text-sm font-medium text-gray-300 mb-4">
           P&L Evolution
@@ -500,11 +513,7 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
           <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis dataKey="tradeNum" stroke="#9CA3AF" fontSize={11} />
-            <YAxis
-              stroke="#9CA3AF"
-              fontSize={11}
-              tickFormatter={(v) => `$${v.toFixed(0)}`}
-            />
+            <YAxis stroke="#9CA3AF" fontSize={11} tickFormatter={(v) => `$${v.toFixed(0)}`} />
             <Tooltip
               content={({ payload }) => {
                 if (!payload || !payload[0]) return null;
@@ -522,22 +531,8 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
               }}
             />
             <ReferenceLine y={0} stroke="#6B7280" strokeDasharray="3 3" />
-            <Area
-              type="monotone"
-              dataKey="realized_pnl"
-              stackId="1"
-              stroke="#10B981"
-              fill="#10B981"
-              fillOpacity={0.4}
-            />
-            <Area
-              type="monotone"
-              dataKey="unrealized_pnl"
-              stackId="1"
-              stroke="#F59E0B"
-              fill="#F59E0B"
-              fillOpacity={0.4}
-            />
+            <Area type="monotone" dataKey="realized_pnl" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.4} />
+            <Area type="monotone" dataKey="unrealized_pnl" stackId="1" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.4} />
           </AreaChart>
         </ResponsiveContainer>
         <div className="flex justify-center gap-6 mt-2 text-xs text-gray-200">
@@ -546,12 +541,13 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* NEW: Entry Quality Analysis */}
+      {/* Entry Quality + Position Summary in ONE ROW */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Entry Quality Analysis */}
         {data.entry_quality && (
           <div className="bg-gray-900 rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-300 mb-4">Entry Quality Analysis</h3>
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-2 gap-3 mb-3">
               <div className={`rounded-lg p-3 text-center ${data.entry_quality.avg_entry_edge > 0 ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'}`}>
                 <p className="text-xs text-gray-400">Avg Entry Edge</p>
                 <p className={`text-xl font-bold ${data.entry_quality.avg_entry_edge > 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -579,108 +575,121 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
           </div>
         )}
 
-        {/* NEW: Position Sizing Pattern */}
-        {data.sizing && data.sizing.buy_sizes.length > 0 && (
+        {/* Position Summary */}
+        {data.summary && (
           <div className="bg-gray-900 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-300 mb-4">
-              Position Sizing Pattern
-              <span className={`ml-2 text-xs px-2 py-0.5 rounded ${
-                data.sizing.pattern === 'DCA' ? 'bg-green-900/50 text-green-400' :
-                data.sizing.pattern === 'Variable' ? 'bg-yellow-900/50 text-yellow-400' :
-                'bg-red-900/50 text-red-400'
-              }`}>
-                {data.sizing.pattern}
-              </span>
-            </h3>
-            <ResponsiveContainer width="100%" height={120}>
-              <BarChart
-                data={data.sizing.buy_sizes.map((size, i) => ({ buy: i + 1, shares: size }))}
-                margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
-              >
-                <XAxis dataKey="buy" stroke="#9CA3AF" fontSize={10} />
-                <YAxis stroke="#9CA3AF" fontSize={10} />
-                <Tooltip
-                  content={({ payload }) => {
-                    if (!payload || !payload[0]) return null;
-                    const d = payload[0].payload;
-                    return (
-                      <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                        <p>Buy #{d.buy}: {d.shares?.toFixed(0)} shares</p>
-                      </div>
-                    );
-                  }}
-                />
-                <Bar dataKey="shares" radius={[4, 4, 0, 0]}>
-                  {data.sizing.buy_sizes.map((size, index) => (
-                    <Cell key={index} fill={size === Math.max(...data.sizing.buy_sizes) ? '#F59E0B' : '#6366F1'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <div className="grid grid-cols-4 gap-2 mt-3 text-xs">
-              <div className="bg-gray-800 rounded p-2 text-center">
-                <p className="text-gray-400">Avg Size</p>
-                <p className="text-white font-bold">{data.sizing.avg_size.toFixed(0)}</p>
+            <h3 className="text-sm font-medium text-gray-300 mb-4">Position Summary</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-800 rounded-lg p-3 text-center">
+                <p className="text-xs text-gray-400">UP VWAP</p>
+                <p className="text-lg font-bold text-green-400">${data.summary.final_up_vwap.toFixed(4)}</p>
               </div>
-              <div className="bg-gray-800 rounded p-2 text-center">
-                <p className="text-gray-400">StdDev</p>
-                <p className="text-white font-bold">{data.sizing.stddev.toFixed(0)}</p>
+              <div className="bg-gray-800 rounded-lg p-3 text-center">
+                <p className="text-xs text-gray-400">DOWN VWAP</p>
+                <p className="text-lg font-bold text-red-400">${data.summary.final_down_vwap.toFixed(4)}</p>
               </div>
-              <div className="bg-gray-800 rounded p-2 text-center">
-                <p className="text-gray-400">CV</p>
-                <p className="text-white font-bold">{data.sizing.coefficient_variation.toFixed(2)}</p>
+              <div className={`rounded-lg p-3 text-center ${data.summary.final_combined_cost < 1.0 ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'}`}>
+                <p className="text-xs text-gray-400">Combined Cost</p>
+                <p className={`text-lg font-bold ${data.summary.final_combined_cost < 1.0 ? 'text-green-400' : 'text-red-400'}`}>
+                  ${data.summary.final_combined_cost.toFixed(4)}
+                </p>
               </div>
-              <div className="bg-gray-800 rounded p-2 text-center">
-                <p className="text-gray-400">Largest %</p>
-                <p className="text-yellow-400 font-bold">{data.sizing.largest_pct.toFixed(0)}%</p>
-              </div>
+              {data.summary.final_pnl !== null ? (
+                <div className={`rounded-lg p-3 text-center ${data.summary.final_pnl >= 0 ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'}`}>
+                  <p className="text-xs text-gray-400">Final P&L</p>
+                  <p className={`text-lg font-bold ${data.summary.final_pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    ${data.summary.final_pnl.toFixed(2)}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-gray-800 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-400">Winner</p>
+                  <p className={`text-lg font-bold ${data.summary.winning_outcome === 'Up' ? 'text-green-400' : data.summary.winning_outcome === 'Down' ? 'text-red-400' : 'text-gray-400'}`}>
+                    {data.summary.winning_outcome || 'Pending'}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
 
-      {/* Summary Card */}
-      {data.summary && (
+      {/* Position Sizing Pattern - EXPANDED */}
+      {data.sizing && data.sizing.buy_sizes.length > 0 && (
         <div className="bg-gray-900 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-300 mb-4">Position Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <h3 className="text-sm font-medium text-gray-300 mb-4">
+            Position Sizing Pattern
+            <span className={`ml-2 text-xs px-2 py-0.5 rounded ${
+              data.sizing.pattern === 'DCA' ? 'bg-green-900/50 text-green-400' :
+              data.sizing.pattern === 'Variable' ? 'bg-yellow-900/50 text-yellow-400' :
+              'bg-red-900/50 text-red-400'
+            }`}>
+              {data.sizing.pattern}
+            </span>
+          </h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart
+              data={data.sizing.buy_sizes.map((size, i) => ({
+                buy: i + 1,
+                shares: size,
+                pctOfTotal: (size / data.sizing.buy_sizes.reduce((a, b) => a + b, 0)) * 100,
+              }))}
+              margin={{ top: 10, right: 30, left: 0, bottom: 20 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis
+                dataKey="buy"
+                stroke="#9CA3AF"
+                fontSize={11}
+                label={{ value: 'Buy Order #', position: 'bottom', fill: '#9CA3AF', fontSize: 10 }}
+              />
+              <YAxis stroke="#9CA3AF" fontSize={11} label={{ value: 'Shares', angle: -90, position: 'insideLeft', fill: '#9CA3AF', fontSize: 10 }} />
+              <Tooltip
+                content={({ payload }) => {
+                  if (!payload || !payload[0]) return null;
+                  const d = payload[0].payload;
+                  return (
+                    <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                      <p className="font-medium">Buy #{d.buy}</p>
+                      <p className="text-cyan-400">{d.shares?.toFixed(0)} shares</p>
+                      <p className="text-gray-400">{d.pctOfTotal?.toFixed(1)}% of total</p>
+                    </div>
+                  );
+                }}
+              />
+              <Bar dataKey="shares" radius={[4, 4, 0, 0]}>
+                {data.sizing.buy_sizes.map((size, index) => (
+                  <Cell
+                    key={index}
+                    fill={size === Math.max(...data.sizing.buy_sizes) ? '#F59E0B' : '#6366F1'}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
             <div className="bg-gray-800 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-400">UP VWAP</p>
-              <p className="text-lg font-bold text-green-400">${data.summary.final_up_vwap.toFixed(4)}</p>
+              <p className="text-xs text-gray-400">Avg Size</p>
+              <p className="text-lg font-bold text-white">{data.sizing.avg_size.toFixed(0)}</p>
+              <p className="text-xs text-gray-500">shares/buy</p>
             </div>
             <div className="bg-gray-800 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-400">DOWN VWAP</p>
-              <p className="text-lg font-bold text-red-400">${data.summary.final_down_vwap.toFixed(4)}</p>
-            </div>
-            <div className={`rounded-lg p-3 text-center ${data.summary.final_combined_cost < 1.0 ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'}`}>
-              <p className="text-xs text-gray-400">Combined Cost</p>
-              <p className={`text-lg font-bold ${data.summary.final_combined_cost < 1.0 ? 'text-green-400' : 'text-red-400'}`}>
-                ${data.summary.final_combined_cost.toFixed(4)}
-              </p>
-              <p className="text-xs text-gray-500">
-                {data.summary.final_combined_cost < 1.0 ? `Edge: $${(1.0 - data.summary.final_combined_cost).toFixed(4)}` : 'Overpaying'}
-              </p>
+              <p className="text-xs text-gray-400">StdDev</p>
+              <p className="text-lg font-bold text-white">{data.sizing.stddev.toFixed(0)}</p>
+              <p className="text-xs text-gray-500">variation</p>
             </div>
             <div className="bg-gray-800 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-400">Realized P&L</p>
-              <p className={`text-lg font-bold ${data.summary.total_realized_pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                ${data.summary.total_realized_pnl.toFixed(2)}
+              <p className="text-xs text-gray-400">CV (Coefficient)</p>
+              <p className={`text-lg font-bold ${data.sizing.coefficient_variation < 0.3 ? 'text-green-400' : data.sizing.coefficient_variation < 0.7 ? 'text-yellow-400' : 'text-red-400'}`}>
+                {data.sizing.coefficient_variation.toFixed(3)}
               </p>
+              <p className="text-xs text-gray-500">&lt;0.3 = DCA</p>
             </div>
             <div className="bg-gray-800 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-400">Winner</p>
-              <p className={`text-lg font-bold ${data.summary.winning_outcome === 'Up' ? 'text-green-400' : 'text-red-400'}`}>
-                {data.summary.winning_outcome || '-'}
-              </p>
+              <p className="text-xs text-gray-400">Largest Buy</p>
+              <p className="text-lg font-bold text-yellow-400">{data.sizing.largest_pct.toFixed(1)}%</p>
+              <p className="text-xs text-gray-500">of total volume</p>
             </div>
-            {data.summary.final_pnl !== null && (
-              <div className={`rounded-lg p-3 text-center ${data.summary.final_pnl >= 0 ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'}`}>
-                <p className="text-xs text-gray-400">Final P&L</p>
-                <p className={`text-lg font-bold ${data.summary.final_pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  ${data.summary.final_pnl.toFixed(2)}
-                </p>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -689,9 +698,6 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
       <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-300">
         <p className="font-medium text-gray-300 mb-2">How to Read This:</p>
         <ul className="list-disc list-inside space-y-1">
-          <li><strong>UP Shares (green)</strong>: Net long position in UP outcome</li>
-          <li><strong>DOWN Shares (red)</strong>: Net long position in DOWN outcome</li>
-          <li><strong>Net Position (yellow line)</strong>: UP - DOWN (positive = biased towards UP)</li>
           <li><strong>Hedge Ratio 100%</strong>: Perfectly balanced UP and DOWN positions</li>
           <li><strong>Combined Cost &lt; $1.00</strong>: Profit potential (arbitrage edge)</li>
           <li><strong>Entry Edge</strong>: How much better trades executed vs mid-market price</li>
