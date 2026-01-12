@@ -7,8 +7,9 @@ import { PositionsPanel } from './components/PositionsPanel';
 import { PricesPanel } from './components/PricesPanel';
 import { TopTradersPanel } from './components/TopTradersPanel';
 import { AnalyticsPage } from './components/analytics/AnalyticsPage';
+import { DeepAnalysisPage } from './components/deep-analysis';
 
-type TabType = 'trades' | 'positions' | 'prices' | 'traders' | 'analytics';
+type TabType = 'trades' | 'positions' | 'prices' | 'traders' | 'analytics' | 'deep-analysis';
 
 function LoadingOverlay() {
   const { state } = useTracker();
@@ -93,6 +94,16 @@ function Dashboard() {
             >
               Analytics
             </button>
+            <button
+              onClick={() => setActiveTab('deep-analysis')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'deep-analysis'
+                  ? 'bg-cyan-600 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              Deep Analysis
+            </button>
           </div>
 
           {/* Tab Content */}
@@ -101,6 +112,7 @@ function Dashboard() {
           {activeTab === 'prices' && <PricesPanel />}
           {activeTab === 'traders' && <TopTradersPanel />}
           {activeTab === 'analytics' && <AnalyticsPage />}
+          {activeTab === 'deep-analysis' && <DeepAnalysisPage />}
         </main>
       </div>
     </div>

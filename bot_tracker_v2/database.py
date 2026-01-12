@@ -1044,3 +1044,591 @@ class Database:
             "markets_analyzed": len(combined_costs),
             "order_placement_analysis": combined_costs[:20]  # Top 20 for reference
         }
+
+    # =========================================================================
+    # DEEP ANALYSIS
+    # =========================================================================
+
+    def get_resolved_markets_list(self) -> List[Dict]:
+        """Get list of resolved markets for the market selector dropdown."""
+        with self._get_conn() as conn:
+            rows = conn.execute("""
+                SELECT
+                    m.slug,
+                    m.question,
+                    m.end_time,
+                    m.winning_outcome,
+                    COUNT(t.id) as trade_count
+                FROM markets m
+                LEFT JOIN trades t ON m.slug = t.market_slug
+                WHERE m.resolved = 1 AND m.winning_outcome IS NOT NULL
+                GROUP BY m.slug
+                HAVING trade_count > 0
+                ORDER BY m.end_time DESC
+            """).fetchall()
+
+        return [{
+            "slug": r["slug"],
+            "question": r["question"] or "",
+            "end_time": datetime.utcfromtimestamp(r["end_time"]).isoformat() + "Z" if r["end_time"] else None,
+            "winner": r["winning_outcome"].lower() if r["winning_outcome"] else None,
+            "trade_count": r["trade_count"]
+        } for r in rows]
+
+    def get_trade_execution_quality(self, market_slug: Optional[str] = None) -> Dict:
+        """Match each trade with closest price snapshot, calculate execution quality score."""
+        market_filter = "AND t.market_slug = ?" if market_slug else ""
+        params = (market_slug,) if market_slug else ()
+
+        with self._get_conn() as conn:
+            # Get all trades
+            trades_rows = conn.execute(f"""
+                SELECT
+                    t.id,
+                    t.timestamp,
+                    t.market_slug,
+                    t.outcome,
+                    t.side,
+                    t.role,
+                    t.price as trade_price,
+                    t.shares,
+                    t.usdc
+                FROM trades t
+                JOIN markets m ON t.market_slug = m.slug
+                WHERE m.resolved = 1
+                {market_filter}
+                ORDER BY t.timestamp
+            """, params).fetchall()
+
+            # Get price snapshots
+            prices_rows = conn.execute("""
+                SELECT timestamp, market_slug, outcome, price, best_bid, best_ask
+                FROM prices
+                ORDER BY timestamp
+            """).fetchall()
+
+        if not trades_rows:
+            return {
+                "trades": [],
+                "summary": {
+                    "total_trades": 0,
+                    "matched_trades": 0,
+                    "avg_execution_score": 0,
+                    "pct_at_bid": 0,
+                    "pct_at_ask": 0,
+                    "pct_mid": 0,
+                    "maker_avg_score": 0,
+                    "taker_avg_score": 0
+                },
+                "distribution": []
+            }
+
+        # Build price index
+        price_index = {}
+        for row in prices_rows:
+            r = dict(row)
+            key = (r["market_slug"], r["outcome"])
+            if key not in price_index:
+                price_index[key] = []
+            price_index[key].append({
+                "timestamp": r["timestamp"],
+                "price": r["price"],
+                "best_bid": r["best_bid"],
+                "best_ask": r["best_ask"]
+            })
+
+        # Analyze each trade
+        matched_trades = []
+        scores = []
+        maker_scores = []
+        taker_scores = []
+        at_bid = 0
+        at_ask = 0
+        mid_range = 0
+
+        for trade_row in trades_rows:
+            t = dict(trade_row)
+            key = (t["market_slug"], t["outcome"])
+
+            trade_data = {
+                "id": t["id"],
+                "timestamp": t["timestamp"],
+                "market_slug": t["market_slug"],
+                "outcome": t["outcome"],
+                "side": t["side"],
+                "role": t["role"],
+                "trade_price": t["trade_price"],
+                "shares": t["shares"],
+                "market_bid": None,
+                "market_ask": None,
+                "market_mid": None,
+                "execution_score": None
+            }
+
+            if key in price_index:
+                price_snapshots = price_index[key]
+                closest = min(price_snapshots, key=lambda p: abs(p["timestamp"] - t["timestamp"]))
+
+                if abs(closest["timestamp"] - t["timestamp"]) <= 60:
+                    best_bid = closest["best_bid"]
+                    best_ask = closest["best_ask"]
+                    spread = best_ask - best_bid
+
+                    trade_data["market_bid"] = best_bid
+                    trade_data["market_ask"] = best_ask
+                    trade_data["market_mid"] = (best_bid + best_ask) / 2
+
+                    # Execution score: 0 = at bid, 1 = at ask
+                    if spread > 0:
+                        score = (t["trade_price"] - best_bid) / spread
+                        score = max(0, min(1, score))  # Clamp to 0-1
+                    else:
+                        score = 0.5
+
+                    trade_data["execution_score"] = round(score, 4)
+                    scores.append(score)
+
+                    if t["role"] == "maker":
+                        maker_scores.append(score)
+                    else:
+                        taker_scores.append(score)
+
+                    # Categorize
+                    if score <= 0.1:
+                        at_bid += 1
+                    elif score >= 0.9:
+                        at_ask += 1
+                    else:
+                        mid_range += 1
+
+            matched_trades.append(trade_data)
+
+        # Create distribution histogram (10 buckets from 0 to 1)
+        distribution = []
+        for i in range(10):
+            bucket_start = i / 10
+            bucket_end = (i + 1) / 10
+            count = len([s for s in scores if bucket_start <= s < bucket_end])
+            distribution.append({
+                "bucket": f"{bucket_start:.1f}-{bucket_end:.1f}",
+                "start": bucket_start,
+                "end": bucket_end,
+                "count": count
+            })
+
+        matched_count = len(scores)
+        return {
+            "trades": matched_trades,
+            "summary": {
+                "total_trades": len(trades_rows),
+                "matched_trades": matched_count,
+                "avg_execution_score": round(sum(scores) / matched_count, 4) if matched_count else 0,
+                "pct_at_bid": round(at_bid / matched_count * 100, 1) if matched_count else 0,
+                "pct_at_ask": round(at_ask / matched_count * 100, 1) if matched_count else 0,
+                "pct_mid": round(mid_range / matched_count * 100, 1) if matched_count else 0,
+                "maker_avg_score": round(sum(maker_scores) / len(maker_scores), 4) if maker_scores else 0,
+                "taker_avg_score": round(sum(taker_scores) / len(taker_scores), 4) if taker_scores else 0
+            },
+            "distribution": distribution
+        }
+
+    def get_market_price_trade_overlay(self, market_slug: str) -> Dict:
+        """Get price evolution and trade markers for a specific market."""
+        with self._get_conn() as conn:
+            # Get market info
+            market = conn.execute(
+                "SELECT * FROM markets WHERE slug = ?", (market_slug,)
+            ).fetchone()
+
+            if not market:
+                return {"prices": [], "trades": [], "market": None}
+
+            market_dict = dict(market)
+
+            # Get price snapshots for this market
+            prices_rows = conn.execute("""
+                SELECT timestamp, outcome, price, best_bid, best_ask
+                FROM prices
+                WHERE market_slug = ?
+                ORDER BY timestamp ASC
+            """, (market_slug,)).fetchall()
+
+            # Get trades for this market
+            trades_rows = conn.execute("""
+                SELECT id, timestamp, side, outcome, role, shares, price, usdc
+                FROM trades
+                WHERE market_slug = ?
+                ORDER BY timestamp ASC
+            """, (market_slug,)).fetchall()
+
+        # Convert prices to timeline format (combine UP and DOWN at each timestamp)
+        price_timeline = {}
+        for row in prices_rows:
+            r = dict(row)
+            ts = r["timestamp"]
+            if ts not in price_timeline:
+                price_timeline[ts] = {
+                    "timestamp": ts,
+                    "timestamp_iso": datetime.utcfromtimestamp(ts).isoformat() + "Z",
+                    "up_price": None, "up_bid": None, "up_ask": None,
+                    "down_price": None, "down_bid": None, "down_ask": None
+                }
+            if r["outcome"] == "Up":
+                price_timeline[ts]["up_price"] = r["price"]
+                price_timeline[ts]["up_bid"] = r["best_bid"]
+                price_timeline[ts]["up_ask"] = r["best_ask"]
+            else:
+                price_timeline[ts]["down_price"] = r["price"]
+                price_timeline[ts]["down_bid"] = r["best_bid"]
+                price_timeline[ts]["down_ask"] = r["best_ask"]
+
+        prices = sorted(price_timeline.values(), key=lambda x: x["timestamp"])
+
+        # Convert trades
+        trades = [{
+            "id": r["id"],
+            "timestamp": r["timestamp"],
+            "timestamp_iso": datetime.utcfromtimestamp(r["timestamp"]).isoformat() + "Z",
+            "side": r["side"],
+            "outcome": r["outcome"],
+            "role": r["role"],
+            "shares": r["shares"],
+            "price": r["price"],
+            "usdc": r["usdc"]
+        } for r in trades_rows]
+
+        return {
+            "prices": prices,
+            "trades": trades,
+            "market": {
+                "slug": market_dict["slug"],
+                "question": market_dict["question"] or "",
+                "start_time": market_dict["start_time"],
+                "end_time": market_dict["end_time"],
+                "winning_outcome": market_dict["winning_outcome"]
+            }
+        }
+
+    def get_position_evolution(self, market_slug: str) -> List[Dict]:
+        """Get position building over time for a market."""
+        with self._get_conn() as conn:
+            rows = conn.execute("""
+                SELECT id, timestamp, side, outcome, shares, price, usdc
+                FROM trades
+                WHERE market_slug = ?
+                ORDER BY timestamp ASC
+            """, (market_slug,)).fetchall()
+
+        evolution = []
+        up_shares = 0
+        down_shares = 0
+        total_cost = 0
+        total_revenue = 0
+
+        for row in rows:
+            r = dict(row)
+
+            if r["side"] == "BUY":
+                if r["outcome"] == "Up":
+                    up_shares += r["shares"]
+                else:
+                    down_shares += r["shares"]
+                total_cost += r["usdc"]
+            else:
+                if r["outcome"] == "Up":
+                    up_shares -= r["shares"]
+                else:
+                    down_shares -= r["shares"]
+                total_revenue += r["usdc"]
+
+            # Calculate hedge ratio
+            if up_shares > 0 and down_shares > 0:
+                hedge_ratio = min(up_shares, down_shares) / max(up_shares, down_shares)
+            elif up_shares > 0 or down_shares > 0:
+                hedge_ratio = 0
+            else:
+                hedge_ratio = 1.0
+
+            evolution.append({
+                "timestamp": r["timestamp"],
+                "timestamp_iso": datetime.utcfromtimestamp(r["timestamp"]).isoformat() + "Z",
+                "up_shares": round(max(0, up_shares), 2),
+                "down_shares": round(max(0, down_shares), 2),
+                "net_position": round(up_shares - down_shares, 2),
+                "hedge_ratio": round(hedge_ratio * 100, 1),
+                "total_cost": round(total_cost, 2),
+                "total_revenue": round(total_revenue, 2)
+            })
+
+        return evolution
+
+    def get_trading_intensity_patterns(self) -> Dict:
+        """Analyze when trades occur within markets (relative timing)."""
+        with self._get_conn() as conn:
+            rows = conn.execute("""
+                SELECT
+                    t.timestamp as trade_ts,
+                    t.market_slug,
+                    t.shares,
+                    t.usdc,
+                    m.start_time,
+                    m.end_time,
+                    m.winning_outcome
+                FROM trades t
+                JOIN markets m ON t.market_slug = m.slug
+                WHERE m.resolved = 1 AND m.start_time IS NOT NULL AND m.end_time IS NOT NULL
+            """).fetchall()
+
+        if not rows:
+            return {
+                "by_minute": [],
+                "by_phase": {"early": 0, "middle": 0, "late": 0},
+                "total_trades": 0
+            }
+
+        # Group trades by minute within market (0-15 for 15-min markets)
+        minute_counts = {}
+        phase_counts = {"early": 0, "middle": 0, "late": 0}
+
+        for row in rows:
+            r = dict(row)
+            market_duration = r["end_time"] - r["start_time"]
+            if market_duration <= 0:
+                continue
+
+            time_into_market = r["trade_ts"] - r["start_time"]
+            minute = int(time_into_market / 60)
+            minute = max(0, min(14, minute))  # Clamp to 0-14
+
+            if minute not in minute_counts:
+                minute_counts[minute] = {"count": 0, "volume": 0}
+            minute_counts[minute]["count"] += 1
+            minute_counts[minute]["volume"] += r["usdc"]
+
+            # Phase analysis
+            pct_into_market = time_into_market / market_duration
+            if pct_into_market < 0.33:
+                phase_counts["early"] += 1
+            elif pct_into_market < 0.67:
+                phase_counts["middle"] += 1
+            else:
+                phase_counts["late"] += 1
+
+        # Build minute breakdown
+        by_minute = []
+        for minute in range(15):
+            data = minute_counts.get(minute, {"count": 0, "volume": 0})
+            by_minute.append({
+                "minute": minute,
+                "trade_count": data["count"],
+                "volume": round(data["volume"], 2)
+            })
+
+        return {
+            "by_minute": by_minute,
+            "by_phase": phase_counts,
+            "total_trades": len(rows)
+        }
+
+    def get_loss_pattern_analysis(self) -> Dict:
+        """Compare winning vs losing markets across multiple dimensions."""
+        markets = self.get_markets_analytics()
+
+        if not markets:
+            return {
+                "winners": {"count": 0, "metrics": {}},
+                "losers": {"count": 0, "metrics": {}},
+                "comparison": []
+            }
+
+        winners = [m for m in markets if m["pnl"] > 0]
+        losers = [m for m in markets if m["pnl"] < 0]
+
+        def calc_metrics(market_list: List[Dict]) -> Dict:
+            if not market_list:
+                return {
+                    "avg_hedge_ratio": 0,
+                    "avg_maker_ratio": 0,
+                    "avg_combined_price": 0,
+                    "avg_trades": 0,
+                    "avg_volume": 0,
+                    "avg_edge": 0,
+                    "pct_correct_bias": 0,
+                    "pct_balanced": 0,
+                    "avg_pnl": 0
+                }
+
+            n = len(market_list)
+            return {
+                "avg_hedge_ratio": round(sum(m["hedge_ratio"] for m in market_list) / n, 1),
+                "avg_maker_ratio": round(sum(m["maker_ratio"] for m in market_list) / n, 1),
+                "avg_combined_price": round(sum(m["combined_price"] for m in market_list) / n, 4),
+                "avg_trades": round(sum(m["trades"] for m in market_list) / n, 1),
+                "avg_volume": round(sum(m["volume"] for m in market_list) / n, 2),
+                "avg_edge": round(sum(m["edge"] for m in market_list) / n, 2),
+                "pct_correct_bias": round(len([m for m in market_list if m["correct_bias"]]) / n * 100, 1),
+                "pct_balanced": round(len([m for m in market_list if m["net_bias"] == "BALANCED"]) / n * 100, 1),
+                "avg_pnl": round(sum(m["pnl"] for m in market_list) / n, 2)
+            }
+
+        winner_metrics = calc_metrics(winners)
+        loser_metrics = calc_metrics(losers)
+
+        # Build comparison table
+        metrics = ["avg_hedge_ratio", "avg_maker_ratio", "avg_combined_price", "avg_trades",
+                   "avg_volume", "avg_edge", "pct_correct_bias", "pct_balanced"]
+        comparison = []
+        for metric in metrics:
+            w_val = winner_metrics[metric]
+            l_val = loser_metrics[metric]
+            diff = w_val - l_val if isinstance(w_val, (int, float)) and isinstance(l_val, (int, float)) else None
+            comparison.append({
+                "metric": metric,
+                "winners": w_val,
+                "losers": l_val,
+                "difference": round(diff, 2) if diff is not None else None
+            })
+
+        # Box plot data - distributions for key metrics
+        def get_distribution(market_list: List[Dict], key: str) -> Dict:
+            values = [m[key] for m in market_list if m[key] is not None]
+            if not values:
+                return {"min": 0, "q1": 0, "median": 0, "q3": 0, "max": 0}
+            values.sort()
+            n = len(values)
+            return {
+                "min": round(values[0], 2),
+                "q1": round(values[n // 4], 2),
+                "median": round(values[n // 2], 2),
+                "q3": round(values[3 * n // 4], 2),
+                "max": round(values[-1], 2)
+            }
+
+        distributions = {}
+        for key in ["hedge_ratio", "maker_ratio", "combined_price", "edge"]:
+            distributions[key] = {
+                "winners": get_distribution(winners, key),
+                "losers": get_distribution(losers, key)
+            }
+
+        return {
+            "winners": {"count": len(winners), "metrics": winner_metrics},
+            "losers": {"count": len(losers), "metrics": loser_metrics},
+            "comparison": comparison,
+            "distributions": distributions,
+            "all_markets": markets  # For detailed analysis
+        }
+
+    def get_risk_metrics(self) -> Dict:
+        """Calculate risk-adjusted performance metrics."""
+        markets = self.get_markets_analytics()
+
+        if not markets:
+            return {
+                "sharpe": 0,
+                "max_drawdown": 0,
+                "calmar": 0,
+                "var_5pct": 0,
+                "win_streak": 0,
+                "loss_streak": 0,
+                "current_streak": 0,
+                "win_rate": 0,
+                "win_rate_ci_low": 0,
+                "win_rate_ci_high": 0,
+                "total_pnl": 0,
+                "total_markets": 0,
+                "pnl_std": 0,
+                "mean_pnl": 0
+            }
+
+        pnls = [m["pnl"] for m in markets]
+        n = len(pnls)
+
+        # Basic stats
+        total_pnl = sum(pnls)
+        mean_pnl = total_pnl / n
+        variance = sum((p - mean_pnl) ** 2 for p in pnls) / n
+        std_pnl = variance ** 0.5 if variance > 0 else 0
+
+        # Sharpe-like ratio (mean / std)
+        sharpe = mean_pnl / std_pnl if std_pnl > 0 else 0
+
+        # Calculate cumulative P&L for drawdown
+        cumulative = []
+        running = 0
+        for pnl in pnls:
+            running += pnl
+            cumulative.append(running)
+
+        # Max drawdown
+        peak = cumulative[0]
+        max_drawdown = 0
+        for val in cumulative:
+            if val > peak:
+                peak = val
+            drawdown = peak - val
+            if drawdown > max_drawdown:
+                max_drawdown = drawdown
+
+        # Calmar ratio (total P&L / max drawdown)
+        calmar = total_pnl / max_drawdown if max_drawdown > 0 else float('inf') if total_pnl > 0 else 0
+
+        # VaR 5% (5th percentile P&L)
+        sorted_pnls = sorted(pnls)
+        var_idx = int(n * 0.05)
+        var_5pct = sorted_pnls[var_idx] if var_idx < n else sorted_pnls[0]
+
+        # Streaks
+        win_streak = 0
+        loss_streak = 0
+        current_streak = 0
+        current_type = None
+        max_win_streak = 0
+        max_loss_streak = 0
+
+        for pnl in pnls:
+            if pnl > 0:
+                if current_type == "win":
+                    current_streak += 1
+                else:
+                    current_streak = 1
+                    current_type = "win"
+                max_win_streak = max(max_win_streak, current_streak)
+            else:
+                if current_type == "loss":
+                    current_streak += 1
+                else:
+                    current_streak = 1
+                    current_type = "loss"
+                max_loss_streak = max(max_loss_streak, current_streak)
+
+        # Win rate with 95% confidence interval (binomial)
+        wins = len([p for p in pnls if p > 0])
+        win_rate = wins / n if n > 0 else 0
+
+        # Wilson score interval for binomial proportion
+        z = 1.96  # 95% CI
+        denominator = 1 + z * z / n
+        center = (win_rate + z * z / (2 * n)) / denominator
+        spread = z * ((win_rate * (1 - win_rate) + z * z / (4 * n)) / n) ** 0.5 / denominator
+
+        win_rate_ci_low = max(0, center - spread)
+        win_rate_ci_high = min(1, center + spread)
+
+        return {
+            "sharpe": round(sharpe, 3),
+            "max_drawdown": round(max_drawdown, 2),
+            "calmar": round(calmar, 2) if calmar != float('inf') else 999,
+            "var_5pct": round(var_5pct, 2),
+            "win_streak": max_win_streak,
+            "loss_streak": max_loss_streak,
+            "current_streak": current_streak,
+            "current_streak_type": current_type,
+            "win_rate": round(win_rate * 100, 1),
+            "win_rate_ci_low": round(win_rate_ci_low * 100, 1),
+            "win_rate_ci_high": round(win_rate_ci_high * 100, 1),
+            "total_pnl": round(total_pnl, 2),
+            "total_markets": n,
+            "pnl_std": round(std_pnl, 2),
+            "mean_pnl": round(mean_pnl, 2)
+        }

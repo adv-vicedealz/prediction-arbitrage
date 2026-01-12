@@ -365,6 +365,82 @@ def get_price_execution(wallet: Optional[str] = None):
 
 
 # =============================================================================
+# DEEP ANALYSIS ENDPOINTS
+# =============================================================================
+
+@app.get("/api/deep-analysis/markets")
+def get_deep_analysis_markets():
+    """Get list of resolved markets for the market selector."""
+    if not db:
+        return []
+    return db.get_resolved_markets_list()
+
+
+@app.get("/api/deep-analysis/execution-quality")
+def get_execution_quality(market: Optional[str] = None):
+    """Get trade execution quality analysis with scatter plot data."""
+    if not db:
+        return {
+            "trades": [],
+            "summary": {
+                "total_trades": 0, "matched_trades": 0, "avg_execution_score": 0,
+                "pct_at_bid": 0, "pct_at_ask": 0, "pct_mid": 0,
+                "maker_avg_score": 0, "taker_avg_score": 0
+            },
+            "distribution": []
+        }
+    return db.get_trade_execution_quality(market)
+
+
+@app.get("/api/deep-analysis/market/{slug:path}/overlay")
+def get_market_overlay(slug: str):
+    """Get price evolution and trade markers for a specific market."""
+    if not db:
+        return {"prices": [], "trades": [], "market": None}
+    return db.get_market_price_trade_overlay(slug)
+
+
+@app.get("/api/deep-analysis/market/{slug:path}/position-evolution")
+def get_market_position_evolution(slug: str):
+    """Get position building over time for a market."""
+    if not db:
+        return []
+    return db.get_position_evolution(slug)
+
+
+@app.get("/api/deep-analysis/intensity-patterns")
+def get_intensity_patterns():
+    """Get trading intensity patterns by minute and phase."""
+    if not db:
+        return {"by_minute": [], "by_phase": {"early": 0, "middle": 0, "late": 0}, "total_trades": 0}
+    return db.get_trading_intensity_patterns()
+
+
+@app.get("/api/deep-analysis/loss-patterns")
+def get_loss_patterns():
+    """Compare winning vs losing markets across multiple dimensions."""
+    if not db:
+        return {
+            "winners": {"count": 0, "metrics": {}},
+            "losers": {"count": 0, "metrics": {}},
+            "comparison": []
+        }
+    return db.get_loss_pattern_analysis()
+
+
+@app.get("/api/deep-analysis/risk-metrics")
+def get_risk_metrics():
+    """Get statistical risk metrics (Sharpe, drawdown, VaR, streaks)."""
+    if not db:
+        return {
+            "sharpe": 0, "max_drawdown": 0, "calmar": 0, "var_5pct": 0,
+            "win_streak": 0, "loss_streak": 0, "win_rate": 0,
+            "win_rate_ci_low": 0, "win_rate_ci_high": 0, "total_pnl": 0, "total_markets": 0
+        }
+    return db.get_risk_metrics()
+
+
+# =============================================================================
 # DEBUG/ADMIN ENDPOINTS
 # =============================================================================
 

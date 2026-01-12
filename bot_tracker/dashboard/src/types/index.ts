@@ -222,3 +222,173 @@ export interface AnalyticsState {
   pnlTimeline: PnLTimelinePoint[];
   isLoading: boolean;
 }
+
+// Deep Analysis Types
+export interface DeepAnalysisMarket {
+  slug: string;
+  question: string;
+  end_time: string | null;
+  winner: 'up' | 'down' | null;
+  trade_count: number;
+}
+
+export interface ExecutionQualityTrade {
+  id: string;
+  timestamp: number;
+  market_slug: string;
+  outcome: 'Up' | 'Down';
+  side: 'BUY' | 'SELL';
+  role: 'maker' | 'taker';
+  trade_price: number;
+  shares: number;
+  market_bid: number | null;
+  market_ask: number | null;
+  market_mid: number | null;
+  execution_score: number | null;
+}
+
+export interface ExecutionQualitySummary {
+  total_trades: number;
+  matched_trades: number;
+  avg_execution_score: number;
+  pct_at_bid: number;
+  pct_at_ask: number;
+  pct_mid: number;
+  maker_avg_score: number;
+  taker_avg_score: number;
+}
+
+export interface ExecutionDistributionBucket {
+  bucket: string;
+  start: number;
+  end: number;
+  count: number;
+}
+
+export interface ExecutionQualityData {
+  trades: ExecutionQualityTrade[];
+  summary: ExecutionQualitySummary;
+  distribution: ExecutionDistributionBucket[];
+}
+
+export interface PriceTimelinePoint {
+  timestamp: number;
+  timestamp_iso: string;
+  up_price: number | null;
+  up_bid: number | null;
+  up_ask: number | null;
+  down_price: number | null;
+  down_bid: number | null;
+  down_ask: number | null;
+}
+
+export interface OverlayTrade {
+  id: string;
+  timestamp: number;
+  timestamp_iso: string;
+  side: 'BUY' | 'SELL';
+  outcome: 'Up' | 'Down';
+  role: 'maker' | 'taker';
+  shares: number;
+  price: number;
+  usdc: number;
+}
+
+export interface MarketOverlayData {
+  prices: PriceTimelinePoint[];
+  trades: OverlayTrade[];
+  market: {
+    slug: string;
+    question: string;
+    start_time: number;
+    end_time: number;
+    winning_outcome: string | null;
+  } | null;
+}
+
+export interface PositionEvolutionPoint {
+  timestamp: number;
+  timestamp_iso: string;
+  up_shares: number;
+  down_shares: number;
+  net_position: number;
+  hedge_ratio: number;
+  total_cost: number;
+  total_revenue: number;
+}
+
+export interface TradingIntensityMinute {
+  minute: number;
+  trade_count: number;
+  volume: number;
+}
+
+export interface TradingIntensityData {
+  by_minute: TradingIntensityMinute[];
+  by_phase: {
+    early: number;
+    middle: number;
+    late: number;
+  };
+  total_trades: number;
+}
+
+export interface LossPatternMetrics {
+  avg_hedge_ratio: number;
+  avg_maker_ratio: number;
+  avg_combined_price: number;
+  avg_trades: number;
+  avg_volume: number;
+  avg_edge: number;
+  pct_correct_bias: number;
+  pct_balanced: number;
+  avg_pnl: number;
+}
+
+export interface LossPatternComparison {
+  metric: string;
+  winners: number;
+  losers: number;
+  difference: number | null;
+}
+
+export interface BoxPlotData {
+  min: number;
+  q1: number;
+  median: number;
+  q3: number;
+  max: number;
+}
+
+export interface LossPatternDistributions {
+  hedge_ratio: { winners: BoxPlotData; losers: BoxPlotData };
+  maker_ratio: { winners: BoxPlotData; losers: BoxPlotData };
+  combined_price: { winners: BoxPlotData; losers: BoxPlotData };
+  edge: { winners: BoxPlotData; losers: BoxPlotData };
+}
+
+export interface LossPatternData {
+  winners: { count: number; metrics: LossPatternMetrics };
+  losers: { count: number; metrics: LossPatternMetrics };
+  comparison: LossPatternComparison[];
+  distributions: LossPatternDistributions;
+  all_markets: MarketAnalytics[];
+}
+
+export interface RiskMetrics {
+  sharpe: number;
+  max_drawdown: number;
+  calmar: number;
+  var_5pct: number;
+  win_streak: number;
+  loss_streak: number;
+  current_streak: number;
+  current_streak_type: 'win' | 'loss' | null;
+  win_rate: number;
+  win_rate_ci_low: number;
+  win_rate_ci_high: number;
+  total_pnl: number;
+  total_markets: number;
+  pnl_std: number;
+  mean_pnl: number;
+}
