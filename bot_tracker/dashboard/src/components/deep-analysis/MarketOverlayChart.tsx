@@ -8,11 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   Area,
-  AreaChart,
   ReferenceLine,
-  LineChart,
   Bar,
-  BarChart,
 } from 'recharts';
 import type { MarketOverlayData } from '../../types';
 
@@ -61,13 +58,14 @@ export function MarketOverlayChart({ marketSlug }: Props) {
   }
 
   const startTime = data.market.start_time;
-  const endTime = data.market.end_time;
 
-  // Use downsampled prices for cleaner charts
-  const priceData = (data.prices_downsampled || data.prices).map((p) => ({
-    ...p,
-    minuteIntoMarket: (p.timestamp - startTime) / 60,
-  }));
+  // Use downsampled prices, filter to 0-15 minutes only
+  const priceData = (data.prices_downsampled || data.prices)
+    .map((p) => ({
+      ...p,
+      minuteIntoMarket: (p.timestamp - startTime) / 60,
+    }))
+    .filter((p) => p.minuteIntoMarket >= 0 && p.minuteIntoMarket <= 15);
 
   // Calculate trade stats from raw trades
   const buyUpTrades = data.trades.filter((t) => t.side === 'BUY' && t.outcome === 'Up');
@@ -80,13 +78,54 @@ export function MarketOverlayChart({ marketSlug }: Props) {
   const totalUpSells = sellUpTrades.reduce((sum, t) => sum + t.shares, 0);
   const totalDownSells = sellDownTrades.reduce((sum, t) => sum + t.shares, 0);
 
-  // Format volume bars with net values (buy positive, sell negative)
-  const volumeData = (data.trade_volume_by_minute || []).map((v) => ({
-    ...v,
-    up_buy: v.buy_up_usdc,
-    up_sell: -v.sell_up_usdc,
-    down_buy: v.buy_down_usdc,
-    down_sell: -v.sell_down_usdc,
+  // Format volume bars - filter to 0-14 minutes
+  const volumeData = (data.trade_volume_by_minute || [])
+    .filter((v) => v.minute >= 0 && v.minute <= 14)
+    .map((v) => ({
+      ...v,
+      up_net: v.buy_up_usdc - v.sell_up_usdc,
+      down_net: v.buy_down_usdc - v.sell_down_usdc,
+    }));
+
+  // Merge price data with volume data for combined charts
+  // Group prices by minute for alignment with volume
+  const priceByMinute: Record<number, { up_price: number | null; down_price: number | null; up_bid: number | null; up_ask: number | null; down_bid: number | null; down_ask: number | null }> = {};
+  priceData.forEach((p) => {
+    const minute = Math.floor(p.minuteIntoMarket);
+    if (minute >= 0 && minute <= 14) {
+      if (!priceByMinute[minute]) {
+        priceByMinute[minute] = { up_price: null, down_price: null, up_bid: null, up_ask: null, down_bid: null, down_ask: null };
+      }
+      // Use last price in each minute
+      if (p.up_price !== null) priceByMinute[minute].up_price = p.up_price;
+      if (p.down_price !== null) priceByMinute[minute].down_price = p.down_price;
+      if (p.up_bid !== null) priceByMinute[minute].up_bid = p.up_bid;
+      if (p.up_ask !== null) priceByMinute[minute].up_ask = p.up_ask;
+      if (p.down_bid !== null) priceByMinute[minute].down_bid = p.down_bid;
+      if (p.down_ask !== null) priceByMinute[minute].down_ask = p.down_ask;
+    }
+  });
+
+  // Create combined data for UP price + UP volume chart
+  const upPriceVolumeData = volumeData.map((v) => ({
+    minute: v.minute,
+    up_price: priceByMinute[v.minute]?.up_price,
+    up_bid: priceByMinute[v.minute]?.up_bid,
+    up_ask: priceByMinute[v.minute]?.up_ask,
+    buy_volume: v.buy_up_usdc,
+    sell_volume: -v.sell_up_usdc,
+    net_volume: v.up_net,
+  }));
+
+  // Create combined data for DOWN price + DOWN volume chart
+  const downPriceVolumeData = volumeData.map((v) => ({
+    minute: v.minute,
+    down_price: priceByMinute[v.minute]?.down_price,
+    down_bid: priceByMinute[v.minute]?.down_bid,
+    down_ask: priceByMinute[v.minute]?.down_ask,
+    buy_volume: v.buy_down_usdc,
+    sell_volume: -v.sell_down_usdc,
+    net_volume: v.down_net,
   }));
 
   return (
@@ -105,7 +144,7 @@ export function MarketOverlayChart({ marketSlug }: Props) {
             </p>
           </div>
           <div className="text-right text-xs text-gray-400">
-            <p>{priceData.length} price points (5s intervals)</p>
+            <p>{priceData.length} price points (0-15m)</p>
             <p>{data.trades.length} trades</p>
           </div>
         </div>
@@ -135,22 +174,23 @@ export function MarketOverlayChart({ marketSlug }: Props) {
         </div>
       </div>
 
-      {/* UP Price Chart with Spread Band */}
+      {/* Combined UP + DOWN Price Chart */}
       <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">UP Price with Bid-Ask Spread</h3>
-        <ResponsiveContainer width="100%" height={250}>
+        <h3 className="text-sm font-medium text-gray-300 mb-4">UP & DOWN Prices (0-15 minutes)</h3>
+        <ResponsiveContainer width="100%" height={300}>
           <ComposedChart data={priceData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis
               dataKey="minuteIntoMarket"
               type="number"
-              domain={[0, (endTime - startTime) / 60]}
+              domain={[0, 15]}
               tickFormatter={(v) => `${Math.floor(v)}m`}
               stroke="#9CA3AF"
               fontSize={11}
+              label={{ value: 'Minutes', position: 'bottom', fill: '#9CA3AF', fontSize: 10 }}
             />
             <YAxis
-              domain={['auto', 'auto']}
+              domain={[0, 1]}
               tickFormatter={(v) => v.toFixed(2)}
               stroke="#9CA3AF"
               fontSize={11}
@@ -161,25 +201,104 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 const d = payload[0].payload;
                 return (
                   <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p>Time: {d.minuteIntoMarket?.toFixed(1)}m</p>
-                    <p className="text-green-400">Mid: {d.up_price?.toFixed(4)}</p>
-                    <p className="text-gray-400">Bid: {d.up_bid?.toFixed(4)}</p>
-                    <p className="text-gray-400">Ask: {d.up_ask?.toFixed(4)}</p>
-                    <p className="text-cyan-400">Spread: {((d.up_ask - d.up_bid) * 100).toFixed(2)}¢</p>
+                    <p className="font-medium">Time: {d.minuteIntoMarket?.toFixed(1)}m</p>
+                    <p className="text-green-400">UP: {d.up_price?.toFixed(4)}</p>
+                    <p className="text-red-400">DOWN: {d.down_price?.toFixed(4)}</p>
+                    {d.up_price && d.down_price && (
+                      <p className="text-cyan-400">Combined: {(d.up_price + d.down_price).toFixed(4)}</p>
+                    )}
                   </div>
                 );
               }}
             />
-            {/* Spread band as area between bid and ask */}
+            <ReferenceLine y={0.5} stroke="#6B7280" strokeDasharray="3 3" />
+            <Line
+              type="monotone"
+              dataKey="up_price"
+              stroke="#10B981"
+              strokeWidth={2}
+              dot={false}
+              connectNulls
+              name="UP"
+            />
+            <Line
+              type="monotone"
+              dataKey="down_price"
+              stroke="#EF4444"
+              strokeWidth={2}
+              dot={false}
+              connectNulls
+              name="DOWN"
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+        <div className="flex justify-center gap-6 mt-2 text-xs text-gray-200">
+          <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-green-500"></span> UP Price</span>
+          <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-red-500"></span> DOWN Price</span>
+        </div>
+      </div>
+
+      {/* UP Price + UP Volume (Dual Axis) */}
+      <div className="bg-gray-900 rounded-lg p-4">
+        <h3 className="text-sm font-medium text-gray-300 mb-4">UP Price with Trade Volume</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <ComposedChart data={upPriceVolumeData} margin={{ top: 10, right: 50, left: 0, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis
+              dataKey="minute"
+              tickFormatter={(v) => `${v}m`}
+              stroke="#9CA3AF"
+              fontSize={11}
+            />
+            <YAxis
+              yAxisId="price"
+              domain={['auto', 'auto']}
+              tickFormatter={(v) => v.toFixed(2)}
+              stroke="#10B981"
+              fontSize={11}
+              label={{ value: 'Price', angle: -90, position: 'insideLeft', fill: '#10B981', fontSize: 9 }}
+            />
+            <YAxis
+              yAxisId="volume"
+              orientation="right"
+              stroke="#6366F1"
+              fontSize={10}
+              tickFormatter={(v) => `$${Math.abs(v).toFixed(0)}`}
+              label={{ value: 'Volume ($)', angle: 90, position: 'insideRight', fill: '#6366F1', fontSize: 9 }}
+            />
+            <Tooltip
+              content={({ payload }) => {
+                if (!payload || !payload[0]) return null;
+                const d = payload[0].payload;
+                return (
+                  <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                    <p className="font-medium">Minute {d.minute}</p>
+                    <p className="text-green-400">UP Price: ${d.up_price?.toFixed(4)}</p>
+                    <p className="text-green-500">Buy Vol: ${d.buy_volume?.toFixed(2)}</p>
+                    <p className="text-green-300">Sell Vol: ${Math.abs(d.sell_volume || 0).toFixed(2)}</p>
+                    <p className={`font-bold ${d.net_volume >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      Net: ${d.net_volume?.toFixed(2)}
+                    </p>
+                  </div>
+                );
+              }}
+            />
+            <ReferenceLine yAxisId="volume" y={0} stroke="#6B7280" />
+            {/* Volume bars */}
+            <Bar yAxisId="volume" dataKey="buy_volume" fill="#22C55E" stackId="vol" />
+            <Bar yAxisId="volume" dataKey="sell_volume" fill="#86EFAC" stackId="vol" />
+            {/* Price line with spread band */}
             <Area
+              yAxisId="price"
               type="monotone"
               dataKey="up_ask"
               stroke="none"
               fill="#10B981"
-              fillOpacity={0.15}
+              fillOpacity={0.1}
               connectNulls
             />
             <Area
+              yAxisId="price"
               type="monotone"
               dataKey="up_bid"
               stroke="none"
@@ -187,8 +306,8 @@ export function MarketOverlayChart({ marketSlug }: Props) {
               fillOpacity={1}
               connectNulls
             />
-            {/* Mid price line */}
             <Line
+              yAxisId="price"
               type="monotone"
               dataKey="up_price"
               stroke="#10B981"
@@ -198,60 +317,40 @@ export function MarketOverlayChart({ marketSlug }: Props) {
             />
           </ComposedChart>
         </ResponsiveContainer>
-      </div>
-
-      {/* UP Trade Volume Bars */}
-      <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">UP Trade Volume by Minute</h3>
-        <ResponsiveContainer width="100%" height={150}>
-          <BarChart data={volumeData} margin={{ top: 10, right: 30, left: 0, bottom: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="minute" stroke="#9CA3AF" fontSize={11} tickFormatter={(v) => `${v}m`} />
-            <YAxis stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `$${Math.abs(v).toFixed(0)}`} />
-            <Tooltip
-              content={({ payload }) => {
-                if (!payload || !payload[0]) return null;
-                const d = payload[0].payload;
-                return (
-                  <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p>Minute {d.minute}</p>
-                    <p className="text-green-400">Buy UP: ${d.buy_up_usdc?.toFixed(2)}</p>
-                    <p className="text-green-300">Sell UP: ${d.sell_up_usdc?.toFixed(2)}</p>
-                    <p className="text-gray-400">{d.trade_count} trades total</p>
-                  </div>
-                );
-              }}
-            />
-            <ReferenceLine y={0} stroke="#6B7280" />
-            <Bar dataKey="up_buy" fill="#22C55E" stackId="up" />
-            <Bar dataKey="up_sell" fill="#86EFAC" stackId="up" />
-          </BarChart>
-        </ResponsiveContainer>
-        <div className="flex justify-center gap-4 text-xs text-gray-400">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500"></span> Buy</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-300"></span> Sell</span>
+        <div className="flex justify-center gap-4 mt-2 text-xs text-gray-400">
+          <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-green-500"></span> UP Price</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500"></span> Buy Vol</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-300"></span> Sell Vol</span>
         </div>
       </div>
 
-      {/* DOWN Price Chart with Spread Band */}
+      {/* DOWN Price + DOWN Volume (Dual Axis) */}
       <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">DOWN Price with Bid-Ask Spread</h3>
-        <ResponsiveContainer width="100%" height={250}>
-          <ComposedChart data={priceData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+        <h3 className="text-sm font-medium text-gray-300 mb-4">DOWN Price with Trade Volume</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <ComposedChart data={downPriceVolumeData} margin={{ top: 10, right: 50, left: 0, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis
-              dataKey="minuteIntoMarket"
-              type="number"
-              domain={[0, (endTime - startTime) / 60]}
-              tickFormatter={(v) => `${Math.floor(v)}m`}
+              dataKey="minute"
+              tickFormatter={(v) => `${v}m`}
               stroke="#9CA3AF"
               fontSize={11}
             />
             <YAxis
+              yAxisId="price"
               domain={['auto', 'auto']}
               tickFormatter={(v) => v.toFixed(2)}
-              stroke="#9CA3AF"
+              stroke="#EF4444"
               fontSize={11}
+              label={{ value: 'Price', angle: -90, position: 'insideLeft', fill: '#EF4444', fontSize: 9 }}
+            />
+            <YAxis
+              yAxisId="volume"
+              orientation="right"
+              stroke="#6366F1"
+              fontSize={10}
+              tickFormatter={(v) => `$${Math.abs(v).toFixed(0)}`}
+              label={{ value: 'Volume ($)', angle: 90, position: 'insideRight', fill: '#6366F1', fontSize: 9 }}
             />
             <Tooltip
               content={({ payload }) => {
@@ -259,25 +358,33 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 const d = payload[0].payload;
                 return (
                   <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p>Time: {d.minuteIntoMarket?.toFixed(1)}m</p>
-                    <p className="text-red-400">Mid: {d.down_price?.toFixed(4)}</p>
-                    <p className="text-gray-400">Bid: {d.down_bid?.toFixed(4)}</p>
-                    <p className="text-gray-400">Ask: {d.down_ask?.toFixed(4)}</p>
-                    <p className="text-cyan-400">Spread: {((d.down_ask - d.down_bid) * 100).toFixed(2)}¢</p>
+                    <p className="font-medium">Minute {d.minute}</p>
+                    <p className="text-red-400">DOWN Price: ${d.down_price?.toFixed(4)}</p>
+                    <p className="text-red-500">Buy Vol: ${d.buy_volume?.toFixed(2)}</p>
+                    <p className="text-red-300">Sell Vol: ${Math.abs(d.sell_volume || 0).toFixed(2)}</p>
+                    <p className={`font-bold ${d.net_volume >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      Net: ${d.net_volume?.toFixed(2)}
+                    </p>
                   </div>
                 );
               }}
             />
-            {/* Spread band as area between bid and ask */}
+            <ReferenceLine yAxisId="volume" y={0} stroke="#6B7280" />
+            {/* Volume bars */}
+            <Bar yAxisId="volume" dataKey="buy_volume" fill="#DC2626" stackId="vol" />
+            <Bar yAxisId="volume" dataKey="sell_volume" fill="#FCA5A5" stackId="vol" />
+            {/* Price line with spread band */}
             <Area
+              yAxisId="price"
               type="monotone"
               dataKey="down_ask"
               stroke="none"
               fill="#EF4444"
-              fillOpacity={0.15}
+              fillOpacity={0.1}
               connectNulls
             />
             <Area
+              yAxisId="price"
               type="monotone"
               dataKey="down_bid"
               stroke="none"
@@ -285,8 +392,8 @@ export function MarketOverlayChart({ marketSlug }: Props) {
               fillOpacity={1}
               connectNulls
             />
-            {/* Mid price line */}
             <Line
+              yAxisId="price"
               type="monotone"
               dataKey="down_price"
               stroke="#EF4444"
@@ -296,100 +403,12 @@ export function MarketOverlayChart({ marketSlug }: Props) {
             />
           </ComposedChart>
         </ResponsiveContainer>
-      </div>
-
-      {/* DOWN Trade Volume Bars */}
-      <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">DOWN Trade Volume by Minute</h3>
-        <ResponsiveContainer width="100%" height={150}>
-          <BarChart data={volumeData} margin={{ top: 10, right: 30, left: 0, bottom: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="minute" stroke="#9CA3AF" fontSize={11} tickFormatter={(v) => `${v}m`} />
-            <YAxis stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `$${Math.abs(v).toFixed(0)}`} />
-            <Tooltip
-              content={({ payload }) => {
-                if (!payload || !payload[0]) return null;
-                const d = payload[0].payload;
-                return (
-                  <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p>Minute {d.minute}</p>
-                    <p className="text-red-400">Buy DOWN: ${d.buy_down_usdc?.toFixed(2)}</p>
-                    <p className="text-red-300">Sell DOWN: ${d.sell_down_usdc?.toFixed(2)}</p>
-                    <p className="text-gray-400">{d.trade_count} trades total</p>
-                  </div>
-                );
-              }}
-            />
-            <ReferenceLine y={0} stroke="#6B7280" />
-            <Bar dataKey="down_buy" fill="#DC2626" stackId="down" />
-            <Bar dataKey="down_sell" fill="#FCA5A5" stackId="down" />
-          </BarChart>
-        </ResponsiveContainer>
-        <div className="flex justify-center gap-4 text-xs text-gray-400">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-600"></span> Buy</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-300"></span> Sell</span>
+        <div className="flex justify-center gap-4 mt-2 text-xs text-gray-400">
+          <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-red-500"></span> DOWN Price</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-600"></span> Buy Vol</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-300"></span> Sell Vol</span>
         </div>
       </div>
-
-      {/* Spread Analysis */}
-      {data.spread_analysis && data.spread_analysis.by_timestamp.length > 0 && (
-        <div className="bg-gray-900 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-300 mb-4">
-            Bid-Ask Spread Evolution
-            <span className="ml-2 text-xs text-gray-400">
-              Avg: {(data.spread_analysis.avg_spread * 100).toFixed(2)}¢ |
-              Range: {(data.spread_analysis.min_spread * 100).toFixed(2)}¢ - {(data.spread_analysis.max_spread * 100).toFixed(2)}¢
-            </span>
-          </h3>
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="bg-gray-800 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-400">Avg Spread</p>
-              <p className="text-lg font-bold text-cyan-400">{(data.spread_analysis.avg_spread * 100).toFixed(2)}¢</p>
-            </div>
-            <div className="bg-gray-800 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-400">Min Spread</p>
-              <p className="text-lg font-bold text-green-400">{(data.spread_analysis.min_spread * 100).toFixed(2)}¢</p>
-            </div>
-            <div className="bg-gray-800 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-400">Max Spread</p>
-              <p className="text-lg font-bold text-red-400">{(data.spread_analysis.max_spread * 100).toFixed(2)}¢</p>
-            </div>
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <AreaChart
-              data={data.spread_analysis.by_timestamp.map((p, i) => ({
-                ...p,
-                index: i,
-                up_spread_cents: p.up_spread ? p.up_spread * 100 : null,
-                down_spread_cents: p.down_spread ? p.down_spread * 100 : null,
-              }))}
-              margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="index" stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${Math.floor(v / 60)}m`} />
-              <YAxis stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${v.toFixed(1)}¢`} />
-              <Tooltip
-                content={({ payload }) => {
-                  if (!payload || !payload[0]) return null;
-                  const d = payload[0].payload;
-                  return (
-                    <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                      <p>UP Spread: {d.up_spread_cents?.toFixed(2)}¢</p>
-                      <p>DOWN Spread: {d.down_spread_cents?.toFixed(2)}¢</p>
-                    </div>
-                  );
-                }}
-              />
-              <Area type="monotone" dataKey="up_spread_cents" stroke="#10B981" fill="#10B981" fillOpacity={0.3} connectNulls />
-              <Area type="monotone" dataKey="down_spread_cents" stroke="#EF4444" fill="#EF4444" fillOpacity={0.3} connectNulls />
-            </AreaChart>
-          </ResponsiveContainer>
-          <div className="flex justify-center gap-4 mt-2 text-xs text-gray-400">
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500/50"></span> UP Spread</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500/50"></span> DOWN Spread</span>
-          </div>
-        </div>
-      )}
 
       {/* Market Efficiency (UP + DOWN = 1.0) */}
       {data.efficiency && data.efficiency.by_timestamp.length > 0 && (
@@ -421,78 +440,27 @@ export function MarketOverlayChart({ marketSlug }: Props) {
               <p className="text-xs text-gray-500">when combined &lt; 0.98</p>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart
-              data={data.efficiency.by_timestamp.map((p, i) => ({ ...p, index: i }))}
-              margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="index" stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${Math.floor(v / 60)}m`} />
-              <YAxis domain={[0.94, 1.06]} stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => v.toFixed(2)} />
-              <Tooltip
-                content={({ payload }) => {
-                  if (!payload || !payload[0]) return null;
-                  const d = payload[0].payload;
-                  return (
-                    <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                      <p>Combined: {d.combined?.toFixed(4)}</p>
-                      <p className={d.combined < 1.0 ? 'text-green-400' : 'text-red-400'}>
-                        {d.combined < 1.0 ? 'Potential profit!' : 'Overpaying'}
-                      </p>
-                    </div>
-                  );
-                }}
-              />
-              <ReferenceLine y={1.0} stroke="#6B7280" strokeDasharray="3 3" label={{ value: 'Perfect', fill: '#6B7280', fontSize: 9 }} />
-              <ReferenceLine y={0.98} stroke="#10B981" strokeDasharray="3 3" label={{ value: 'Target', fill: '#10B981', fontSize: 9 }} />
-              <Line type="monotone" dataKey="combined" stroke="#06B6D4" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Volatility by Minute */}
-        {data.volatility && data.volatility.by_minute.length > 0 && (
+        {/* Spread Analysis */}
+        {data.spread_analysis && (
           <div className="bg-gray-900 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-300 mb-4">
-              Price Volatility + Trade Density
-              <span className="ml-2 text-xs text-gray-400">
-                (r = {data.volatility.vol_trade_correlation.toFixed(3)})
-              </span>
-            </h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <ComposedChart
-                data={data.volatility.by_minute}
-                margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="minute" stroke="#9CA3AF" fontSize={10} />
-                <YAxis yAxisId="left" stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${(v * 100).toFixed(1)}%`} />
-                <YAxis yAxisId="right" orientation="right" stroke="#9CA3AF" fontSize={10} />
-                <Tooltip
-                  content={({ payload }) => {
-                    if (!payload || !payload[0]) return null;
-                    const d = payload[0].payload;
-                    return (
-                      <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                        <p>Minute {d.minute}</p>
-                        <p>Volatility: {(d.volatility * 100).toFixed(2)}%</p>
-                        <p>Trades: {d.trade_count}</p>
-                      </div>
-                    );
-                  }}
-                />
-                <Bar yAxisId="right" dataKey="trade_count" fill="#6366F1" opacity={0.5} />
-                <Line yAxisId="left" type="monotone" dataKey="volatility" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3 }} />
-              </ComposedChart>
-            </ResponsiveContainer>
-            <div className="text-xs text-gray-400 text-center mt-2">
-              {data.volatility.vol_trade_correlation > 0.3
-                ? 'Trades cluster during volatile periods (opportunistic)'
-                : data.volatility.vol_trade_correlation < -0.3
-                ? 'Trades avoid volatile periods (risk-averse)'
-                : 'No strong relationship between volatility and trading'}
+            <h3 className="text-sm font-medium text-gray-300 mb-4">Spread Analysis</h3>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-gray-800 rounded-lg p-2 text-center">
+                <p className="text-xs text-gray-400">Avg</p>
+                <p className="text-lg font-bold text-cyan-400">{(data.spread_analysis.avg_spread * 100).toFixed(2)}¢</p>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-2 text-center">
+                <p className="text-xs text-gray-400">Min</p>
+                <p className="text-lg font-bold text-green-400">{(data.spread_analysis.min_spread * 100).toFixed(2)}¢</p>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-2 text-center">
+                <p className="text-xs text-gray-400">Max</p>
+                <p className="text-lg font-bold text-red-400">{(data.spread_analysis.max_spread * 100).toFixed(2)}¢</p>
+              </div>
             </div>
           </div>
         )}
@@ -500,45 +468,38 @@ export function MarketOverlayChart({ marketSlug }: Props) {
         {/* Trade Impact Analysis */}
         {data.trade_impact && (
           <div className="bg-gray-900 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-300 mb-4">Trade Impact (price change after trade)</h3>
+            <h3 className="text-sm font-medium text-gray-300 mb-4">Trade Impact (30s after)</h3>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-800 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-2">BUY Trades Impact</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-green-400">BUY UP</span>
-                    <span className={`text-sm font-bold ${data.trade_impact.buy_up_impact > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {data.trade_impact.buy_up_impact > 0 ? '+' : ''}{data.trade_impact.buy_up_impact.toFixed(2)}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-red-400">BUY DOWN</span>
-                    <span className={`text-sm font-bold ${data.trade_impact.buy_down_impact > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {data.trade_impact.buy_down_impact > 0 ? '+' : ''}{data.trade_impact.buy_down_impact.toFixed(2)}%
-                    </span>
-                  </div>
+              <div className="bg-gray-800 rounded-lg p-2">
+                <p className="text-xs text-gray-400 mb-1">BUY Impact</p>
+                <div className="flex justify-between text-sm">
+                  <span className="text-green-400">UP</span>
+                  <span className={data.trade_impact.buy_up_impact > 0 ? 'text-green-400' : 'text-red-400'}>
+                    {data.trade_impact.buy_up_impact > 0 ? '+' : ''}{data.trade_impact.buy_up_impact.toFixed(2)}%
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-red-400">DOWN</span>
+                  <span className={data.trade_impact.buy_down_impact > 0 ? 'text-green-400' : 'text-red-400'}>
+                    {data.trade_impact.buy_down_impact > 0 ? '+' : ''}{data.trade_impact.buy_down_impact.toFixed(2)}%
+                  </span>
                 </div>
               </div>
-              <div className="bg-gray-800 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-2">SELL Trades Impact</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-green-400">SELL UP</span>
-                    <span className={`text-sm font-bold ${data.trade_impact.sell_up_impact > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {data.trade_impact.sell_up_impact > 0 ? '+' : ''}{data.trade_impact.sell_up_impact.toFixed(2)}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-red-400">SELL DOWN</span>
-                    <span className={`text-sm font-bold ${data.trade_impact.sell_down_impact > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {data.trade_impact.sell_down_impact > 0 ? '+' : ''}{data.trade_impact.sell_down_impact.toFixed(2)}%
-                    </span>
-                  </div>
+              <div className="bg-gray-800 rounded-lg p-2">
+                <p className="text-xs text-gray-400 mb-1">SELL Impact</p>
+                <div className="flex justify-between text-sm">
+                  <span className="text-green-400">UP</span>
+                  <span className={data.trade_impact.sell_up_impact > 0 ? 'text-green-400' : 'text-red-400'}>
+                    {data.trade_impact.sell_up_impact > 0 ? '+' : ''}{data.trade_impact.sell_up_impact.toFixed(2)}%
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-red-400">DOWN</span>
+                  <span className={data.trade_impact.sell_down_impact > 0 ? 'text-green-400' : 'text-red-400'}>
+                    {data.trade_impact.sell_down_impact > 0 ? '+' : ''}{data.trade_impact.sell_down_impact.toFixed(2)}%
+                  </span>
                 </div>
               </div>
-            </div>
-            <div className="mt-3 text-xs text-gray-400 text-center">
-              Shows average price change 30 seconds after each trade type
             </div>
           </div>
         )}
@@ -546,12 +507,12 @@ export function MarketOverlayChart({ marketSlug }: Props) {
 
       {/* Interpretation */}
       <div className="bg-gray-900/50 rounded-lg p-4 text-sm text-gray-300">
-        <p className="font-medium text-gray-300 mb-2">What These Metrics Tell Us:</p>
+        <p className="font-medium text-gray-300 mb-2">How to Read These Charts:</p>
         <ul className="list-disc list-inside space-y-1">
-          <li><strong>Spread Band</strong>: Shaded area shows bid-ask spread - tighter = lower costs</li>
-          <li><strong>Volume Bars</strong>: Buy volume above zero, sell volume below</li>
-          <li><strong>Efficiency</strong>: Combined &lt; 1.0 means arbitrage profit possible</li>
-          <li><strong>Trade Impact</strong>: Positive = trades move price in profitable direction</li>
+          <li><strong>Combined Price Chart</strong>: See UP and DOWN price movements together</li>
+          <li><strong>Price + Volume Charts</strong>: Volume bars show trading activity at each price level</li>
+          <li><strong>Green bars</strong> = Buy volume, <strong>Light bars</strong> = Sell volume</li>
+          <li><strong>Net volume</strong>: Positive = more buying, Negative = more selling</li>
         </ul>
       </div>
     </div>
