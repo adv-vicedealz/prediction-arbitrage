@@ -243,18 +243,21 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
             </div>
           </div>
 
-          {/* UP Position vs UP Price Chart (0-15 minutes) */}
+          {/* COMBINED Position vs Price Chart (0-15 minutes) - 5 second bins */}
           <div className="bg-gray-900 rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-300 mb-4">
-              UP Position vs UP Price (0-15 min)
+              Position Building vs Price (0-15 min, 5s bins)
+              <span className="ml-4 text-xs text-gray-400">
+                UP r = {data.price_correlation.up_shares_vs_up_price.toFixed(3)}
+              </span>
               <span className="ml-2 text-xs text-gray-400">
-                r = {data.price_correlation.up_shares_vs_up_price.toFixed(3)}
+                DOWN r = {data.price_correlation.down_shares_vs_down_price.toFixed(3)}
               </span>
             </h3>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={500}>
               <ComposedChart
                 data={filteredTimeline}
-                margin={{ top: 10, right: 50, left: 0, bottom: 10 }}
+                margin={{ top: 20, right: 60, left: 10, bottom: 30 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis
@@ -262,134 +265,96 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
                   type="number"
                   domain={[0, 15]}
                   stroke="#9CA3AF"
-                  fontSize={10}
+                  fontSize={11}
                   tickFormatter={(v) => `${Math.floor(v)}m`}
+                  label={{ value: 'Time into Market', position: 'bottom', fill: '#9CA3AF', fontSize: 11, offset: 10 }}
                 />
                 <YAxis
                   yAxisId="shares"
-                  stroke="#10B981"
-                  fontSize={10}
-                  label={{ value: 'Shares', angle: -90, position: 'insideLeft', fill: '#10B981', fontSize: 9 }}
+                  stroke="#9CA3AF"
+                  fontSize={11}
+                  tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(1)}k` : v.toFixed(0)}
+                  label={{ value: 'Position (shares)', angle: -90, position: 'insideLeft', fill: '#9CA3AF', fontSize: 11 }}
                 />
                 <YAxis
                   yAxisId="price"
                   orientation="right"
-                  stroke="#F59E0B"
-                  fontSize={10}
-                  domain={['auto', 'auto']}
-                  tickFormatter={(v) => v.toFixed(2)}
-                  label={{ value: 'Price', angle: 90, position: 'insideRight', fill: '#F59E0B', fontSize: 9 }}
+                  stroke="#9CA3AF"
+                  fontSize={11}
+                  domain={[0, 1]}
+                  tickFormatter={(v) => `$${v.toFixed(2)}`}
+                  label={{ value: 'Price', angle: 90, position: 'insideRight', fill: '#9CA3AF', fontSize: 11 }}
                 />
                 <Tooltip
                   content={({ payload }) => {
                     if (!payload || !payload[0]) return null;
                     const d = payload[0].payload;
                     return (
-                      <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                        <p className="font-medium">{d.minuteIntoMarket?.toFixed(1)}m</p>
-                        <p className="text-green-400">UP Shares: {d.up_shares?.toFixed(0)}</p>
-                        <p className="text-yellow-400">UP Price: ${d.up_price?.toFixed(4)}</p>
+                      <div className="bg-gray-800 border border-gray-600 rounded p-3 text-sm">
+                        <p className="font-bold text-white mb-2">{d.minuteIntoMarket?.toFixed(2)} minutes</p>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                          <p className="text-green-400">UP Position:</p>
+                          <p className="text-green-400 font-mono">{d.up_shares?.toFixed(0)}</p>
+                          <p className="text-red-400">DOWN Position:</p>
+                          <p className="text-red-400 font-mono">{d.down_shares?.toFixed(0)}</p>
+                          <p className="text-green-300">UP Price:</p>
+                          <p className="text-green-300 font-mono">${d.up_price?.toFixed(4)}</p>
+                          <p className="text-red-300">DOWN Price:</p>
+                          <p className="text-red-300 font-mono">${d.down_price?.toFixed(4)}</p>
+                        </div>
                       </div>
                     );
                   }}
                 />
+                {/* Position Areas */}
                 <Area
                   yAxisId="shares"
                   type="monotone"
                   dataKey="up_shares"
                   stroke="#10B981"
+                  strokeWidth={1}
                   fill="#10B981"
-                  fillOpacity={0.3}
-                />
-                <Line
-                  yAxisId="price"
-                  type="monotone"
-                  dataKey="up_price"
-                  stroke="#F59E0B"
-                  strokeWidth={2}
-                  dot={false}
-                  connectNulls
-                />
-              </ComposedChart>
-            </ResponsiveContainer>
-            <div className="flex justify-center gap-6 mt-2 text-xs text-gray-200">
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500/50"></span> UP Position</span>
-              <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-yellow-500"></span> UP Price</span>
-            </div>
-          </div>
-
-          {/* DOWN Position vs DOWN Price Chart (0-15 minutes) */}
-          <div className="bg-gray-900 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-300 mb-4">
-              DOWN Position vs DOWN Price (0-15 min)
-              <span className="ml-2 text-xs text-gray-400">
-                r = {data.price_correlation.down_shares_vs_down_price.toFixed(3)}
-              </span>
-            </h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <ComposedChart
-                data={filteredTimeline}
-                margin={{ top: 10, right: 50, left: 0, bottom: 10 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis
-                  dataKey="minuteIntoMarket"
-                  type="number"
-                  domain={[0, 15]}
-                  stroke="#9CA3AF"
-                  fontSize={10}
-                  tickFormatter={(v) => `${Math.floor(v)}m`}
-                />
-                <YAxis
-                  yAxisId="shares"
-                  stroke="#EF4444"
-                  fontSize={10}
-                  label={{ value: 'Shares', angle: -90, position: 'insideLeft', fill: '#EF4444', fontSize: 9 }}
-                />
-                <YAxis
-                  yAxisId="price"
-                  orientation="right"
-                  stroke="#F59E0B"
-                  fontSize={10}
-                  domain={['auto', 'auto']}
-                  tickFormatter={(v) => v.toFixed(2)}
-                  label={{ value: 'Price', angle: 90, position: 'insideRight', fill: '#F59E0B', fontSize: 9 }}
-                />
-                <Tooltip
-                  content={({ payload }) => {
-                    if (!payload || !payload[0]) return null;
-                    const d = payload[0].payload;
-                    return (
-                      <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                        <p className="font-medium">{d.minuteIntoMarket?.toFixed(1)}m</p>
-                        <p className="text-red-400">DOWN Shares: {d.down_shares?.toFixed(0)}</p>
-                        <p className="text-yellow-400">DOWN Price: ${d.down_price?.toFixed(4)}</p>
-                      </div>
-                    );
-                  }}
+                  fillOpacity={0.4}
+                  name="UP Position"
                 />
                 <Area
                   yAxisId="shares"
                   type="monotone"
                   dataKey="down_shares"
                   stroke="#EF4444"
+                  strokeWidth={1}
                   fill="#EF4444"
-                  fillOpacity={0.3}
+                  fillOpacity={0.4}
+                  name="DOWN Position"
+                />
+                {/* Price Lines */}
+                <Line
+                  yAxisId="price"
+                  type="monotone"
+                  dataKey="up_price"
+                  stroke="#22C55E"
+                  strokeWidth={2}
+                  dot={false}
+                  connectNulls
+                  name="UP Price"
                 />
                 <Line
                   yAxisId="price"
                   type="monotone"
                   dataKey="down_price"
-                  stroke="#F59E0B"
+                  stroke="#F87171"
                   strokeWidth={2}
                   dot={false}
                   connectNulls
+                  name="DOWN Price"
                 />
               </ComposedChart>
             </ResponsiveContainer>
-            <div className="flex justify-center gap-6 mt-2 text-xs text-gray-200">
-              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500/50"></span> DOWN Position</span>
-              <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-yellow-500"></span> DOWN Price</span>
+            <div className="flex justify-center gap-8 mt-4 text-sm text-gray-200">
+              <span className="flex items-center gap-2"><span className="w-4 h-4 rounded bg-green-500/50"></span> UP Position</span>
+              <span className="flex items-center gap-2"><span className="w-4 h-4 rounded bg-red-500/50"></span> DOWN Position</span>
+              <span className="flex items-center gap-2"><span className="w-6 h-0.5 bg-green-500"></span> UP Price</span>
+              <span className="flex items-center gap-2"><span className="w-6 h-0.5 bg-red-400"></span> DOWN Price</span>
             </div>
           </div>
 

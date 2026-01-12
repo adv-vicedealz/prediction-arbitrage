@@ -1972,9 +1972,9 @@ class Database:
             trade_idx = 0
             sorted_rows = sorted([dict(r) for r in rows], key=lambda x: x["timestamp"])
 
-            # Generate 10-second buckets for the market period (90 buckets)
-            bucket_size = 10
-            num_buckets = 90  # 15 minutes / 10 seconds
+            # Generate 5-second buckets for the market period (180 buckets)
+            bucket_size = 5
+            num_buckets = 180  # 15 minutes / 5 seconds
 
             for bucket_idx in range(num_buckets):
                 bucket_ts = market_start + (bucket_idx * bucket_size)
