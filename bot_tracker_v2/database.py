@@ -1297,14 +1297,22 @@ class Database:
             "usdc": r["usdc"]
         } for r in trades_rows]
 
+        # For 15-minute markets, calculate correct start_time (end_time - 15 min)
+        # The API's startDate is market creation, not the 15-min window start
+        end_time = market_dict["end_time"]
+        if end_time and "15m" in market_dict["slug"]:
+            calculated_start = end_time - 900  # 15 minutes = 900 seconds
+        else:
+            calculated_start = market_dict["start_time"]
+
         return {
             "prices": prices,
             "trades": trades,
             "market": {
                 "slug": market_dict["slug"],
                 "question": market_dict["question"] or "",
-                "start_time": market_dict["start_time"],
-                "end_time": market_dict["end_time"],
+                "start_time": calculated_start,
+                "end_time": end_time,
                 "winning_outcome": market_dict["winning_outcome"]
             }
         }
@@ -1392,11 +1400,18 @@ class Database:
 
         for row in rows:
             r = dict(row)
-            market_duration = r["end_time"] - r["start_time"]
+            # For 15m markets, use calculated start (end - 15 min) instead of DB start_time
+            if "15m" in r["market_slug"]:
+                actual_start = r["end_time"] - 900
+                market_duration = 900
+            else:
+                actual_start = r["start_time"]
+                market_duration = r["end_time"] - r["start_time"]
+
             if market_duration <= 0:
                 continue
 
-            time_into_market = r["trade_ts"] - r["start_time"]
+            time_into_market = r["trade_ts"] - actual_start
             minute = int(time_into_market / 60)
             minute = max(0, min(14, minute))  # Clamp to 0-14
 
@@ -1405,8 +1420,11 @@ class Database:
             minute_counts[minute]["count"] += 1
             minute_counts[minute]["volume"] += r["usdc"]
 
-            # Phase analysis
-            pct_into_market = time_into_market / market_duration
+            # Phase analysis (use already calculated time_into_market and market_duration)
+            if market_duration > 0:
+                pct_into_market = time_into_market / market_duration
+            else:
+                pct_into_market = 0.5
             if pct_into_market < 0.33:
                 phase_counts["early"] += 1
             elif pct_into_market < 0.67:
