@@ -375,8 +375,9 @@ export interface TradeImpact {
   sell_down_impact: number;
 }
 
-export interface TradeVolumeByMinute {
-  minute: number;
+export interface TradeVolumeByBucket {
+  bucket: number;
+  time_seconds: number;
   buy_up_usdc: number;
   sell_up_usdc: number;
   buy_down_usdc: number;
@@ -392,7 +393,7 @@ export interface MarketOverlayData {
   prices: PriceTimelinePoint[];
   prices_downsampled: PriceTimelinePoint[];
   trades: OverlayTrade[];
-  trade_volume_by_minute: TradeVolumeByMinute[];
+  trade_volume_by_bucket: TradeVolumeByBucket[];
   market: {
     slug: string;
     question: string;

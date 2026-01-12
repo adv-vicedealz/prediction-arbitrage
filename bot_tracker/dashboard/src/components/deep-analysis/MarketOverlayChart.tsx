@@ -7,9 +7,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Area,
-  ReferenceLine,
   Bar,
+  ReferenceLine,
 } from 'recharts';
 import type { MarketOverlayData } from '../../types';
 
@@ -78,53 +77,56 @@ export function MarketOverlayChart({ marketSlug }: Props) {
   const totalUpSells = sellUpTrades.reduce((sum, t) => sum + t.shares, 0);
   const totalDownSells = sellDownTrades.reduce((sum, t) => sum + t.shares, 0);
 
-  // Format volume bars - filter to 0-14 minutes
-  const volumeData = (data.trade_volume_by_minute || [])
-    .filter((v) => v.minute >= 0 && v.minute <= 14)
+  // Format volume bars from 10-second buckets (sparse - only buckets with trades)
+  const volumeBuckets = (data.trade_volume_by_bucket || [])
+    .filter((v) => v.time_seconds >= 0 && v.time_seconds < 900) // 0-15 minutes
     .map((v) => ({
       ...v,
+      minuteIntoMarket: v.time_seconds / 60,
       up_net: v.buy_up_usdc - v.sell_up_usdc,
       down_net: v.buy_down_usdc - v.sell_down_usdc,
     }));
 
   // Merge price data with volume data for combined charts
-  // Group prices by minute for alignment with volume
-  const priceByMinute: Record<number, { up_price: number | null; down_price: number | null; up_bid: number | null; up_ask: number | null; down_bid: number | null; down_ask: number | null }> = {};
+  // Group prices by 10-second bucket for alignment with volume
+  const priceByBucket: Record<number, { up_price: number | null; down_price: number | null; up_bid: number | null; up_ask: number | null; down_bid: number | null; down_ask: number | null }> = {};
   priceData.forEach((p) => {
-    const minute = Math.floor(p.minuteIntoMarket);
-    if (minute >= 0 && minute <= 14) {
-      if (!priceByMinute[minute]) {
-        priceByMinute[minute] = { up_price: null, down_price: null, up_bid: null, up_ask: null, down_bid: null, down_ask: null };
+    const bucket = Math.floor(p.minuteIntoMarket * 6); // 6 buckets per minute (10s each)
+    if (bucket >= 0 && bucket < 90) {
+      if (!priceByBucket[bucket]) {
+        priceByBucket[bucket] = { up_price: null, down_price: null, up_bid: null, up_ask: null, down_bid: null, down_ask: null };
       }
-      // Use last price in each minute
-      if (p.up_price !== null) priceByMinute[minute].up_price = p.up_price;
-      if (p.down_price !== null) priceByMinute[minute].down_price = p.down_price;
-      if (p.up_bid !== null) priceByMinute[minute].up_bid = p.up_bid;
-      if (p.up_ask !== null) priceByMinute[minute].up_ask = p.up_ask;
-      if (p.down_bid !== null) priceByMinute[minute].down_bid = p.down_bid;
-      if (p.down_ask !== null) priceByMinute[minute].down_ask = p.down_ask;
+      // Use last price in each bucket
+      if (p.up_price !== null) priceByBucket[bucket].up_price = p.up_price;
+      if (p.down_price !== null) priceByBucket[bucket].down_price = p.down_price;
+      if (p.up_bid !== null) priceByBucket[bucket].up_bid = p.up_bid;
+      if (p.up_ask !== null) priceByBucket[bucket].up_ask = p.up_ask;
+      if (p.down_bid !== null) priceByBucket[bucket].down_bid = p.down_bid;
+      if (p.down_ask !== null) priceByBucket[bucket].down_ask = p.down_ask;
     }
   });
 
   // Create combined data for UP price + UP volume chart
-  const upPriceVolumeData = volumeData.map((v) => ({
-    minute: v.minute,
-    up_price: priceByMinute[v.minute]?.up_price,
-    up_bid: priceByMinute[v.minute]?.up_bid,
-    up_ask: priceByMinute[v.minute]?.up_ask,
+  const upPriceVolumeData = volumeBuckets.map((v) => ({
+    bucket: v.bucket,
+    minuteIntoMarket: v.minuteIntoMarket,
+    up_price: priceByBucket[v.bucket]?.up_price,
+    up_bid: priceByBucket[v.bucket]?.up_bid,
+    up_ask: priceByBucket[v.bucket]?.up_ask,
     buy_volume: v.buy_up_usdc,
-    sell_volume: -v.sell_up_usdc,
+    sell_volume: v.sell_up_usdc, // Keep positive for visual clarity
     net_volume: v.up_net,
   }));
 
   // Create combined data for DOWN price + DOWN volume chart
-  const downPriceVolumeData = volumeData.map((v) => ({
-    minute: v.minute,
-    down_price: priceByMinute[v.minute]?.down_price,
-    down_bid: priceByMinute[v.minute]?.down_bid,
-    down_ask: priceByMinute[v.minute]?.down_ask,
+  const downPriceVolumeData = volumeBuckets.map((v) => ({
+    bucket: v.bucket,
+    minuteIntoMarket: v.minuteIntoMarket,
+    down_price: priceByBucket[v.bucket]?.down_price,
+    down_bid: priceByBucket[v.bucket]?.down_bid,
+    down_ask: priceByBucket[v.bucket]?.down_ask,
     buy_volume: v.buy_down_usdc,
-    sell_volume: -v.sell_down_usdc,
+    sell_volume: v.sell_down_usdc, // Keep positive for visual clarity
     net_volume: v.down_net,
   }));
 
@@ -144,8 +146,8 @@ export function MarketOverlayChart({ marketSlug }: Props) {
             </p>
           </div>
           <div className="text-right text-xs text-gray-400">
-            <p>{priceData.length} price points (0-15m)</p>
-            <p>{data.trades.length} trades</p>
+            <p>{priceData.length} price points</p>
+            <p>{data.trades.length} trades in {volumeBuckets.length} buckets</p>
           </div>
         </div>
       </div>
@@ -240,13 +242,15 @@ export function MarketOverlayChart({ marketSlug }: Props) {
 
       {/* UP Price + UP Volume (Dual Axis) */}
       <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">UP Price with Trade Volume</h3>
+        <h3 className="text-sm font-medium text-gray-300 mb-4">UP Price with Trade Volume (10s buckets)</h3>
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart data={upPriceVolumeData} margin={{ top: 10, right: 50, left: 0, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis
-              dataKey="minute"
-              tickFormatter={(v) => `${v}m`}
+              dataKey="minuteIntoMarket"
+              type="number"
+              domain={[0, 15]}
+              tickFormatter={(v) => `${Math.floor(v)}m`}
               stroke="#9CA3AF"
               fontSize={11}
             />
@@ -263,7 +267,7 @@ export function MarketOverlayChart({ marketSlug }: Props) {
               orientation="right"
               stroke="#6366F1"
               fontSize={10}
-              tickFormatter={(v) => `$${Math.abs(v).toFixed(0)}`}
+              tickFormatter={(v) => `$${v.toFixed(0)}`}
               label={{ value: 'Volume ($)', angle: 90, position: 'insideRight', fill: '#6366F1', fontSize: 9 }}
             />
             <Tooltip
@@ -272,10 +276,10 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 const d = payload[0].payload;
                 return (
                   <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p className="font-medium">Minute {d.minute}</p>
-                    <p className="text-green-400">UP Price: ${d.up_price?.toFixed(4)}</p>
+                    <p className="font-medium">{d.minuteIntoMarket?.toFixed(2)}m (bucket {d.bucket})</p>
+                    <p className="text-green-400">UP Price: {d.up_price?.toFixed(4)}</p>
                     <p className="text-green-500">Buy Vol: ${d.buy_volume?.toFixed(2)}</p>
-                    <p className="text-green-300">Sell Vol: ${Math.abs(d.sell_volume || 0).toFixed(2)}</p>
+                    <p className="text-orange-400">Sell Vol: ${d.sell_volume?.toFixed(2)}</p>
                     <p className={`font-bold ${d.net_volume >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                       Net: ${d.net_volume?.toFixed(2)}
                     </p>
@@ -283,29 +287,10 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 );
               }}
             />
-            <ReferenceLine yAxisId="volume" y={0} stroke="#6B7280" />
-            {/* Volume bars */}
-            <Bar yAxisId="volume" dataKey="buy_volume" fill="#22C55E" stackId="vol" />
-            <Bar yAxisId="volume" dataKey="sell_volume" fill="#86EFAC" stackId="vol" />
-            {/* Price line with spread band */}
-            <Area
-              yAxisId="price"
-              type="monotone"
-              dataKey="up_ask"
-              stroke="none"
-              fill="#10B981"
-              fillOpacity={0.1}
-              connectNulls
-            />
-            <Area
-              yAxisId="price"
-              type="monotone"
-              dataKey="up_bid"
-              stroke="none"
-              fill="#1F2937"
-              fillOpacity={1}
-              connectNulls
-            />
+            {/* Volume bars - buy up, sell down (not stacked) */}
+            <Bar yAxisId="volume" dataKey="buy_volume" fill="#22C55E" name="Buy" barSize={8} />
+            <Bar yAxisId="volume" dataKey="sell_volume" fill="#F97316" name="Sell" barSize={8} />
+            {/* Price line */}
             <Line
               yAxisId="price"
               type="monotone"
@@ -320,19 +305,21 @@ export function MarketOverlayChart({ marketSlug }: Props) {
         <div className="flex justify-center gap-4 mt-2 text-xs text-gray-400">
           <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-green-500"></span> UP Price</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500"></span> Buy Vol</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-300"></span> Sell Vol</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-orange-500"></span> Sell Vol</span>
         </div>
       </div>
 
       {/* DOWN Price + DOWN Volume (Dual Axis) */}
       <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">DOWN Price with Trade Volume</h3>
+        <h3 className="text-sm font-medium text-gray-300 mb-4">DOWN Price with Trade Volume (10s buckets)</h3>
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart data={downPriceVolumeData} margin={{ top: 10, right: 50, left: 0, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis
-              dataKey="minute"
-              tickFormatter={(v) => `${v}m`}
+              dataKey="minuteIntoMarket"
+              type="number"
+              domain={[0, 15]}
+              tickFormatter={(v) => `${Math.floor(v)}m`}
               stroke="#9CA3AF"
               fontSize={11}
             />
@@ -349,7 +336,7 @@ export function MarketOverlayChart({ marketSlug }: Props) {
               orientation="right"
               stroke="#6366F1"
               fontSize={10}
-              tickFormatter={(v) => `$${Math.abs(v).toFixed(0)}`}
+              tickFormatter={(v) => `$${v.toFixed(0)}`}
               label={{ value: 'Volume ($)', angle: 90, position: 'insideRight', fill: '#6366F1', fontSize: 9 }}
             />
             <Tooltip
@@ -358,10 +345,10 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 const d = payload[0].payload;
                 return (
                   <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p className="font-medium">Minute {d.minute}</p>
-                    <p className="text-red-400">DOWN Price: ${d.down_price?.toFixed(4)}</p>
+                    <p className="font-medium">{d.minuteIntoMarket?.toFixed(2)}m (bucket {d.bucket})</p>
+                    <p className="text-red-400">DOWN Price: {d.down_price?.toFixed(4)}</p>
                     <p className="text-red-500">Buy Vol: ${d.buy_volume?.toFixed(2)}</p>
-                    <p className="text-red-300">Sell Vol: ${Math.abs(d.sell_volume || 0).toFixed(2)}</p>
+                    <p className="text-orange-400">Sell Vol: ${d.sell_volume?.toFixed(2)}</p>
                     <p className={`font-bold ${d.net_volume >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                       Net: ${d.net_volume?.toFixed(2)}
                     </p>
@@ -369,29 +356,10 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 );
               }}
             />
-            <ReferenceLine yAxisId="volume" y={0} stroke="#6B7280" />
-            {/* Volume bars */}
-            <Bar yAxisId="volume" dataKey="buy_volume" fill="#DC2626" stackId="vol" />
-            <Bar yAxisId="volume" dataKey="sell_volume" fill="#FCA5A5" stackId="vol" />
-            {/* Price line with spread band */}
-            <Area
-              yAxisId="price"
-              type="monotone"
-              dataKey="down_ask"
-              stroke="none"
-              fill="#EF4444"
-              fillOpacity={0.1}
-              connectNulls
-            />
-            <Area
-              yAxisId="price"
-              type="monotone"
-              dataKey="down_bid"
-              stroke="none"
-              fill="#1F2937"
-              fillOpacity={1}
-              connectNulls
-            />
+            {/* Volume bars - buy up, sell down (not stacked) */}
+            <Bar yAxisId="volume" dataKey="buy_volume" fill="#DC2626" name="Buy" barSize={8} />
+            <Bar yAxisId="volume" dataKey="sell_volume" fill="#F97316" name="Sell" barSize={8} />
+            {/* Price line */}
             <Line
               yAxisId="price"
               type="monotone"
@@ -406,7 +374,7 @@ export function MarketOverlayChart({ marketSlug }: Props) {
         <div className="flex justify-center gap-4 mt-2 text-xs text-gray-400">
           <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-red-500"></span> DOWN Price</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-600"></span> Buy Vol</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-300"></span> Sell Vol</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-orange-500"></span> Sell Vol</span>
         </div>
       </div>
 

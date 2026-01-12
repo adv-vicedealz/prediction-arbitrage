@@ -1651,18 +1651,21 @@ class Database:
             if bucket_data:
                 prices_downsampled.append(bucket_data)
 
-        # NEW: Aggregate trades by minute for volume bars
-        trade_volume_by_minute = []
+        # NEW: Aggregate trades by 10-second buckets for volume bars (90 buckets for 15 min)
+        trade_volume_by_bucket = []
+        bucket_size_seconds = 10
+        total_buckets = 90  # 15 minutes * 60 seconds / 10 seconds
         if calculated_start and trades:
-            minute_volumes = {}  # {minute: {buy_up, sell_up, buy_down, sell_down, buy_up_shares, sell_up_shares, ...}}
+            bucket_volumes = {}  # {bucket_idx: {...}}
 
             for t in trades:
-                minute = int((t["timestamp"] - calculated_start) / 60)
-                minute = max(0, min(14, minute))  # Clamp to 0-14 for 15-min markets
+                bucket_idx = int((t["timestamp"] - calculated_start) / bucket_size_seconds)
+                bucket_idx = max(0, min(total_buckets - 1, bucket_idx))  # Clamp to 0-89
 
-                if minute not in minute_volumes:
-                    minute_volumes[minute] = {
-                        "minute": minute,
+                if bucket_idx not in bucket_volumes:
+                    bucket_volumes[bucket_idx] = {
+                        "bucket": bucket_idx,
+                        "time_seconds": bucket_idx * bucket_size_seconds,
                         "buy_up_usdc": 0, "sell_up_usdc": 0,
                         "buy_down_usdc": 0, "sell_down_usdc": 0,
                         "buy_up_shares": 0, "sell_up_shares": 0,
@@ -1671,29 +1674,19 @@ class Database:
                     }
 
                 key_prefix = f"{t['side'].lower()}_{t['outcome'].lower()}"
-                minute_volumes[minute][f"{key_prefix}_usdc"] += t["usdc"]
-                minute_volumes[minute][f"{key_prefix}_shares"] += t["shares"]
-                minute_volumes[minute]["trade_count"] += 1
+                bucket_volumes[bucket_idx][f"{key_prefix}_usdc"] += t["usdc"]
+                bucket_volumes[bucket_idx][f"{key_prefix}_shares"] += t["shares"]
+                bucket_volumes[bucket_idx]["trade_count"] += 1
 
-            # Convert to sorted list
-            for minute in range(15):
-                if minute in minute_volumes:
-                    trade_volume_by_minute.append(minute_volumes[minute])
-                else:
-                    trade_volume_by_minute.append({
-                        "minute": minute,
-                        "buy_up_usdc": 0, "sell_up_usdc": 0,
-                        "buy_down_usdc": 0, "sell_down_usdc": 0,
-                        "buy_up_shares": 0, "sell_up_shares": 0,
-                        "buy_down_shares": 0, "sell_down_shares": 0,
-                        "trade_count": 0
-                    })
+            # Only include buckets that have trades (sparse representation)
+            for bucket_idx in sorted(bucket_volumes.keys()):
+                trade_volume_by_bucket.append(bucket_volumes[bucket_idx])
 
         return {
             "prices": prices,
             "prices_downsampled": prices_downsampled,
             "trades": trades,
-            "trade_volume_by_minute": trade_volume_by_minute,
+            "trade_volume_by_bucket": trade_volume_by_bucket,
             "market": {
                 "slug": market_dict["slug"],
                 "question": market_dict["question"] or "",
