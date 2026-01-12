@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Bar,
+  Cell,
   ReferenceLine,
 } from 'recharts';
 import type { MarketOverlayData } from '../../types';
@@ -240,35 +241,19 @@ export function MarketOverlayChart({ marketSlug }: Props) {
         </div>
       </div>
 
-      {/* UP Price + UP Volume (Dual Axis) */}
+      {/* UP Price + UP Volume (Split View) */}
       <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">UP Price with Trade Volume (10s buckets)</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart data={upPriceVolumeData} margin={{ top: 10, right: 50, left: 0, bottom: 20 }}>
+        <h3 className="text-sm font-medium text-gray-300 mb-2">UP Price with Trade Volume</h3>
+        {/* Price Chart */}
+        <ResponsiveContainer width="100%" height={200}>
+          <ComposedChart data={upPriceVolumeData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis
-              dataKey="minuteIntoMarket"
-              type="number"
-              domain={[0, 15]}
-              tickFormatter={(v) => `${Math.floor(v)}m`}
-              stroke="#9CA3AF"
-              fontSize={11}
-            />
+            <XAxis dataKey="minuteIntoMarket" type="number" domain={[0, 15]} hide />
             <YAxis
-              yAxisId="price"
               domain={['auto', 'auto']}
               tickFormatter={(v) => v.toFixed(2)}
               stroke="#10B981"
-              fontSize={11}
-              label={{ value: 'Price', angle: -90, position: 'insideLeft', fill: '#10B981', fontSize: 9 }}
-            />
-            <YAxis
-              yAxisId="volume"
-              orientation="right"
-              stroke="#6366F1"
               fontSize={10}
-              tickFormatter={(v) => `$${v.toFixed(0)}`}
-              label={{ value: 'Volume ($)', angle: 90, position: 'insideRight', fill: '#6366F1', fontSize: 9 }}
             />
             <Tooltip
               content={({ payload }) => {
@@ -276,68 +261,71 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 const d = payload[0].payload;
                 return (
                   <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p className="font-medium">{d.minuteIntoMarket?.toFixed(2)}m (bucket {d.bucket})</p>
+                    <p className="font-medium">{d.minuteIntoMarket?.toFixed(1)}m</p>
                     <p className="text-green-400">UP Price: {d.up_price?.toFixed(4)}</p>
-                    <p className="text-green-500">Buy Vol: ${d.buy_volume?.toFixed(2)}</p>
-                    <p className="text-orange-400">Sell Vol: ${d.sell_volume?.toFixed(2)}</p>
+                  </div>
+                );
+              }}
+            />
+            <Line type="monotone" dataKey="up_price" stroke="#10B981" strokeWidth={2} dot={false} connectNulls />
+          </ComposedChart>
+        </ResponsiveContainer>
+        {/* Volume Chart */}
+        <ResponsiveContainer width="100%" height={100}>
+          <ComposedChart data={upPriceVolumeData} margin={{ top: 0, right: 30, left: 0, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis
+              dataKey="minuteIntoMarket"
+              type="number"
+              domain={[0, 15]}
+              tickFormatter={(v) => `${Math.floor(v)}m`}
+              stroke="#9CA3AF"
+              fontSize={10}
+            />
+            <YAxis tickFormatter={(v) => `$${v}`} stroke="#9CA3AF" fontSize={9} />
+            <Tooltip
+              content={({ payload }) => {
+                if (!payload || !payload[0]) return null;
+                const d = payload[0].payload;
+                return (
+                  <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                    <p className="text-green-500">Buy: ${d.buy_volume?.toFixed(0)}</p>
+                    <p className="text-red-400">Sell: ${d.sell_volume?.toFixed(0)}</p>
                     <p className={`font-bold ${d.net_volume >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      Net: ${d.net_volume?.toFixed(2)}
+                      Net: ${d.net_volume?.toFixed(0)}
                     </p>
                   </div>
                 );
               }}
             />
-            {/* Volume bars - buy up, sell down (not stacked) */}
-            <Bar yAxisId="volume" dataKey="buy_volume" fill="#22C55E" name="Buy" barSize={8} />
-            <Bar yAxisId="volume" dataKey="sell_volume" fill="#F97316" name="Sell" barSize={8} />
-            {/* Price line */}
-            <Line
-              yAxisId="price"
-              type="monotone"
-              dataKey="up_price"
-              stroke="#10B981"
-              strokeWidth={2}
-              dot={false}
-              connectNulls
-            />
+            <ReferenceLine y={0} stroke="#6B7280" />
+            <Bar dataKey="net_volume" barSize={6}>
+              {upPriceVolumeData.map((entry, index) => (
+                <Cell key={index} fill={entry.net_volume >= 0 ? '#22C55E' : '#EF4444'} />
+              ))}
+            </Bar>
           </ComposedChart>
         </ResponsiveContainer>
-        <div className="flex justify-center gap-4 mt-2 text-xs text-gray-400">
+        <div className="flex justify-center gap-4 text-xs text-gray-400">
           <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-green-500"></span> UP Price</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500"></span> Buy Vol</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-orange-500"></span> Sell Vol</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500"></span> Net Buy</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500"></span> Net Sell</span>
         </div>
       </div>
 
-      {/* DOWN Price + DOWN Volume (Dual Axis) */}
+      {/* DOWN Price + DOWN Volume (Split View) */}
       <div className="bg-gray-900 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">DOWN Price with Trade Volume (10s buckets)</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart data={downPriceVolumeData} margin={{ top: 10, right: 50, left: 0, bottom: 20 }}>
+        <h3 className="text-sm font-medium text-gray-300 mb-2">DOWN Price with Trade Volume</h3>
+        {/* Price Chart */}
+        <ResponsiveContainer width="100%" height={200}>
+          <ComposedChart data={downPriceVolumeData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis
-              dataKey="minuteIntoMarket"
-              type="number"
-              domain={[0, 15]}
-              tickFormatter={(v) => `${Math.floor(v)}m`}
-              stroke="#9CA3AF"
-              fontSize={11}
-            />
+            <XAxis dataKey="minuteIntoMarket" type="number" domain={[0, 15]} hide />
             <YAxis
-              yAxisId="price"
               domain={['auto', 'auto']}
               tickFormatter={(v) => v.toFixed(2)}
               stroke="#EF4444"
-              fontSize={11}
-              label={{ value: 'Price', angle: -90, position: 'insideLeft', fill: '#EF4444', fontSize: 9 }}
-            />
-            <YAxis
-              yAxisId="volume"
-              orientation="right"
-              stroke="#6366F1"
               fontSize={10}
-              tickFormatter={(v) => `$${v.toFixed(0)}`}
-              label={{ value: 'Volume ($)', angle: 90, position: 'insideRight', fill: '#6366F1', fontSize: 9 }}
             />
             <Tooltip
               content={({ payload }) => {
@@ -345,36 +333,55 @@ export function MarketOverlayChart({ marketSlug }: Props) {
                 const d = payload[0].payload;
                 return (
                   <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
-                    <p className="font-medium">{d.minuteIntoMarket?.toFixed(2)}m (bucket {d.bucket})</p>
+                    <p className="font-medium">{d.minuteIntoMarket?.toFixed(1)}m</p>
                     <p className="text-red-400">DOWN Price: {d.down_price?.toFixed(4)}</p>
-                    <p className="text-red-500">Buy Vol: ${d.buy_volume?.toFixed(2)}</p>
-                    <p className="text-orange-400">Sell Vol: ${d.sell_volume?.toFixed(2)}</p>
+                  </div>
+                );
+              }}
+            />
+            <Line type="monotone" dataKey="down_price" stroke="#EF4444" strokeWidth={2} dot={false} connectNulls />
+          </ComposedChart>
+        </ResponsiveContainer>
+        {/* Volume Chart */}
+        <ResponsiveContainer width="100%" height={100}>
+          <ComposedChart data={downPriceVolumeData} margin={{ top: 0, right: 30, left: 0, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis
+              dataKey="minuteIntoMarket"
+              type="number"
+              domain={[0, 15]}
+              tickFormatter={(v) => `${Math.floor(v)}m`}
+              stroke="#9CA3AF"
+              fontSize={10}
+            />
+            <YAxis tickFormatter={(v) => `$${v}`} stroke="#9CA3AF" fontSize={9} />
+            <Tooltip
+              content={({ payload }) => {
+                if (!payload || !payload[0]) return null;
+                const d = payload[0].payload;
+                return (
+                  <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                    <p className="text-red-500">Buy: ${d.buy_volume?.toFixed(0)}</p>
+                    <p className="text-orange-400">Sell: ${d.sell_volume?.toFixed(0)}</p>
                     <p className={`font-bold ${d.net_volume >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      Net: ${d.net_volume?.toFixed(2)}
+                      Net: ${d.net_volume?.toFixed(0)}
                     </p>
                   </div>
                 );
               }}
             />
-            {/* Volume bars - buy up, sell down (not stacked) */}
-            <Bar yAxisId="volume" dataKey="buy_volume" fill="#DC2626" name="Buy" barSize={8} />
-            <Bar yAxisId="volume" dataKey="sell_volume" fill="#F97316" name="Sell" barSize={8} />
-            {/* Price line */}
-            <Line
-              yAxisId="price"
-              type="monotone"
-              dataKey="down_price"
-              stroke="#EF4444"
-              strokeWidth={2}
-              dot={false}
-              connectNulls
-            />
+            <ReferenceLine y={0} stroke="#6B7280" />
+            <Bar dataKey="net_volume" barSize={6}>
+              {downPriceVolumeData.map((entry, index) => (
+                <Cell key={index} fill={entry.net_volume >= 0 ? '#22C55E' : '#EF4444'} />
+              ))}
+            </Bar>
           </ComposedChart>
         </ResponsiveContainer>
-        <div className="flex justify-center gap-4 mt-2 text-xs text-gray-400">
+        <div className="flex justify-center gap-4 text-xs text-gray-400">
           <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-red-500"></span> DOWN Price</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-600"></span> Buy Vol</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-orange-500"></span> Sell Vol</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500"></span> Net Buy</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500"></span> Net Sell</span>
         </div>
       </div>
 

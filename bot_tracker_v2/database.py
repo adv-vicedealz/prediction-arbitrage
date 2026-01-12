@@ -1953,51 +1953,70 @@ class Database:
                     down_sells_above_avg += 1
 
         # Build timeline for position vs price correlation charts
-        # Sample prices at ~10 second intervals and track cumulative position
+        # Use 10-second buckets within market period (0-15 minutes)
         price_position_timeline = []
-        up_pos = 0
-        down_pos = 0
-        trade_idx = 0
-        sorted_rows = sorted([dict(r) for r in rows], key=lambda x: x["timestamp"])
 
-        # Get unique price timestamps
-        all_timestamps = sorted(set(list(up_prices.keys()) + list(down_prices.keys())))
+        # Get market end time to calculate start time
+        with self._get_conn() as conn:
+            market_row = conn.execute(
+                "SELECT end_time FROM markets WHERE slug = ?", (market_slug,)
+            ).fetchone()
 
-        for ts in all_timestamps[::5]:  # Sample every 5th price point (~5 seconds)
-            # Update position based on trades up to this timestamp
-            while trade_idx < len(sorted_rows) and sorted_rows[trade_idx]["timestamp"] <= ts:
-                t = sorted_rows[trade_idx]
-                if t["side"] == "BUY":
-                    if t["outcome"] == "Up":
-                        up_pos += t["shares"]
+        if market_row and market_row["end_time"]:
+            market_end = market_row["end_time"]
+            # For 15m markets, calculate actual start (end - 15 min)
+            market_start = market_end - 900  # 15 minutes
+
+            up_pos = 0
+            down_pos = 0
+            trade_idx = 0
+            sorted_rows = sorted([dict(r) for r in rows], key=lambda x: x["timestamp"])
+
+            # Generate 10-second buckets for the market period (90 buckets)
+            bucket_size = 10
+            num_buckets = 90  # 15 minutes / 10 seconds
+
+            for bucket_idx in range(num_buckets):
+                bucket_ts = market_start + (bucket_idx * bucket_size)
+                bucket_end = bucket_ts + bucket_size
+
+                # Update position based on trades up to this bucket
+                while trade_idx < len(sorted_rows) and sorted_rows[trade_idx]["timestamp"] < bucket_end:
+                    t = sorted_rows[trade_idx]
+                    if t["side"] == "BUY":
+                        if t["outcome"] == "Up":
+                            up_pos += t["shares"]
+                        else:
+                            down_pos += t["shares"]
                     else:
-                        down_pos += t["shares"]
-                else:
-                    if t["outcome"] == "Up":
-                        up_pos = max(0, up_pos - t["shares"])
-                    else:
-                        down_pos = max(0, down_pos - t["shares"])
-                trade_idx += 1
+                        if t["outcome"] == "Up":
+                            up_pos = max(0, up_pos - t["shares"])
+                        else:
+                            down_pos = max(0, down_pos - t["shares"])
+                    trade_idx += 1
 
-            up_price = up_prices.get(ts)
-            down_price = down_prices.get(ts)
+                # Find closest price within +/- 30 seconds
+                up_price = None
+                down_price = None
 
-            # Find closest price if exact timestamp not found
-            if up_price is None:
-                closest_ts = min(up_prices.keys(), key=lambda x: abs(x - ts), default=None)
-                up_price = up_prices.get(closest_ts) if closest_ts else None
-            if down_price is None:
-                closest_ts = min(down_prices.keys(), key=lambda x: abs(x - ts), default=None)
-                down_price = down_prices.get(closest_ts) if closest_ts else None
+                if up_prices:
+                    closest_up_ts = min(up_prices.keys(), key=lambda x: abs(x - bucket_ts), default=None)
+                    if closest_up_ts and abs(closest_up_ts - bucket_ts) <= 30:
+                        up_price = up_prices[closest_up_ts]
 
-            price_position_timeline.append({
-                "timestamp": ts,
-                "timestamp_iso": datetime.utcfromtimestamp(ts).isoformat() + "Z",
-                "up_shares": round(up_pos, 2),
-                "down_shares": round(down_pos, 2),
-                "up_price": round(up_price, 4) if up_price else None,
-                "down_price": round(down_price, 4) if down_price else None
-            })
+                if down_prices:
+                    closest_down_ts = min(down_prices.keys(), key=lambda x: abs(x - bucket_ts), default=None)
+                    if closest_down_ts and abs(closest_down_ts - bucket_ts) <= 30:
+                        down_price = down_prices[closest_down_ts]
+
+                price_position_timeline.append({
+                    "timestamp": bucket_ts,
+                    "timestamp_iso": datetime.utcfromtimestamp(bucket_ts).isoformat() + "Z",
+                    "up_shares": round(up_pos, 2),
+                    "down_shares": round(down_pos, 2),
+                    "up_price": round(up_price, 4) if up_price else None,
+                    "down_price": round(down_price, 4) if down_price else None
+                })
 
         # Calculate Pearson correlation between position and price
         def calc_correlation(positions, prices):
