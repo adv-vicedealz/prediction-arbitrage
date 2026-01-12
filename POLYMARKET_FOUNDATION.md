@@ -1,29 +1,50 @@
-# Polymarket Prediction Arbitrage Bot - Foundation Document
+# Polymarket Prediction Arbitrage - Foundation Document
 
-> **Purpose**: This document serves as a comprehensive foundation for building a prediction market arbitrage bot that monitors and executes trades on Polymarket's binary Up/Down markets. It contains all the technical details, API specifications, and strategic concepts needed to start from scratch.
+> **Purpose**: This document explains the Polymarket prediction market platform, the arbitrage opportunity, and all the technical information needed to analyze and eventually build trading systems.
+
+---
+
+## Goals
+
+### Immediate Goal: Understand Profitable Traders
+
+Before building a trading bot, we need to understand **how profitable traders operate**:
+- Which wallets are consistently profitable?
+- What strategies do they use?
+- What's their trade timing and sizing?
+- How do they manage risk and hedge positions?
+- What edge do they capture and how?
+
+This means building tools to **monitor, track, and analyze** successful traders on Polymarket.
+
+### End Goal: Build a Trading Bot
+
+Once we understand the winning strategies, the end goal is to build an **automated trading bot** that:
+- Identifies arbitrage opportunities in real-time
+- Executes trades automatically
+- Manages risk through proper hedging
+- Generates consistent profits
 
 ---
 
 ## Table of Contents
 
-1. [Project Overview](#1-project-overview)
-2. [What We're Building](#2-what-were-building)
-3. [Polymarket Platform Basics](#3-polymarket-platform-basics)
-4. [API Reference](#4-api-reference)
-5. [Trading Strategy Deep Dive](#5-trading-strategy-deep-dive)
-6. [Data Models](#6-data-models)
-7. [System Architecture](#7-system-architecture)
-8. [Implementation Guide](#8-implementation-guide)
+1. [The Opportunity](#1-the-opportunity)
+2. [Polymarket Platform Basics](#2-polymarket-platform-basics)
+3. [API Reference](#3-api-reference)
+4. [Trading Strategy Concepts](#4-trading-strategy-concepts)
 
 ---
 
-## 1. Project Overview
+## 1. The Opportunity
 
-### The Opportunity
+### What is Polymarket?
 
-Polymarket offers binary prediction markets where users bet on outcomes like "Will BTC price go up in the next 15 minutes?". Each market has two outcomes (Up/Down), and when the market resolves, the winning outcome pays $1.00 per share while the losing outcome pays $0.00.
+Polymarket is a prediction market platform where users bet on real-world outcomes. Markets have binary outcomes (Yes/No, Up/Down), and when the market resolves, the winning outcome pays **$1.00 per share** while the losing outcome pays **$0.00**.
 
-**The arbitrage opportunity**: If you can buy both outcomes for less than $1.00 combined, you're guaranteed a profit regardless of which outcome wins.
+### The Arbitrage Opportunity
+
+**If you can buy both outcomes for less than $1.00 combined, you're guaranteed a profit regardless of which outcome wins.**
 
 ### Example
 
@@ -45,22 +66,9 @@ When market resolves:
 Profit: $100.00 - $99.00 = $1.00 (guaranteed, regardless of outcome)
 ```
 
----
-
-## 2. What We're Building
-
-### Core Components
-
-1. **Market Discovery** - Find active 15-minute BTC/ETH markets
-2. **Price Monitoring** - Real-time orderbook data via WebSocket
-3. **Trade Execution** - Place limit orders on both outcomes
-4. **Position Tracking** - Track shares, costs, and P&L
-5. **Risk Management** - Maintain balanced hedging
-6. **Dashboard** - Real-time visualization of activity
-
 ### Target Markets
 
-**15-Minute Binary Markets**:
+**15-Minute Binary Markets** (new market every 15 minutes):
 - "Bitcoin Up or Down" (BTC)
 - "Ethereum Up or Down" (ETH)
 
@@ -73,11 +81,9 @@ Examples:
 - eth-updown-15m-1705000900
 ```
 
-New markets open every 15 minutes, providing continuous trading opportunities.
-
 ---
 
-## 3. Polymarket Platform Basics
+## 2. Polymarket Platform Basics
 
 ### Market Structure
 
@@ -111,9 +117,9 @@ Polymarket uses a Central Limit Order Book:
 
 ---
 
-## 4. API Reference
+## 3. API Reference
 
-### 4.1 Gamma API (Market Metadata)
+### 3.1 Gamma API (Market Metadata)
 
 **Base URL**: `https://gamma-api.polymarket.com`
 
@@ -169,7 +175,7 @@ market = response.json()[0]  # Returns array
 
 ---
 
-### 4.2 CLOB API (Trading & Orderbook)
+### 3.2 CLOB API (Trading & Orderbook)
 
 **Base URL**: `https://clob.polymarket.com`
 
@@ -259,7 +265,7 @@ order = client.create_and_post_order(
 
 ---
 
-### 4.3 Data API (Trade History)
+### 3.3 Data API (Trade History)
 
 **Base URL**: `https://data-api.polymarket.com`
 
@@ -316,7 +322,7 @@ trades = response.json()
 
 ---
 
-### 4.4 WebSocket (Real-Time Prices)
+### 3.4 WebSocket (Real-Time Prices)
 
 **URL**: `wss://ws-subscriptions-clob.polymarket.com/ws/market`
 
@@ -382,7 +388,7 @@ async def connect():
 
 ---
 
-### 4.5 Goldsky Subgraph (On-Chain Data)
+### 3.5 Goldsky Subgraph (On-Chain Data)
 
 **URL**: `https://api.goldsky.com/api/public/project_cl6mb8i9h0003e201j6li0diw/subgraphs/orderbook-subgraph/0.0.1/gn`
 
@@ -416,7 +422,7 @@ query GetTrades($wallet: String!, $tokens: [String!]!) {
 
 ---
 
-### 4.6 Smart Contracts
+### 3.6 Smart Contracts
 
 | Contract | Address | Purpose |
 |----------|---------|---------|
@@ -428,9 +434,9 @@ query GetTrades($wallet: String!, $tokens: [String!]!) {
 
 ---
 
-## 5. Trading Strategy Deep Dive
+## 4. Trading Strategy Concepts
 
-### 5.1 The Complete Set Arbitrage
+### 4.1 The Complete Set Arbitrage
 
 **Core Concept**: Buy both outcomes for less than $1.00 total.
 
@@ -454,7 +460,7 @@ Buy 1000 shares of each:
   Profit: $10 (1% edge)
 ```
 
-### 5.2 Key Metrics
+### 4.2 Key Metrics to Analyze
 
 | Metric | Formula | Meaning |
 |--------|---------|---------|
@@ -464,45 +470,38 @@ Buy 1000 shares of each:
 | **Unhedged** | abs(up_shares - down_shares) | Directional exposure |
 | **Hedge Ratio** | min(up,down) / max(up,down) | % of position hedged |
 
-### 5.3 Position States
+### 4.3 Position States
 
-```python
-# Perfect hedge (no directional risk)
-up_shares = 100, down_shares = 100
-complete_sets = 100
-hedge_ratio = 1.0
+```
+Perfect hedge (no directional risk):
+  up_shares = 100, down_shares = 100
+  complete_sets = 100
+  hedge_ratio = 1.0
 
-# Partial hedge
-up_shares = 100, down_shares = 80
-complete_sets = 80
-unhedged_up = 20  # Directional bet on UP
-hedge_ratio = 0.8
+Partial hedge:
+  up_shares = 100, down_shares = 80
+  complete_sets = 80
+  unhedged_up = 20  (directional bet on UP)
+  hedge_ratio = 0.8
 
-# No hedge (pure directional)
-up_shares = 100, down_shares = 0
-complete_sets = 0
-unhedged_up = 100
-hedge_ratio = 0.0
+No hedge (pure directional):
+  up_shares = 100, down_shares = 0
+  complete_sets = 0
+  unhedged_up = 100
+  hedge_ratio = 0.0
 ```
 
-### 5.4 P&L Calculation
+### 4.4 P&L Calculation
 
-```python
-def calculate_pnl(position, winning_outcome):
-    # Payout from winning shares
-    if winning_outcome == "Up":
-        payout = position.up_shares * 1.00
-    else:
-        payout = position.down_shares * 1.00
+```
+When market resolves:
+  - Winning shares pay $1.00 each
+  - Losing shares pay $0.00 each
 
-    # Total P&L
-    total_revenue = payout + position.sell_revenue
-    pnl = total_revenue - position.total_cost
-
-    return pnl
+P&L = (winning_shares × $1.00) + sell_revenue - total_cost
 ```
 
-### 5.5 Strategy Types
+### 4.5 Strategy Types
 
 | Strategy | Hedge Ratio | Edge | Description |
 |----------|-------------|------|-------------|
@@ -511,14 +510,14 @@ def calculate_pnl(position, winning_outcome):
 | **Directional** | < 30% | N/A | Bet on outcome |
 | **Mixed** | 30-70% | Variable | Combination |
 
-### 5.6 Risk Factors
+### 4.6 Risk Factors
 
 1. **Inventory Imbalance**: Fills happen asynchronously; may end up with unhedged exposure
 2. **Price Movement**: Market can move against unbalanced position
 3. **Execution Risk**: Orders may not fill at expected prices
 4. **Latency**: Slower execution = worse fills
 
-### 5.7 Maker vs Taker
+### 4.7 Maker vs Taker
 
 | Role | Pros | Cons |
 |------|------|------|
@@ -529,422 +528,14 @@ def calculate_pnl(position, winning_outcome):
 
 ---
 
-## 6. Data Models
-
-### 6.1 Trade Event
-
-```python
-@dataclass
-class TradeEvent:
-    id: str                    # Unique: tx_hash:asset_id
-    tx_hash: str               # Blockchain transaction hash
-    timestamp: int             # Unix timestamp
-    wallet: str                # Wallet address
-    wallet_name: str           # Human-readable name
-    role: str                  # "maker" or "taker"
-    side: str                  # "BUY" or "SELL"
-    outcome: str               # "Up" or "Down"
-    shares: float              # Number of shares
-    usdc: float                # USDC amount
-    price: float               # Price per share
-    fee: float                 # Transaction fee
-    market_slug: str           # Market identifier
-    market_question: str       # Market question text
-```
-
-### 6.2 Wallet Position
-
-```python
-@dataclass
-class WalletPosition:
-    wallet: str
-    wallet_name: str
-    market_slug: str
-
-    # Share holdings
-    up_shares: float
-    down_shares: float
-
-    # Cost basis
-    up_cost: float             # Total spent on UP
-    down_cost: float           # Total spent on DOWN
-
-    # Revenue from sells
-    up_revenue: float
-    down_revenue: float
-
-    # Derived metrics
-    complete_sets: float       # min(up, down)
-    unhedged_up: float         # max(0, up - down)
-    unhedged_down: float       # max(0, down - up)
-
-    # Averages
-    avg_up_price: float        # up_cost / up_shares
-    avg_down_price: float      # down_cost / down_shares
-    combined_price: float      # avg_up + avg_down
-
-    # Strategy metrics
-    edge: float                # 1.0 - combined_price
-    hedge_ratio: float         # min(up,down) / max(up,down)
-
-    # Trade counts
-    total_trades: int
-    buy_trades: int
-    sell_trades: int
-    maker_trades: int
-    taker_trades: int
-```
-
-### 6.3 Market Context
-
-```python
-@dataclass
-class MarketContext:
-    slug: str                  # e.g., "btc-updown-15m-1705000000"
-    question: str              # Market question
-    condition_id: str          # On-chain identifier
-    token_ids: Dict[str, str]  # {"up": "...", "down": "..."}
-    outcomes: List[str]        # ["Up", "Down"]
-    start_date: datetime
-    end_date: datetime
-    resolved: bool
-    winning_outcome: str       # "Up", "Down", or None
-
-    # Live orderbook data
-    up_best_bid: float
-    up_best_ask: float
-    down_best_bid: float
-    down_best_ask: float
-    combined_bid: float        # up_bid + down_bid
-    spread: float              # 1.0 - combined_bid
-```
-
-### 6.4 Price Point
-
-```python
-@dataclass
-class PricePoint:
-    timestamp: int
-    timestamp_iso: str
-    market_slug: str
-    outcome: str               # "Up" or "Down"
-    price: float               # Mid price
-    best_bid: float
-    best_ask: float
-```
-
----
-
-## 7. System Architecture
-
-### 7.1 Component Overview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    POLYMARKET APIS                          │
-├─────────────┬─────────────┬─────────────┬─────────────────┤
-│ Gamma API   │ CLOB API    │ Data API    │ WebSocket       │
-│ (metadata)  │ (orderbook) │ (trades)    │ (real-time)     │
-└─────────────┴─────────────┴─────────────┴─────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    BACKEND SERVICES                         │
-├─────────────┬─────────────┬─────────────┬─────────────────┤
-│ Market      │ Trade       │ Price       │ Position        │
-│ Discovery   │ Poller      │ Stream      │ Tracker         │
-└─────────────┴─────────────┴─────────────┴─────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    DATA LAYER                               │
-├─────────────────────────────────────────────────────────────┤
-│                    SQLite Database                          │
-│  ┌─────────┬──────────┬─────────┬────────┬───────────┐    │
-│  │ trades  │ positions│ markets │ prices │ sessions  │    │
-│  └─────────┴──────────┴─────────┴────────┴───────────┘    │
-└─────────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    API LAYER                                │
-├─────────────────────────────────────────────────────────────┤
-│              FastAPI (REST + WebSocket)                     │
-└─────────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    FRONTEND                                 │
-├─────────────────────────────────────────────────────────────┤
-│              React Dashboard (TypeScript)                   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 7.2 Service Responsibilities
-
-**Market Discovery**
-- Generate potential market slugs based on timestamps
-- Query Gamma API to find active markets
-- Track market lifecycle (active → resolved)
-
-**Trade Poller**
-- Poll Data API for wallet trades every 2 seconds
-- Deduplicate trades by ID
-- Emit new trades to position tracker
-
-**Price Stream**
-- Maintain WebSocket connection
-- Subscribe to active market token IDs
-- Save price snapshots to database
-- Emit price updates to dashboard
-
-**Position Tracker**
-- Process incoming trades
-- Update position metrics
-- Calculate derived values (edge, hedge ratio)
-
-### 7.3 Database Schema
-
-```sql
--- Trades table
-CREATE TABLE trades (
-    id TEXT PRIMARY KEY,
-    tx_hash TEXT NOT NULL,
-    timestamp INTEGER NOT NULL,
-    wallet TEXT NOT NULL,
-    wallet_name TEXT,
-    role TEXT NOT NULL,
-    side TEXT NOT NULL,
-    outcome TEXT NOT NULL,
-    shares REAL NOT NULL,
-    usdc REAL NOT NULL,
-    price REAL NOT NULL,
-    fee REAL DEFAULT 0,
-    market_slug TEXT NOT NULL,
-    market_question TEXT,
-    session_id TEXT,
-    recorded_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-
--- Positions table
-CREATE TABLE positions (
-    wallet TEXT NOT NULL,
-    market_slug TEXT NOT NULL,
-    wallet_name TEXT,
-    up_shares REAL DEFAULT 0,
-    down_shares REAL DEFAULT 0,
-    up_cost REAL DEFAULT 0,
-    down_cost REAL DEFAULT 0,
-    up_revenue REAL DEFAULT 0,
-    down_revenue REAL DEFAULT 0,
-    complete_sets REAL DEFAULT 0,
-    unhedged_up REAL DEFAULT 0,
-    unhedged_down REAL DEFAULT 0,
-    avg_up_price REAL DEFAULT 0,
-    avg_down_price REAL DEFAULT 0,
-    combined_price REAL DEFAULT 0,
-    edge REAL DEFAULT 0,
-    hedge_ratio REAL DEFAULT 1,
-    total_trades INTEGER DEFAULT 0,
-    buy_trades INTEGER DEFAULT 0,
-    sell_trades INTEGER DEFAULT 0,
-    maker_trades INTEGER DEFAULT 0,
-    taker_trades INTEGER DEFAULT 0,
-    first_trade_ts INTEGER,
-    last_trade_ts INTEGER,
-    PRIMARY KEY (wallet, market_slug)
-);
-
--- Markets table
-CREATE TABLE markets (
-    slug TEXT PRIMARY KEY,
-    condition_id TEXT,
-    question TEXT,
-    token_ids TEXT,  -- JSON: {"up": "...", "down": "..."}
-    outcomes TEXT,   -- JSON: ["Up", "Down"]
-    start_date TEXT,
-    end_date TEXT,
-    resolved INTEGER DEFAULT 0,
-    winning_outcome TEXT,
-    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-
--- Prices table
-CREATE TABLE prices (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp INTEGER NOT NULL,
-    timestamp_iso TEXT,
-    market_slug TEXT NOT NULL,
-    outcome TEXT NOT NULL,
-    price REAL,
-    best_bid REAL,
-    best_ask REAL,
-    session_id TEXT
-);
-
--- Indexes
-CREATE INDEX idx_trades_wallet ON trades(wallet);
-CREATE INDEX idx_trades_market ON trades(market_slug);
-CREATE INDEX idx_trades_timestamp ON trades(timestamp);
-CREATE INDEX idx_prices_market ON prices(market_slug);
-CREATE INDEX idx_prices_timestamp ON prices(timestamp);
-```
-
-### 7.4 Tech Stack
-
-**Backend**:
-- Python 3.8+
-- FastAPI (REST API + WebSocket server)
-- SQLite (WAL mode for concurrent access)
-- aiohttp (async HTTP client)
-- websockets (WebSocket client)
-- Pydantic (data validation)
-
-**Frontend**:
-- React 18 + TypeScript
-- Vite (build tool)
-- Tailwind CSS (styling)
-- Recharts (data visualization)
-
----
-
-## 8. Implementation Guide
-
-### 8.1 Project Structure
-
-```
-prediction-arbitrage/
-├── backend/
-│   ├── main.py              # Entry point
-│   ├── config.py            # Configuration
-│   ├── models.py            # Pydantic models
-│   ├── database.py          # SQLite operations
-│   ├── api.py               # FastAPI routes
-│   ├── services/
-│   │   ├── discovery.py     # Market discovery
-│   │   ├── trade_poller.py  # Trade fetching
-│   │   ├── price_stream.py  # WebSocket prices
-│   │   └── position.py      # Position tracking
-│   └── utils/
-│       └── logger.py        # Logging setup
-│
-├── frontend/
-│   ├── src/
-│   │   ├── App.tsx
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── context/
-│   │   └── types/
-│   ├── package.json
-│   └── vite.config.ts
-│
-├── data/
-│   └── tracker.db
-│
-├── requirements.txt
-└── README.md
-```
-
-### 8.2 Configuration
-
-```python
-# config.py
-from dataclasses import dataclass
-from typing import Dict
-
-@dataclass
-class Config:
-    # Target wallets to monitor
-    TARGET_WALLETS: Dict[str, str] = {
-        "0x6031b6eed...": "gabagool22",
-    }
-
-    # Market filter
-    MARKET_PATTERN: str = r"(btc|eth)-updown-15m-\d+"
-
-    # API URLs
-    GAMMA_API: str = "https://gamma-api.polymarket.com"
-    CLOB_API: str = "https://clob.polymarket.com"
-    DATA_API: str = "https://data-api.polymarket.com"
-    WS_URL: str = "wss://ws-subscriptions-clob.polymarket.com/ws/market"
-
-    # Polling intervals
-    TRADE_POLL_INTERVAL: float = 2.0      # seconds
-    MARKET_POLL_INTERVAL: float = 30.0    # seconds
-    PRICE_SAVE_INTERVAL: float = 1.0      # seconds
-
-    # Server
-    HTTP_PORT: int = 8000
-
-    # Database
-    DATABASE_PATH: str = "data/tracker.db"
-```
-
-### 8.3 Key Implementation Steps
-
-1. **Set up database**
-   - Create SQLite database with schema
-   - Implement CRUD operations
-
-2. **Implement market discovery**
-   - Generate slug patterns for current time
-   - Query Gamma API for market details
-   - Store active markets
-
-3. **Implement trade poller**
-   - Poll Data API for target wallet trades
-   - Deduplicate by trade ID
-   - Process new trades
-
-4. **Implement price stream**
-   - Connect to WebSocket
-   - Subscribe to active market tokens
-   - Save price points
-
-5. **Implement position tracking**
-   - Calculate running totals on each trade
-   - Compute derived metrics
-
-6. **Build API layer**
-   - REST endpoints for data retrieval
-   - WebSocket for real-time updates
-
-7. **Build dashboard**
-   - Connect to WebSocket
-   - Display trades, positions, prices
-   - Visualize with charts
-
-### 8.4 Polling Recommendations
-
-| Task | Interval | Notes |
-|------|----------|-------|
-| Trade polling | 2 seconds | Catch trades quickly |
-| Market discovery | 30 seconds | New markets every 15 min |
-| Price saves | 1 second | Throttle WebSocket saves |
-| Position resolution | After market closes + 2 min | Wait for final trades |
-
-### 8.5 Error Handling
-
-- Implement retry logic with exponential backoff
-- Handle WebSocket disconnections with auto-reconnect
-- Log all API errors with context
-- Graceful degradation when APIs are unavailable
-
----
-
 ## Summary
 
-This document provides everything needed to build a Polymarket prediction arbitrage system:
+**Immediate Goal**: Build tools to monitor and analyze profitable traders on Polymarket to understand their strategies, timing, sizing, and risk management.
 
-1. **APIs**: Full reference for Gamma, CLOB, Data, and WebSocket APIs
-2. **Strategy**: Complete explanation of arbitrage mechanics
-3. **Models**: Data structures for trades, positions, markets
-4. **Architecture**: System design and component interactions
-5. **Implementation**: Step-by-step guide to build the system
+**End Goal**: Use these insights to build an automated trading bot that captures arbitrage opportunities.
 
-The core arbitrage opportunity is simple: buy both outcomes for less than $1.00 combined to guarantee profit. The complexity lies in execution - managing inventory, handling asynchronous fills, and maintaining balanced hedges.
+**The Core Opportunity**: Buy both outcomes for less than $1.00 combined to guarantee profit regardless of which outcome wins.
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: January 2026*
+*Document Version: 1.1*
