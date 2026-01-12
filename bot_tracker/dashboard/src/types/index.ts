@@ -375,9 +375,24 @@ export interface TradeImpact {
   sell_down_impact: number;
 }
 
+export interface TradeVolumeByMinute {
+  minute: number;
+  buy_up_usdc: number;
+  sell_up_usdc: number;
+  buy_down_usdc: number;
+  sell_down_usdc: number;
+  buy_up_shares: number;
+  sell_up_shares: number;
+  buy_down_shares: number;
+  sell_down_shares: number;
+  trade_count: number;
+}
+
 export interface MarketOverlayData {
   prices: PriceTimelinePoint[];
+  prices_downsampled: PriceTimelinePoint[];
   trades: OverlayTrade[];
+  trade_volume_by_minute: TradeVolumeByMinute[];
   market: {
     slug: string;
     question: string;
@@ -442,11 +457,33 @@ export interface PositionSizing {
   pattern: 'DCA' | 'Variable' | 'Concentrated';
 }
 
+export interface PricePositionTimelinePoint {
+  timestamp: number;
+  timestamp_iso: string;
+  up_shares: number;
+  down_shares: number;
+  up_price: number | null;
+  down_price: number | null;
+}
+
+export interface PriceCorrelation {
+  up_shares_vs_up_price: number;
+  down_shares_vs_down_price: number;
+  pct_bought_below_avg_up: number;
+  pct_bought_below_avg_down: number;
+  pct_sold_above_avg_up: number;
+  pct_sold_above_avg_down: number;
+  avg_up_price: number;
+  avg_down_price: number;
+  timeline: PricePositionTimelinePoint[];
+}
+
 export interface PositionEvolutionData {
   points: PositionEvolutionPoint[];
   summary: PositionSummary;
   entry_quality: EntryQuality;
   sizing: PositionSizing;
+  price_correlation: PriceCorrelation;
 }
 
 export interface TradingIntensityMinute {

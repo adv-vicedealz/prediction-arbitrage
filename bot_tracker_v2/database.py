@@ -1050,7 +1050,7 @@ class Database:
     # =========================================================================
 
     def get_resolved_markets_list(self) -> List[Dict]:
-        """Get list of resolved markets for the market selector dropdown."""
+        """Get list of all markets with trades for the market selector dropdown."""
         with self._get_conn() as conn:
             rows = conn.execute("""
                 SELECT
@@ -1058,13 +1058,13 @@ class Database:
                     m.question,
                     m.end_time,
                     m.winning_outcome,
+                    m.resolved,
                     COUNT(t.id) as trade_count
                 FROM markets m
                 LEFT JOIN trades t ON m.slug = t.market_slug
-                WHERE m.resolved = 1 AND m.winning_outcome IS NOT NULL
                 GROUP BY m.slug
                 HAVING trade_count > 0
-                ORDER BY m.end_time DESC
+                ORDER BY m.end_time DESC NULLS LAST
             """).fetchall()
 
         return [{
@@ -1629,9 +1629,71 @@ class Database:
                         key = f"{side.lower()}_{outcome.lower()}"
                         trade_impacts[key].append(impact)
 
+        # NEW: Downsample prices to 1 per 5 seconds for cleaner chart
+        prices_downsampled = []
+        if prices:
+            bucket_size = 5  # 5 seconds per point
+            current_bucket = None
+            bucket_data = None
+
+            for p in prices:
+                bucket = (p["timestamp"] // bucket_size) * bucket_size
+                if bucket != current_bucket:
+                    if bucket_data:
+                        prices_downsampled.append(bucket_data)
+                    current_bucket = bucket
+                    bucket_data = p.copy()
+                else:
+                    # Update with latest values in bucket
+                    for key in ["up_price", "up_bid", "up_ask", "down_price", "down_bid", "down_ask"]:
+                        if p[key] is not None:
+                            bucket_data[key] = p[key]
+            if bucket_data:
+                prices_downsampled.append(bucket_data)
+
+        # NEW: Aggregate trades by minute for volume bars
+        trade_volume_by_minute = []
+        if calculated_start and trades:
+            minute_volumes = {}  # {minute: {buy_up, sell_up, buy_down, sell_down, buy_up_shares, sell_up_shares, ...}}
+
+            for t in trades:
+                minute = int((t["timestamp"] - calculated_start) / 60)
+                minute = max(0, min(14, minute))  # Clamp to 0-14 for 15-min markets
+
+                if minute not in minute_volumes:
+                    minute_volumes[minute] = {
+                        "minute": minute,
+                        "buy_up_usdc": 0, "sell_up_usdc": 0,
+                        "buy_down_usdc": 0, "sell_down_usdc": 0,
+                        "buy_up_shares": 0, "sell_up_shares": 0,
+                        "buy_down_shares": 0, "sell_down_shares": 0,
+                        "trade_count": 0
+                    }
+
+                key_prefix = f"{t['side'].lower()}_{t['outcome'].lower()}"
+                minute_volumes[minute][f"{key_prefix}_usdc"] += t["usdc"]
+                minute_volumes[minute][f"{key_prefix}_shares"] += t["shares"]
+                minute_volumes[minute]["trade_count"] += 1
+
+            # Convert to sorted list
+            for minute in range(15):
+                if minute in minute_volumes:
+                    trade_volume_by_minute.append(minute_volumes[minute])
+                else:
+                    trade_volume_by_minute.append({
+                        "minute": minute,
+                        "buy_up_usdc": 0, "sell_up_usdc": 0,
+                        "buy_down_usdc": 0, "sell_down_usdc": 0,
+                        "buy_up_shares": 0, "sell_up_shares": 0,
+                        "buy_down_shares": 0, "sell_down_shares": 0,
+                        "trade_count": 0
+                    })
+
         return {
             "prices": prices,
+            "prices_downsampled": prices_downsampled,
             "trades": trades,
+            "trade_volume_by_minute": trade_volume_by_minute,
             "market": {
                 "slug": market_dict["slug"],
                 "question": market_dict["question"] or "",
@@ -1825,6 +1887,171 @@ class Database:
             else:
                 final_pnl = up_shares * 0.0 + down_shares * 1.0 - total_cost + total_revenue
 
+        # NEW: Calculate position vs price correlation
+        with self._get_conn() as conn:
+            # Get price data for correlation analysis
+            prices_rows = conn.execute("""
+                SELECT timestamp, outcome, price as mid_price
+                FROM prices
+                WHERE market_slug = ?
+                ORDER BY timestamp ASC
+            """, (market_slug,)).fetchall()
+
+            # Also get buy trades with prices for "bought the dip" analysis
+            buy_trades = conn.execute("""
+                SELECT t.timestamp, t.outcome, t.price as trade_price, t.shares
+                FROM trades t
+                WHERE t.market_slug = ? AND t.side = 'BUY'
+                ORDER BY t.timestamp ASC
+            """, (market_slug,)).fetchall()
+
+            # Get sell trades for "sold the top" analysis
+            sell_trades = conn.execute("""
+                SELECT t.timestamp, t.outcome, t.price as trade_price, t.shares
+                FROM trades t
+                WHERE t.market_slug = ? AND t.side = 'SELL'
+                ORDER BY t.timestamp ASC
+            """, (market_slug,)).fetchall()
+
+        # Build price lookup by timestamp and outcome
+        up_prices = {}
+        down_prices = {}
+        for pr in prices_rows:
+            p = dict(pr)
+            if p["outcome"] == "Up":
+                up_prices[p["timestamp"]] = p["mid_price"]
+            else:
+                down_prices[p["timestamp"]] = p["mid_price"]
+
+        # Calculate average prices for "bought below" analysis
+        avg_up_price = sum(up_prices.values()) / len(up_prices) if up_prices else 0.5
+        avg_down_price = sum(down_prices.values()) / len(down_prices) if down_prices else 0.5
+
+        # Calculate "bought the dip" percentages
+        up_buys_below_avg = 0
+        up_buy_total = 0
+        down_buys_below_avg = 0
+        down_buy_total = 0
+        for bt in buy_trades:
+            b = dict(bt)
+            if b["outcome"] == "Up":
+                up_buy_total += 1
+                if b["trade_price"] < avg_up_price:
+                    up_buys_below_avg += 1
+            else:
+                down_buy_total += 1
+                if b["trade_price"] < avg_down_price:
+                    down_buys_below_avg += 1
+
+        # Calculate "sold the top" percentages
+        up_sells_above_avg = 0
+        up_sell_total = 0
+        down_sells_above_avg = 0
+        down_sell_total = 0
+        for st in sell_trades:
+            s = dict(st)
+            if s["outcome"] == "Up":
+                up_sell_total += 1
+                if s["trade_price"] > avg_up_price:
+                    up_sells_above_avg += 1
+            else:
+                down_sell_total += 1
+                if s["trade_price"] > avg_down_price:
+                    down_sells_above_avg += 1
+
+        # Build timeline for position vs price correlation charts
+        # Sample prices at ~10 second intervals and track cumulative position
+        price_position_timeline = []
+        up_pos = 0
+        down_pos = 0
+        trade_idx = 0
+        sorted_rows = sorted([dict(r) for r in rows], key=lambda x: x["timestamp"])
+
+        # Get unique price timestamps
+        all_timestamps = sorted(set(list(up_prices.keys()) + list(down_prices.keys())))
+
+        for ts in all_timestamps[::5]:  # Sample every 5th price point (~5 seconds)
+            # Update position based on trades up to this timestamp
+            while trade_idx < len(sorted_rows) and sorted_rows[trade_idx]["timestamp"] <= ts:
+                t = sorted_rows[trade_idx]
+                if t["side"] == "BUY":
+                    if t["outcome"] == "Up":
+                        up_pos += t["shares"]
+                    else:
+                        down_pos += t["shares"]
+                else:
+                    if t["outcome"] == "Up":
+                        up_pos = max(0, up_pos - t["shares"])
+                    else:
+                        down_pos = max(0, down_pos - t["shares"])
+                trade_idx += 1
+
+            up_price = up_prices.get(ts)
+            down_price = down_prices.get(ts)
+
+            # Find closest price if exact timestamp not found
+            if up_price is None:
+                closest_ts = min(up_prices.keys(), key=lambda x: abs(x - ts), default=None)
+                up_price = up_prices.get(closest_ts) if closest_ts else None
+            if down_price is None:
+                closest_ts = min(down_prices.keys(), key=lambda x: abs(x - ts), default=None)
+                down_price = down_prices.get(closest_ts) if closest_ts else None
+
+            price_position_timeline.append({
+                "timestamp": ts,
+                "timestamp_iso": datetime.utcfromtimestamp(ts).isoformat() + "Z",
+                "up_shares": round(up_pos, 2),
+                "down_shares": round(down_pos, 2),
+                "up_price": round(up_price, 4) if up_price else None,
+                "down_price": round(down_price, 4) if down_price else None
+            })
+
+        # Calculate Pearson correlation between position and price
+        def calc_correlation(positions, prices):
+            """Calculate Pearson correlation coefficient."""
+            if len(positions) < 3 or len(prices) < 3:
+                return 0
+            # Filter out None values
+            valid_pairs = [(p, pr) for p, pr in zip(positions, prices) if p is not None and pr is not None]
+            if len(valid_pairs) < 3:
+                return 0
+            positions = [p for p, _ in valid_pairs]
+            prices = [pr for _, pr in valid_pairs]
+
+            n = len(positions)
+            mean_pos = sum(positions) / n
+            mean_price = sum(prices) / n
+
+            # Check for zero variance
+            var_pos = sum((p - mean_pos) ** 2 for p in positions)
+            var_price = sum((pr - mean_price) ** 2 for pr in prices)
+            if var_pos == 0 or var_price == 0:
+                return 0
+
+            numerator = sum((p - mean_pos) * (pr - mean_price) for p, pr in zip(positions, prices))
+            denominator = (var_pos ** 0.5) * (var_price ** 0.5)
+            return numerator / denominator if denominator > 0 else 0
+
+        up_positions = [p["up_shares"] for p in price_position_timeline]
+        down_positions = [p["down_shares"] for p in price_position_timeline]
+        up_price_vals = [p["up_price"] for p in price_position_timeline]
+        down_price_vals = [p["down_price"] for p in price_position_timeline]
+
+        up_corr = calc_correlation(up_positions, up_price_vals)
+        down_corr = calc_correlation(down_positions, down_price_vals)
+
+        price_correlation = {
+            "up_shares_vs_up_price": round(up_corr, 3),
+            "down_shares_vs_down_price": round(down_corr, 3),
+            "pct_bought_below_avg_up": round(up_buys_below_avg / up_buy_total * 100, 1) if up_buy_total > 0 else 0,
+            "pct_bought_below_avg_down": round(down_buys_below_avg / down_buy_total * 100, 1) if down_buy_total > 0 else 0,
+            "pct_sold_above_avg_up": round(up_sells_above_avg / up_sell_total * 100, 1) if up_sell_total > 0 else 0,
+            "pct_sold_above_avg_down": round(down_sells_above_avg / down_sell_total * 100, 1) if down_sell_total > 0 else 0,
+            "avg_up_price": round(avg_up_price, 4),
+            "avg_down_price": round(avg_down_price, 4),
+            "timeline": price_position_timeline
+        }
+
         return {
             "points": evolution,
             "summary": {
@@ -1856,7 +2083,8 @@ class Database:
                 "coefficient_variation": round(coefficient_variation, 3),  # Low = DCA, High = variable
                 "largest_pct": round(largest_pct, 1),
                 "pattern": "DCA" if coefficient_variation < 0.3 else ("Variable" if coefficient_variation < 0.7 else "Concentrated")
-            }
+            },
+            "price_correlation": price_correlation
         }
 
     def get_trading_intensity_patterns(self) -> Dict:

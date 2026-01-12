@@ -187,6 +187,211 @@ export function PositionEvolutionChart({ marketSlug }: Props) {
         </div>
       </div>
 
+      {/* NEW: Position vs Price Correlation */}
+      {data.price_correlation && data.price_correlation.timeline.length > 0 && (
+        <>
+          {/* Correlation Stats Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className={`rounded-lg p-3 text-center ${Math.abs(data.price_correlation.up_shares_vs_up_price) < 0.3 ? 'bg-gray-800' : data.price_correlation.up_shares_vs_up_price > 0 ? 'bg-yellow-900/30 border border-yellow-700' : 'bg-green-900/30 border border-green-700'}`}>
+              <p className="text-xs text-gray-400">UP Position vs UP Price</p>
+              <p className={`text-xl font-bold ${data.price_correlation.up_shares_vs_up_price > 0.3 ? 'text-yellow-400' : data.price_correlation.up_shares_vs_up_price < -0.3 ? 'text-green-400' : 'text-gray-400'}`}>
+                r = {data.price_correlation.up_shares_vs_up_price.toFixed(3)}
+              </p>
+              <p className="text-xs text-gray-500">
+                {data.price_correlation.up_shares_vs_up_price > 0.3 ? 'Chasing (buys on rise)' :
+                 data.price_correlation.up_shares_vs_up_price < -0.3 ? 'Contrarian (buys dips)' : 'Neutral'}
+              </p>
+            </div>
+            <div className={`rounded-lg p-3 text-center ${Math.abs(data.price_correlation.down_shares_vs_down_price) < 0.3 ? 'bg-gray-800' : data.price_correlation.down_shares_vs_down_price > 0 ? 'bg-yellow-900/30 border border-yellow-700' : 'bg-green-900/30 border border-green-700'}`}>
+              <p className="text-xs text-gray-400">DOWN Position vs DOWN Price</p>
+              <p className={`text-xl font-bold ${data.price_correlation.down_shares_vs_down_price > 0.3 ? 'text-yellow-400' : data.price_correlation.down_shares_vs_down_price < -0.3 ? 'text-green-400' : 'text-gray-400'}`}>
+                r = {data.price_correlation.down_shares_vs_down_price.toFixed(3)}
+              </p>
+              <p className="text-xs text-gray-500">
+                {data.price_correlation.down_shares_vs_down_price > 0.3 ? 'Chasing (buys on rise)' :
+                 data.price_correlation.down_shares_vs_down_price < -0.3 ? 'Contrarian (buys dips)' : 'Neutral'}
+              </p>
+            </div>
+            <div className={`rounded-lg p-3 text-center ${data.price_correlation.pct_bought_below_avg_up >= 50 ? 'bg-green-900/30 border border-green-700' : 'bg-gray-800'}`}>
+              <p className="text-xs text-gray-400">"Bought the Dip" UP</p>
+              <p className={`text-xl font-bold ${data.price_correlation.pct_bought_below_avg_up >= 50 ? 'text-green-400' : 'text-gray-400'}`}>
+                {data.price_correlation.pct_bought_below_avg_up.toFixed(0)}%
+              </p>
+              <p className="text-xs text-gray-500">below avg ${data.price_correlation.avg_up_price.toFixed(3)}</p>
+            </div>
+            <div className={`rounded-lg p-3 text-center ${data.price_correlation.pct_bought_below_avg_down >= 50 ? 'bg-green-900/30 border border-green-700' : 'bg-gray-800'}`}>
+              <p className="text-xs text-gray-400">"Bought the Dip" DOWN</p>
+              <p className={`text-xl font-bold ${data.price_correlation.pct_bought_below_avg_down >= 50 ? 'text-green-400' : 'text-gray-400'}`}>
+                {data.price_correlation.pct_bought_below_avg_down.toFixed(0)}%
+              </p>
+              <p className="text-xs text-gray-500">below avg ${data.price_correlation.avg_down_price.toFixed(3)}</p>
+            </div>
+          </div>
+
+          {/* UP Position vs UP Price Chart (Dual Y-Axis) */}
+          <div className="bg-gray-900 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-gray-300 mb-4">
+              UP Position vs UP Price
+              <span className="ml-2 text-xs text-gray-400">
+                Correlation: r = {data.price_correlation.up_shares_vs_up_price.toFixed(3)}
+              </span>
+            </h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <ComposedChart
+                data={data.price_correlation.timeline.map((p, i) => ({ ...p, index: i }))}
+                margin={{ top: 10, right: 50, left: 0, bottom: 10 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="index" stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${Math.floor(v / 12)}m`} />
+                <YAxis
+                  yAxisId="shares"
+                  stroke="#10B981"
+                  fontSize={10}
+                  label={{ value: 'Shares', angle: -90, position: 'insideLeft', fill: '#10B981', fontSize: 9 }}
+                />
+                <YAxis
+                  yAxisId="price"
+                  orientation="right"
+                  stroke="#F59E0B"
+                  fontSize={10}
+                  domain={['auto', 'auto']}
+                  tickFormatter={(v) => v.toFixed(2)}
+                  label={{ value: 'Price', angle: 90, position: 'insideRight', fill: '#F59E0B', fontSize: 9 }}
+                />
+                <Tooltip
+                  content={({ payload }) => {
+                    if (!payload || !payload[0]) return null;
+                    const d = payload[0].payload;
+                    return (
+                      <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                        <p className="text-green-400">UP Shares: {d.up_shares?.toFixed(0)}</p>
+                        <p className="text-yellow-400">UP Price: ${d.up_price?.toFixed(4)}</p>
+                      </div>
+                    );
+                  }}
+                />
+                <Area
+                  yAxisId="shares"
+                  type="monotone"
+                  dataKey="up_shares"
+                  stroke="#10B981"
+                  fill="#10B981"
+                  fillOpacity={0.3}
+                />
+                <Line
+                  yAxisId="price"
+                  type="monotone"
+                  dataKey="up_price"
+                  stroke="#F59E0B"
+                  strokeWidth={2}
+                  dot={false}
+                  connectNulls
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+            <div className="flex justify-center gap-6 mt-2 text-xs text-gray-200">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-500/50"></span> UP Position</span>
+              <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-yellow-500"></span> UP Price</span>
+            </div>
+          </div>
+
+          {/* DOWN Position vs DOWN Price Chart (Dual Y-Axis) */}
+          <div className="bg-gray-900 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-gray-300 mb-4">
+              DOWN Position vs DOWN Price
+              <span className="ml-2 text-xs text-gray-400">
+                Correlation: r = {data.price_correlation.down_shares_vs_down_price.toFixed(3)}
+              </span>
+            </h3>
+            <ResponsiveContainer width="100%" height={250}>
+              <ComposedChart
+                data={data.price_correlation.timeline.map((p, i) => ({ ...p, index: i }))}
+                margin={{ top: 10, right: 50, left: 0, bottom: 10 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="index" stroke="#9CA3AF" fontSize={10} tickFormatter={(v) => `${Math.floor(v / 12)}m`} />
+                <YAxis
+                  yAxisId="shares"
+                  stroke="#EF4444"
+                  fontSize={10}
+                  label={{ value: 'Shares', angle: -90, position: 'insideLeft', fill: '#EF4444', fontSize: 9 }}
+                />
+                <YAxis
+                  yAxisId="price"
+                  orientation="right"
+                  stroke="#F59E0B"
+                  fontSize={10}
+                  domain={['auto', 'auto']}
+                  tickFormatter={(v) => v.toFixed(2)}
+                  label={{ value: 'Price', angle: 90, position: 'insideRight', fill: '#F59E0B', fontSize: 9 }}
+                />
+                <Tooltip
+                  content={({ payload }) => {
+                    if (!payload || !payload[0]) return null;
+                    const d = payload[0].payload;
+                    return (
+                      <div className="bg-gray-800 border border-gray-600 rounded p-2 text-xs">
+                        <p className="text-red-400">DOWN Shares: {d.down_shares?.toFixed(0)}</p>
+                        <p className="text-yellow-400">DOWN Price: ${d.down_price?.toFixed(4)}</p>
+                      </div>
+                    );
+                  }}
+                />
+                <Area
+                  yAxisId="shares"
+                  type="monotone"
+                  dataKey="down_shares"
+                  stroke="#EF4444"
+                  fill="#EF4444"
+                  fillOpacity={0.3}
+                />
+                <Line
+                  yAxisId="price"
+                  type="monotone"
+                  dataKey="down_price"
+                  stroke="#F59E0B"
+                  strokeWidth={2}
+                  dot={false}
+                  connectNulls
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+            <div className="flex justify-center gap-6 mt-2 text-xs text-gray-200">
+              <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-500/50"></span> DOWN Position</span>
+              <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-yellow-500"></span> DOWN Price</span>
+            </div>
+          </div>
+
+          {/* Timing Analysis Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className={`rounded-lg p-3 text-center ${data.price_correlation.pct_sold_above_avg_up >= 50 ? 'bg-green-900/30 border border-green-700' : 'bg-gray-800'}`}>
+              <p className="text-xs text-gray-400">"Sold the Top" UP</p>
+              <p className={`text-xl font-bold ${data.price_correlation.pct_sold_above_avg_up >= 50 ? 'text-green-400' : 'text-gray-400'}`}>
+                {data.price_correlation.pct_sold_above_avg_up.toFixed(0)}%
+              </p>
+              <p className="text-xs text-gray-500">sold above avg</p>
+            </div>
+            <div className={`rounded-lg p-3 text-center ${data.price_correlation.pct_sold_above_avg_down >= 50 ? 'bg-green-900/30 border border-green-700' : 'bg-gray-800'}`}>
+              <p className="text-xs text-gray-400">"Sold the Top" DOWN</p>
+              <p className={`text-xl font-bold ${data.price_correlation.pct_sold_above_avg_down >= 50 ? 'text-green-400' : 'text-gray-400'}`}>
+                {data.price_correlation.pct_sold_above_avg_down.toFixed(0)}%
+              </p>
+              <p className="text-xs text-gray-500">sold above avg</p>
+            </div>
+            <div className="bg-gray-800 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-400">Avg UP Price</p>
+              <p className="text-xl font-bold text-green-400">${data.price_correlation.avg_up_price.toFixed(4)}</p>
+              <p className="text-xs text-gray-500">market avg</p>
+            </div>
+            <div className="bg-gray-800 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-400">Avg DOWN Price</p>
+              <p className="text-xl font-bold text-red-400">${data.price_correlation.avg_down_price.toFixed(4)}</p>
+              <p className="text-xs text-gray-500">market avg</p>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Hedge Ratio Evolution */}
       <div className="bg-gray-900 rounded-lg p-4">
         <h3 className="text-sm font-medium text-gray-300 mb-4">Hedge Ratio Evolution</h3>
