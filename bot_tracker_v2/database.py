@@ -558,3 +558,489 @@ class Database:
             if backup_file.stat().st_mtime < cutoff:
                 backup_file.unlink()
                 log.info(f"Old backup removed: {backup_file}")
+
+    # =========================================================================
+    # ANALYTICS
+    # =========================================================================
+
+    def get_analytics_summary(self, wallet: Optional[str] = None) -> Dict:
+        """Get aggregated analytics summary for resolved markets."""
+        wallet_filter = "AND t.wallet = ?" if wallet else ""
+        params = (wallet.lower(),) if wallet else ()
+
+        with self._get_conn() as conn:
+            # Get per-market P&L for resolved markets
+            rows = conn.execute(f"""
+                SELECT
+                    t.market_slug,
+                    m.winning_outcome,
+                    m.end_time,
+                    SUM(CASE WHEN t.outcome = 'Up' AND t.side = 'BUY' THEN t.shares ELSE 0 END) -
+                    SUM(CASE WHEN t.outcome = 'Up' AND t.side = 'SELL' THEN t.shares ELSE 0 END) as up_net,
+                    SUM(CASE WHEN t.outcome = 'Down' AND t.side = 'BUY' THEN t.shares ELSE 0 END) -
+                    SUM(CASE WHEN t.outcome = 'Down' AND t.side = 'SELL' THEN t.shares ELSE 0 END) as down_net,
+                    SUM(CASE WHEN t.side = 'BUY' THEN t.usdc ELSE 0 END) as total_cost,
+                    SUM(CASE WHEN t.side = 'SELL' THEN t.usdc ELSE 0 END) as total_revenue,
+                    SUM(t.usdc) as total_volume,
+                    COUNT(*) as trades,
+                    SUM(CASE WHEN t.role = 'maker' THEN 1 ELSE 0 END) as maker_trades
+                FROM trades t
+                JOIN markets m ON t.market_slug = m.slug
+                WHERE m.resolved = 1 AND m.winning_outcome IS NOT NULL
+                {wallet_filter}
+                GROUP BY t.market_slug
+            """, params).fetchall()
+
+        if not rows:
+            return {
+                "total_pnl": 0, "win_rate": 0, "total_markets": 0,
+                "winning_markets": 0, "losing_markets": 0, "total_volume": 0,
+                "effective_edge": 0, "profit_factor": 0, "avg_win": 0, "avg_loss": 0,
+                "avg_maker_ratio": 0, "btc_pnl": 0, "eth_pnl": 0, "btc_markets": 0, "eth_markets": 0
+            }
+
+        total_pnl = 0
+        total_volume = 0
+        gross_profit = 0
+        gross_loss = 0
+        wins = []
+        losses = []
+        btc_pnl = 0
+        eth_pnl = 0
+        btc_markets = 0
+        eth_markets = 0
+        maker_ratios = []
+
+        for row in rows:
+            r = dict(row)
+            up_net = r["up_net"] or 0
+            down_net = r["down_net"] or 0
+            winner = r["winning_outcome"].lower() if r["winning_outcome"] else None
+            cost = r["total_cost"] or 0
+            revenue = r["total_revenue"] or 0
+            volume = r["total_volume"] or 0
+            trades = r["trades"] or 0
+            maker = r["maker_trades"] or 0
+
+            # Calculate payout based on winner
+            if winner == "up":
+                payout = up_net  # $1 per UP share
+            elif winner == "down":
+                payout = down_net  # $1 per DOWN share
+            else:
+                payout = 0
+
+            pnl = payout + revenue - cost
+            total_pnl += pnl
+            total_volume += volume
+
+            if pnl > 0:
+                gross_profit += pnl
+                wins.append(pnl)
+            else:
+                gross_loss += abs(pnl)
+                losses.append(pnl)
+
+            # Asset breakdown
+            slug = r["market_slug"]
+            if "btc" in slug.lower():
+                btc_pnl += pnl
+                btc_markets += 1
+            elif "eth" in slug.lower():
+                eth_pnl += pnl
+                eth_markets += 1
+
+            if trades > 0:
+                maker_ratios.append(maker / trades)
+
+        total_markets = len(rows)
+        winning_markets = len(wins)
+        losing_markets = len(losses)
+        win_rate = winning_markets / total_markets if total_markets > 0 else 0
+        effective_edge = (total_pnl / total_volume * 100) if total_volume > 0 else 0
+        profit_factor = gross_profit / gross_loss if gross_loss > 0 else float('inf') if gross_profit > 0 else 0
+        avg_win = sum(wins) / len(wins) if wins else 0
+        avg_loss = sum(losses) / len(losses) if losses else 0
+        avg_maker_ratio = sum(maker_ratios) / len(maker_ratios) if maker_ratios else 0
+
+        return {
+            "total_pnl": round(total_pnl, 2),
+            "win_rate": round(win_rate * 100, 1),
+            "total_markets": total_markets,
+            "winning_markets": winning_markets,
+            "losing_markets": losing_markets,
+            "total_volume": round(total_volume, 2),
+            "effective_edge": round(effective_edge, 3),
+            "profit_factor": round(profit_factor, 2) if profit_factor != float('inf') else 999,
+            "avg_win": round(avg_win, 2),
+            "avg_loss": round(avg_loss, 2),
+            "avg_maker_ratio": round(avg_maker_ratio * 100, 1),
+            "btc_pnl": round(btc_pnl, 2),
+            "eth_pnl": round(eth_pnl, 2),
+            "btc_markets": btc_markets,
+            "eth_markets": eth_markets
+        }
+
+    def get_markets_analytics(self, wallet: Optional[str] = None, asset: Optional[str] = None) -> List[Dict]:
+        """Get per-market analytics for resolved markets."""
+        wallet_filter = "AND t.wallet = ?" if wallet else ""
+        asset_filter = ""
+        params = []
+
+        if wallet:
+            params.append(wallet.lower())
+        if asset:
+            asset_filter = f"AND LOWER(t.market_slug) LIKE ?"
+            params.append(f"%{asset.lower()}%")
+
+        with self._get_conn() as conn:
+            rows = conn.execute(f"""
+                SELECT
+                    t.market_slug,
+                    m.question,
+                    m.winning_outcome,
+                    m.end_time,
+                    SUM(CASE WHEN t.outcome = 'Up' AND t.side = 'BUY' THEN t.shares ELSE 0 END) -
+                    SUM(CASE WHEN t.outcome = 'Up' AND t.side = 'SELL' THEN t.shares ELSE 0 END) as up_net,
+                    SUM(CASE WHEN t.outcome = 'Down' AND t.side = 'BUY' THEN t.shares ELSE 0 END) -
+                    SUM(CASE WHEN t.outcome = 'Down' AND t.side = 'SELL' THEN t.shares ELSE 0 END) as down_net,
+                    SUM(CASE WHEN t.side = 'BUY' THEN t.usdc ELSE 0 END) as total_cost,
+                    SUM(CASE WHEN t.side = 'SELL' THEN t.usdc ELSE 0 END) as total_revenue,
+                    SUM(t.usdc) as total_volume,
+                    COUNT(*) as trades,
+                    SUM(CASE WHEN t.role = 'maker' THEN 1 ELSE 0 END) as maker_trades,
+                    SUM(CASE WHEN t.outcome = 'Up' AND t.side = 'BUY' THEN t.usdc ELSE 0 END) as up_cost,
+                    SUM(CASE WHEN t.outcome = 'Down' AND t.side = 'BUY' THEN t.usdc ELSE 0 END) as down_cost,
+                    SUM(CASE WHEN t.outcome = 'Up' AND t.side = 'BUY' THEN t.shares ELSE 0 END) as up_bought,
+                    SUM(CASE WHEN t.outcome = 'Down' AND t.side = 'BUY' THEN t.shares ELSE 0 END) as down_bought
+                FROM trades t
+                JOIN markets m ON t.market_slug = m.slug
+                WHERE m.resolved = 1 AND m.winning_outcome IS NOT NULL
+                {wallet_filter}
+                {asset_filter}
+                GROUP BY t.market_slug
+                ORDER BY m.end_time DESC
+            """, tuple(params)).fetchall()
+
+        markets = []
+        for row in rows:
+            r = dict(row)
+            up_net = r["up_net"] or 0
+            down_net = r["down_net"] or 0
+            winner = r["winning_outcome"].lower() if r["winning_outcome"] else None
+            cost = r["total_cost"] or 0
+            revenue = r["total_revenue"] or 0
+            volume = r["total_volume"] or 0
+            trades = r["trades"] or 0
+            maker = r["maker_trades"] or 0
+            up_cost = r["up_cost"] or 0
+            down_cost = r["down_cost"] or 0
+            up_bought = r["up_bought"] or 0
+            down_bought = r["down_bought"] or 0
+            slug = r["market_slug"]
+
+            # Calculate payout based on winner
+            if winner == "up":
+                payout = up_net
+            elif winner == "down":
+                payout = down_net
+            else:
+                payout = 0
+
+            pnl = payout + revenue - cost
+
+            # Hedge ratio
+            if up_net > 0 and down_net > 0:
+                hedge_ratio = min(up_net, down_net) / max(up_net, down_net)
+            elif up_net > 0 or down_net > 0:
+                hedge_ratio = 0
+            else:
+                hedge_ratio = 1.0
+
+            # Net bias
+            if up_net > down_net + 100:
+                net_bias = "UP"
+            elif down_net > up_net + 100:
+                net_bias = "DOWN"
+            else:
+                net_bias = "BALANCED"
+
+            # Correct bias - did they have more of the winning side?
+            if winner == "up":
+                correct_bias = up_net >= down_net
+            elif winner == "down":
+                correct_bias = down_net >= up_net
+            else:
+                correct_bias = None
+
+            # Average prices and edge
+            avg_up_price = up_cost / up_bought if up_bought > 0 else 0
+            avg_down_price = down_cost / down_bought if down_bought > 0 else 0
+            combined_price = avg_up_price + avg_down_price if up_bought > 0 and down_bought > 0 else 0
+            edge = (1.0 - combined_price) * 100 if combined_price > 0 else 0
+
+            # Asset type
+            asset_type = "BTC" if "btc" in slug.lower() else "ETH" if "eth" in slug.lower() else "OTHER"
+
+            markets.append({
+                "slug": slug,
+                "asset": asset_type,
+                "question": r["question"] or "",
+                "winner": winner,
+                "end_time": datetime.utcfromtimestamp(r["end_time"]).isoformat() + "Z" if r["end_time"] else None,
+                "pnl": round(pnl, 2),
+                "trades": trades,
+                "volume": round(volume, 2),
+                "maker_ratio": round(maker / trades * 100, 1) if trades > 0 else 0,
+                "hedge_ratio": round(hedge_ratio * 100, 1),
+                "edge": round(edge, 2),
+                "up_net": round(up_net, 2),
+                "down_net": round(down_net, 2),
+                "net_bias": net_bias,
+                "correct_bias": correct_bias,
+                "avg_up_price": round(avg_up_price, 4),
+                "avg_down_price": round(avg_down_price, 4),
+                "combined_price": round(combined_price, 4)
+            })
+
+        return markets
+
+    def get_pnl_over_time(self, wallet: Optional[str] = None) -> List[Dict]:
+        """Get cumulative P&L by market end time for resolved markets."""
+        markets = self.get_markets_analytics(wallet)
+
+        # Sort by end_time
+        markets.sort(key=lambda x: x["end_time"] or "")
+
+        cumulative_pnl = 0
+        timeline = []
+
+        for m in markets:
+            cumulative_pnl += m["pnl"]
+            timeline.append({
+                "timestamp": m["end_time"],
+                "market_slug": m["slug"],
+                "asset": m["asset"],
+                "winner": m["winner"],
+                "pnl": m["pnl"],
+                "cumulative_pnl": round(cumulative_pnl, 2)
+            })
+
+        return timeline
+
+    def get_market_trades_timeline(self, market_slug: str) -> List[Dict]:
+        """Get trades for a market with running position totals."""
+        with self._get_conn() as conn:
+            rows = conn.execute("""
+                SELECT
+                    t.*,
+                    m.winning_outcome
+                FROM trades t
+                LEFT JOIN markets m ON t.market_slug = m.slug
+                WHERE t.market_slug = ?
+                ORDER BY t.timestamp ASC
+            """, (market_slug,)).fetchall()
+
+        trades = []
+        cumulative_up = 0
+        cumulative_down = 0
+        cumulative_cost = 0
+        cumulative_revenue = 0
+
+        for row in rows:
+            r = dict(row)
+
+            # Update running totals
+            if r["side"] == "BUY":
+                if r["outcome"] == "Up":
+                    cumulative_up += r["shares"]
+                else:
+                    cumulative_down += r["shares"]
+                cumulative_cost += r["usdc"]
+            else:  # SELL
+                if r["outcome"] == "Up":
+                    cumulative_up -= r["shares"]
+                else:
+                    cumulative_down -= r["shares"]
+                cumulative_revenue += r["usdc"]
+
+            trades.append({
+                "id": r["id"],
+                "timestamp": r["timestamp"],
+                "timestamp_iso": datetime.utcfromtimestamp(r["timestamp"]).isoformat() + "Z",
+                "side": r["side"],
+                "outcome": r["outcome"],
+                "role": r["role"],
+                "shares": r["shares"],
+                "price": r["price"],
+                "usdc": r["usdc"],
+                "cumulative_up": round(cumulative_up, 2),
+                "cumulative_down": round(cumulative_down, 2),
+                "net_position": round(cumulative_up - cumulative_down, 2),
+                "cumulative_cost": round(cumulative_cost, 2),
+                "cumulative_revenue": round(cumulative_revenue, 2)
+            })
+
+        return trades
+
+    def get_price_execution_analysis(self, wallet: Optional[str] = None) -> Dict:
+        """Analyze trade execution prices vs market prices."""
+        wallet_filter = "AND t.wallet = ?" if wallet else ""
+        params = (wallet.lower(),) if wallet else ()
+
+        with self._get_conn() as conn:
+            # Get all trades with their prices and try to match with price snapshots
+            trades_rows = conn.execute(f"""
+                SELECT
+                    t.id,
+                    t.timestamp,
+                    t.market_slug,
+                    t.outcome,
+                    t.side,
+                    t.role,
+                    t.price,
+                    t.shares,
+                    t.usdc
+                FROM trades t
+                WHERE 1=1
+                {wallet_filter}
+                ORDER BY t.timestamp
+            """, params).fetchall()
+
+            # Get all price snapshots for comparison
+            prices_rows = conn.execute("""
+                SELECT
+                    timestamp,
+                    market_slug,
+                    outcome,
+                    price as market_price,
+                    best_bid,
+                    best_ask
+                FROM prices
+                ORDER BY timestamp
+            """).fetchall()
+
+        if not trades_rows:
+            return {
+                "total_trades": 0,
+                "trades_with_price_data": 0,
+                "avg_spread_captured": 0,
+                "pct_at_bid": 0,
+                "pct_at_ask": 0,
+                "pct_between": 0,
+                "avg_combined_cost": 0,
+                "combined_cost_distribution": [],
+                "maker_savings": 0,
+                "order_placement_analysis": []
+            }
+
+        # Build price index for quick lookup
+        price_index = {}
+        for row in prices_rows:
+            r = dict(row)
+            key = (r["market_slug"], r["outcome"])
+            if key not in price_index:
+                price_index[key] = []
+            price_index[key].append({
+                "timestamp": r["timestamp"],
+                "market_price": r["market_price"],
+                "best_bid": r["best_bid"],
+                "best_ask": r["best_ask"]
+            })
+
+        # Analyze each trade
+        total_trades = len(trades_rows)
+        trades_with_price = 0
+        at_bid = 0
+        at_ask = 0
+        between = 0
+        spread_captured_sum = 0
+
+        # Track combined costs per market for distribution
+        market_costs = {}  # market_slug -> {up_cost, down_cost, up_shares, down_shares}
+
+        for trade_row in trades_rows:
+            t = dict(trade_row)
+            key = (t["market_slug"], t["outcome"])
+
+            # Find closest price snapshot
+            if key in price_index:
+                price_snapshots = price_index[key]
+                closest = min(price_snapshots, key=lambda p: abs(p["timestamp"] - t["timestamp"]))
+
+                # Only use if within 60 seconds
+                if abs(closest["timestamp"] - t["timestamp"]) <= 60:
+                    trades_with_price += 1
+                    trade_price = t["price"]
+                    best_bid = closest["best_bid"]
+                    best_ask = closest["best_ask"]
+
+                    if t["side"] == "BUY":
+                        # For BUY: closer to bid is better (buying lower)
+                        if trade_price <= best_bid * 1.01:  # Within 1% of bid
+                            at_bid += 1
+                            spread_captured_sum += (best_ask - trade_price)
+                        elif trade_price >= best_ask * 0.99:  # Within 1% of ask
+                            at_ask += 1
+                        else:
+                            between += 1
+                            spread_captured_sum += (best_ask - trade_price)
+
+            # Track market costs
+            if t["side"] == "BUY":
+                if t["market_slug"] not in market_costs:
+                    market_costs[t["market_slug"]] = {
+                        "up_cost": 0, "down_cost": 0, "up_shares": 0, "down_shares": 0
+                    }
+                mc = market_costs[t["market_slug"]]
+                if t["outcome"] == "Up":
+                    mc["up_cost"] += t["usdc"]
+                    mc["up_shares"] += t["shares"]
+                else:
+                    mc["down_cost"] += t["usdc"]
+                    mc["down_shares"] += t["shares"]
+
+        # Calculate combined cost distribution
+        combined_costs = []
+        for slug, mc in market_costs.items():
+            if mc["up_shares"] > 0 and mc["down_shares"] > 0:
+                avg_up = mc["up_cost"] / mc["up_shares"]
+                avg_down = mc["down_cost"] / mc["down_shares"]
+                combined = avg_up + avg_down
+                combined_costs.append({
+                    "market_slug": slug,
+                    "combined_cost": combined,
+                    "avg_up": avg_up,
+                    "avg_down": avg_down
+                })
+
+        # Create distribution buckets
+        buckets = {}
+        for cc in combined_costs:
+            bucket = round(cc["combined_cost"], 2)
+            bucket_str = f"${bucket:.2f}"
+            if bucket_str not in buckets:
+                buckets[bucket_str] = 0
+            buckets[bucket_str] += 1
+
+        # Sort buckets
+        distribution = [{"bucket": k, "count": v} for k, v in sorted(buckets.items())]
+
+        # Calculate averages
+        avg_spread = spread_captured_sum / trades_with_price if trades_with_price > 0 else 0
+        avg_combined = sum(cc["combined_cost"] for cc in combined_costs) / len(combined_costs) if combined_costs else 0
+        pct_below_dollar = len([cc for cc in combined_costs if cc["combined_cost"] < 1.0]) / len(combined_costs) * 100 if combined_costs else 0
+
+        return {
+            "total_trades": total_trades,
+            "trades_with_price_data": trades_with_price,
+            "avg_spread_captured": round(avg_spread, 4),
+            "pct_at_bid": round(at_bid / trades_with_price * 100, 1) if trades_with_price > 0 else 0,
+            "pct_at_ask": round(at_ask / trades_with_price * 100, 1) if trades_with_price > 0 else 0,
+            "pct_between": round(between / trades_with_price * 100, 1) if trades_with_price > 0 else 0,
+            "avg_combined_cost": round(avg_combined, 4),
+            "pct_below_dollar": round(pct_below_dollar, 1),
+            "combined_cost_distribution": distribution,
+            "markets_analyzed": len(combined_costs),
+            "order_placement_analysis": combined_costs[:20]  # Top 20 for reference
+        }

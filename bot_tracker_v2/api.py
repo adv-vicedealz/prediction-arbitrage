@@ -311,6 +311,60 @@ def update_wallet(wallet: WalletUpdate):
 
 
 # =============================================================================
+# ANALYTICS ENDPOINTS
+# =============================================================================
+
+@app.get("/api/analytics/summary")
+def get_analytics_summary(wallet: Optional[str] = None):
+    """Get aggregated analytics summary for resolved markets."""
+    if not db:
+        return {
+            "total_pnl": 0, "win_rate": 0, "total_markets": 0,
+            "winning_markets": 0, "losing_markets": 0, "total_volume": 0,
+            "effective_edge": 0, "profit_factor": 0, "avg_win": 0, "avg_loss": 0,
+            "avg_maker_ratio": 0, "btc_pnl": 0, "eth_pnl": 0, "btc_markets": 0, "eth_markets": 0
+        }
+    return db.get_analytics_summary(wallet)
+
+
+@app.get("/api/analytics/markets")
+def get_markets_analytics(wallet: Optional[str] = None, asset: Optional[str] = None):
+    """Get per-market analytics for resolved markets."""
+    if not db:
+        return []
+    return db.get_markets_analytics(wallet, asset)
+
+
+@app.get("/api/analytics/pnl-timeline")
+def get_pnl_timeline(wallet: Optional[str] = None):
+    """Get cumulative P&L by market end time."""
+    if not db:
+        return []
+    return db.get_pnl_over_time(wallet)
+
+
+@app.get("/api/analytics/market/{slug:path}/trades")
+def get_market_trades(slug: str):
+    """Get trades for a specific market with running position totals."""
+    if not db:
+        return []
+    return db.get_market_trades_timeline(slug)
+
+
+@app.get("/api/analytics/price-execution")
+def get_price_execution(wallet: Optional[str] = None):
+    """Analyze trade execution prices vs market prices."""
+    if not db:
+        return {
+            "total_trades": 0, "trades_with_price_data": 0,
+            "avg_spread_captured": 0, "pct_at_bid": 0, "pct_at_ask": 0,
+            "pct_between": 0, "avg_combined_cost": 0, "pct_below_dollar": 0,
+            "combined_cost_distribution": [], "markets_analyzed": 0, "order_placement_analysis": []
+        }
+    return db.get_price_execution_analysis(wallet)
+
+
+# =============================================================================
 # DEBUG/ADMIN ENDPOINTS
 # =============================================================================
 

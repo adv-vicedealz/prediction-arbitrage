@@ -149,3 +149,76 @@ export interface PricePoint {
   best_ask: number;
   session_id?: string;
 }
+
+// Analytics Types
+export interface AnalyticsSummary {
+  total_pnl: number;
+  win_rate: number;
+  total_markets: number;
+  winning_markets: number;
+  losing_markets: number;
+  total_volume: number;
+  effective_edge: number;
+  profit_factor: number;
+  avg_win: number;
+  avg_loss: number;
+  avg_maker_ratio: number;
+  btc_pnl: number;
+  eth_pnl: number;
+  btc_markets: number;
+  eth_markets: number;
+}
+
+export interface MarketAnalytics {
+  slug: string;
+  asset: 'BTC' | 'ETH' | 'OTHER';
+  question: string;
+  winner: 'up' | 'down' | null;
+  end_time: string | null;
+  pnl: number;
+  trades: number;
+  volume: number;
+  maker_ratio: number;
+  hedge_ratio: number;
+  edge: number;
+  up_net: number;
+  down_net: number;
+  net_bias: 'UP' | 'DOWN' | 'BALANCED';
+  correct_bias: boolean | null;
+  avg_up_price: number;
+  avg_down_price: number;
+  combined_price: number;
+}
+
+export interface PnLTimelinePoint {
+  timestamp: string | null;
+  market_slug: string;
+  asset: string;
+  winner: string | null;
+  pnl: number;
+  cumulative_pnl: number;
+}
+
+export interface MarketTradeTimeline {
+  id: string;
+  timestamp: number;
+  timestamp_iso: string;
+  side: 'BUY' | 'SELL';
+  outcome: 'Up' | 'Down';
+  role: 'maker' | 'taker';
+  shares: number;
+  price: number;
+  usdc: number;
+  cumulative_up: number;
+  cumulative_down: number;
+  net_position: number;
+  cumulative_cost: number;
+  cumulative_revenue: number;
+}
+
+export interface AnalyticsState {
+  summary: AnalyticsSummary | null;
+  markets: MarketAnalytics[];
+  pnlTimeline: PnLTimelinePoint[];
+  isLoading: boolean;
+}
